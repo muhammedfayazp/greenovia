@@ -1,0 +1,140 @@
+<header class="main-header">
+  <div class="container main-header__wrapper">
+    <div class="main-header__logo">
+      <a href="{{ routes.root_url }}">
+        {%- if settings.logo != blank -%}
+          {{ settings.logo | image_url: width: 200 | image_tag: class: 'header__logo-img', preload: true }}
+        {%- else -%}
+          <span class="h3">{{ shop.name }}</span>
+        {%- endif -%}
+      </a>
+    </div>
+
+    <nav class="main-header__nav desktop-only">
+      <ul class="main-header__menu">
+        {%- for link in linklists.main-menu.links -%}
+          <li>
+            <a href="{{ link.url }}" class="main-header__link {% if link.active %}is-active{% endif %}">
+              {{ link.title }}
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+
+    <div class="main-header__actions">
+      <div class="main-header__search-wrapper desktop-only">
+        <form action="{{ routes.search_url }}" method="get" role="search" class="main-header__search">
+          <input type="text" name="q" placeholder="Search plants..." aria-label="Search">
+          <button type="submit" aria-label="Search">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          </button>
+        </form>
+      </div>
+
+      <a href="{{ routes.account_url }}" class="main-header__icon desktop-only" aria-label="Account">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </a>
+
+      <a href="{{ routes.cart_url }}" class="main-header__icon main-header__cart" aria-label="Cart">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span class="cart-count-bubble">{{ cart.item_count }}</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<style>
+.main-header {
+  height: var(--nav-height);
+  background: white;
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.main-header__wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.main-header__menu {
+  display: flex;
+  list-style: none;
+  gap: 2rem;
+  margin: 0;
+  padding: 0;
+}
+
+.main-header__link {
+  font-weight: 500;
+  color: var(--color-text-light);
+}
+
+.main-header__link:hover, .main-header__link.is-active {
+  color: var(--color-primary);
+}
+
+.main-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.main-header__search {
+  position: relative;
+  width: 240px;
+}
+
+.main-header__search input {
+  padding: 0.5rem 2.5rem 0.5rem 1rem;
+  font-size: 0.9rem;
+  border-radius: 20px;
+}
+
+.main-header__search button {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--color-text-light);
+  cursor: pointer;
+}
+
+.main-header__icon {
+  color: var(--color-text-light);
+  position: relative;
+}
+
+.main-header__icon:hover {
+  color: var(--color-primary);
+}
+
+.desktop-only {
+  display: none;
+}
+
+@media screen and (min-width: 769px) {
+  .desktop-only {
+    display: block;
+  }
+}
+</style>
+
+{% schema %}
+{
+  "name": "Header",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,152 @@
+<section class="hero hover-lift">
+  <div class="hero__bg">
+    {%- if section.settings.image != blank -%}
+      {{ section.settings.image | image_url: width: 2000 | image_tag: class: 'hero__image', loading: 'lazy' }}
+    {%- else -%}
+      <div class="hero__placeholder"></div>
+    {%- endif -%}
+  </div>
+  
+  <div class="hero__overlay"></div>
+
+  <div class="container hero__content">
+    <h1 class="hero__title h1">{{ section.settings.title | default: 'Grow Your Own Paradise' }}</h1>
+    <p class="hero__subtitle">{{ section.settings.subtitle | default: 'Find the perfect plants for your home and garden. Professional landscaping services available.' }}</p>
+    <div class="hero__actions">
+      <a href="{{ section.settings.button_link | default: routes.all_products_collection_url }}" class="button">
+        {{ section.settings.button_label | default: 'Shop Now' }}
+      </a>
+      {%- if section.settings.secondary_button_link != blank -%}
+        <a href="{{ section.settings.secondary_button_link }}" class="button button--secondary">
+          {{ section.settings.secondary_button_label }}
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+<style>
+.hero {
+  position: relative;
+  height: 600px;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+@media screen and (max-width: 768px) {
+  .hero {
+    height: 450px;
+  }
+}
+
+.hero__bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.hero__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero__placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #2d6a4f 0%, #1b4332 100%);
+}
+
+.hero__overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 2;
+}
+
+.hero__content {
+  position: relative;
+  z-index: 3;
+  color: white;
+  text-align: center;
+  max-width: 800px;
+}
+
+.hero__title {
+  color: white;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.hero__subtitle {
+  font-size: 1.25rem;
+  margin-bottom: 2.5rem;
+  opacity: 0.9;
+}
+
+.hero__actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.button--secondary {
+  background-color: transparent;
+  border: 2px solid white;
+}
+
+.button--secondary:hover {
+  background-color: white;
+  color: var(--color-primary);
+}
+</style>
+
+{% schema %}
+{
+  "name": "Hero Banner",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Hero Image"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Headline",
+      "default": "Grow Your Own Paradise"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Find the perfect plants for your home and garden."
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button Label",
+      "default": "Shop Now"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero Banner"
+    }
+  ]
+}
+{% endschema %}
