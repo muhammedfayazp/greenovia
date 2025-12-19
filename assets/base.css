@@ -1,114 +1,41 @@
-/* Base Styles */
-*, *::before, *::after {
-  box-sizing: border-box;
-}
-
-html {
-  font-size: 16px;
-  scroll-behavior: smooth;
-}
-
-body {
-  line-height: 1.5;
-}
-
-img {
-  max-width: 100%;
-  height: auto;
-  display: block;
-}
-
-a {
-  text-decoration: none;
-  color: inherit;
-  transition: color 0.3s ease;
-}
-
+/* Shopify Base Styles */
 .visually-hidden {
   position: absolute !important;
   overflow: hidden;
-  clip: rect(0 0 0 0);
-  height: 1px;
   width: 1px;
+  height: 1px;
   margin: -1px;
   padding: 0;
   border: 0;
+  clip: rect(0 0 0 0);
+  word-wrap: normal !important;
 }
 
-/* Typography */
-.h1, .h2, .h3, .h4 {
-  margin: 0 0 1rem 0;
-  line-height: 1.2;
+.skip-to-content-link {
+  position: absolute;
+  z-index: 9999;
+  left: -9999px;
 }
 
-.h1 { font-size: 2.5rem; }
-.h2 { font-size: 2rem; }
-.h3 { font-size: 1.5rem; }
-
-@media screen and (max-width: 768px) {
-  .h1 { font-size: 2rem; }
-  .h2 { font-size: 1.75rem; }
-  .h3 { font-size: 1.25rem; }
+.skip-to-content-link:focus {
+  left: 50%;
+  transform: translateX(-50%);
+  top: 20px;
 }
 
-/* Form Styles */
-input, select, textarea {
-  font-family: inherit;
-  font-size: 1rem;
-  padding: 0.75rem;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  width: 100%;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+/* Focus styles */
+*:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.1);
+button:focus,
+a:focus {
+  outline: 2px solid var(--color-primary);
 }
 
-/* Button Styles */
-.button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.75rem 1.5rem;
-  background-color: var(--color-primary);
-  color: white;
-  border: none;
-  border-radius: 50px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: transform 0.2s ease, background-color 0.2s ease;
-}
-
-.button:hover {
-  background-color: var(--color-secondary);
-  transform: translateY(-1px);
-}
-
-.button:active {
-  transform: translateY(0);
-}
-
-/* Grid & Layout */
-.section-padding {
-  padding: 4rem 0;
-}
-
-@media screen and (max-width: 768px) {
-  .section-padding {
-    padding: 2.5rem 0;
-  }
-}
-
-/* Interactive Elements */
-.hover-lift {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.hover-lift:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-lg);
+/* Loading state */
+.loading {
+  opacity: 0.5;
+  pointer-events: none;
 }

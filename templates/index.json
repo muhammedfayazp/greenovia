@@ -1,0 +1,33 @@
+{
+  "sections": {
+    "hero": {
+      "type": "hero-slider",
+      "settings": {}
+    },
+    "categories": {
+      "type": "category-grid",
+      "settings": {
+        "title": "Shop by Category"
+      }
+    },
+    "featured-products": {
+      "type": "featured-collection",
+      "settings": {
+        "title": "Featured Plants",
+        "collection": "featured-products"
+      }
+    },
+    "trust-badges": {
+      "type": "trust-section",
+      "settings": {
+        "title": "Why Choose Greenovia"
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "categories",
+    "featured-products",
+    "trust-badges"
+  ]
+}

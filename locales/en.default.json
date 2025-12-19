@@ -1,0 +1,27 @@
+{
+  "general": {
+    "search": {
+      "placeholder": "Search plants...",
+      "submit": "Search"
+    },
+    "404": {
+      "title": "Page not found",
+      "subtext": "The page you requested does not exist."
+    }
+  },
+  "products": {
+    "product": {
+      "add_to_cart": "Add to Cart",
+      "sold_out": "Sold Out",
+      "unavailable": "Unavailable"
+    }
+  },
+  "cart": {
+    "general": {
+      "title": "Your Cart",
+      "remove": "Remove",
+      "subtotal": "Subtotal",
+      "checkout": "Checkout"
+    }
+  }
+}

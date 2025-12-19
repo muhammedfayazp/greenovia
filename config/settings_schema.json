@@ -1,48 +1,16 @@
 [
   {
-    "name": "Theme Settings",
+    "name": "theme_info",
+    "theme_name": "Greenovia",
+    "theme_version": "1.0.0",
+    "theme_author": "Greenovia Team"
+  },
+  {
+    "name": "Colors",
     "settings": [
-      {
-        "type": "header",
-        "content": "Branding"
-      },
-      {
-        "type": "image_picker",
-        "id": "favicon",
-        "label": "Favicon"
-      },
-      {
-        "type": "header",
-        "content": "Typography"
-      },
-      {
-        "type": "font_picker",
-        "id": "type_body_font",
-        "label": "Body font",
-        "default": "assistant_n4"
-      },
-      {
-        "type": "font_picker",
-        "id": "type_header_font",
-        "label": "Heading font",
-        "default": "assistant_n4"
-      },
-      {
-        "type": "header",
-        "content": "Colors"
-      },
-      {
-        "type": "color",
-        "id": "colors_primary",
-        "label": "Primary Color",
-        "default": "#2d6a4f"
-      },
-      {
-        "type": "color",
-        "id": "colors_background",
-        "label": "Background Color",
-        "default": "#ffffff"
-      }
+      {"type": "color", "id": "color_primary", "label": "Primary", "default": "#2D5016"},
+      {"type": "color", "id": "color_secondary", "label": "Secondary", "default": "#5A7C3E"},
+      {"type": "color", "id": "color_accent", "label": "Accent", "default": "#D97D54"}
     ]
   }
 ]
