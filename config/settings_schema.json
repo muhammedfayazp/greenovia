@@ -1,16 +1,1 @@
-[
-  {
-    "name": "theme_info",
-    "theme_name": "Greenovia",
-    "theme_version": "1.0.0",
-    "theme_author": "Greenovia Team"
-  },
-  {
-    "name": "Colors",
-    "settings": [
-      {"type": "color", "id": "color_primary", "label": "Primary", "default": "#2D5016"},
-      {"type": "color", "id": "color_secondary", "label": "Secondary", "default": "#5A7C3E"},
-      {"type": "color", "id": "color_accent", "label": "Accent", "default": "#D97D54"}
-    ]
-  }
-]
+[]
