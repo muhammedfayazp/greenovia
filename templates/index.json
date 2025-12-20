@@ -63,6 +63,7 @@
     },
     "hero_plant_WdReax": {
       "type": "hero-plant",
+      "disabled": true,
       "name": "Hero Plant Exact",
       "settings": {
         "plant_image": "shopify://shop_images/GoldenPhothos01.jpg",
@@ -92,6 +93,7 @@
         "slide_tpxDcE",
         "slide_dNbicj"
       ],
+      "disabled": true,
       "name": "Plant Landing Slider",
       "settings": {
         "heading": "Grow Beautiful Plants at Home",
@@ -353,6 +355,7 @@
       "block_order": [
         "group_6w9b3Y"
       ],
+      "disabled": true,
       "name": "t:names.hero",
       "settings": {
         "media_type_1": "image",
