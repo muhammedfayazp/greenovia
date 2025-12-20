@@ -315,3 +315,57 @@ a[href*="/cart"] svg {
 }
 
 /* ====================================================== */
+/* ======================================================
+   FINAL FIX: Align search, user & cart icons
+   ====================================================== */
+
+/* Right side container */
+.header__icons,
+.header-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 12px !important;
+}
+
+/* Normalize all icon buttons */
+.header__icon,
+.header__icon--search,
+.header__icon--account,
+.header__icon--cart,
+.header-actions__action,
+a[href*="/account"],
+a[href*="/cart"] {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 36px !important;
+  height: 36px !important;
+  line-height: 1 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 50%;
+}
+
+/* Ensure icon graphics are centered */
+.header__icon svg,
+.header__icon img,
+.header-actions__action svg,
+.header-actions__action img,
+a[href*="/account"] svg,
+a[href*="/cart"] svg {
+  width: 18px !important;
+  height: 18px !important;
+  display: block !important;
+}
+
+/* Prevent cart count/text from shifting layout */
+.header__icon .cart-count,
+.header__icon .count,
+.header__icon span:not(svg) {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+}
+
+/* ====================================================== */
