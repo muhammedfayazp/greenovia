@@ -1,6 +1,214 @@
-<div class="hero-plant-slider" id="heroPlantSlider">
+{% schema %}
+{
+  "name": "Hero Plant Slider",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "We Love helping to your Decorate home plants" },
+    { "type": "textarea", "id": "subtext", "label": "Subtext", "default": "Patch helps you discover the best plants for your space, delivers them" },
+    { "type": "text", "id": "button_text", "label": "Button text", "default": "View all items →" },
+    { "type": "url", "id": "button_link", "label": "Button link" }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Plant Slide",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Plant image" }
+      ]
+    },
+    {
+      "type": "feature",
+      "name": "Feature Item",
+      "settings": [
+        { "type": "image_picker", "id": "icon", "label": "Icon" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Light" },
+        { "type": "text", "id": "text", "label": "Description", "default": "Bright but Indirect Light" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Hero Plant Slider" }]
+}
+{% endschema %}
+
+{%- assign slide_blocks = section.blocks | where: "type", "slide" -%}
+{%- assign feature_blocks = section.blocks | where: "type", "feature" -%}
+
+<style>
+.hero-plant-slider {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Slides */
+.hero-plant-slide { display: none; }
+.hero-plant-slide.active { display: block; }
+
+/* Layout */
+.hero-plant {
+  display: flex;
+  min-height: 80vh;
+  background: #f3f7f4;
+}
+
+.hero-left {
+  flex: 1;
+  padding: 80px 60px;
+  background: #fff;
+}
+
+.hero-right {
+  flex: 1;
+  background: #eef4f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-left h1 {
+  font-size: 48px;
+  line-height: 1.2;
+  color: #1f3d1b;
+  margin-bottom: 20px;
+}
+
+.hero-left h1 span { color: #2e7d32; }
+
+.hero-left p {
+  color: #666;
+  max-width: 420px;
+}
+
+.hero-btn {
+  display: inline-block;
+  margin-top: 28px;
+  background: #1f3d1b;
+  color: #fff;
+  padding: 14px 34px;
+  border-radius: 6px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* Image */
+.hero-img img {
+  max-width: 360px;
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Features */
+.hero-features {
+  display: flex;
+  gap: 20px;
+  margin-top: 60px;
+}
+
+.hero-feature {
+  background: #fff;
+  padding: 18px 22px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+  flex: 1;
+  font-size: 14px;
+  color: #444;
+}
+
+.hero-feature strong {
+  display: block;
+  color: #1f3d1b;
+  margin-bottom: 6px;
+}
+
+.hero-feature__icon {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  margin-bottom: 8px;
+  display: block;
+}
+
+/* Dots */
+.hero-dots {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 2;
+}
+
+.hero-dot {
+  width: 10px;
+  height: 10px;
+  background: #b7cbbf;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.hero-dot.active { background: #1f3d1b; }
+
+/* Mobile */
+@media (max-width: 768px) {
+  .hero-plant { flex-direction: column; min-height: auto; }
+
+  .hero-left {
+    padding: 40px 20px;
+    text-align: center;
+  }
+
+  .hero-left h1 { font-size: 34px; }
+
+  .hero-left p { max-width: 100%; }
+
+  .hero-right { padding: 24px 0; }
+
+  .hero-img img {
+    max-width: 280px;
+    margin: 0 auto;
+  }
+
+  .hero-dots {
+    position: static;
+    transform: none;
+    flex-direction: row;
+    justify-content: center;
+    margin: 14px 0 0;
+  }
+
+  /* ✅ better mobile cards */
+  .hero-features {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-top: 26px;
+  }
+
+  .hero-feature {
+    padding: 14px 12px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    font-size: 13px;
+  }
+
+  .hero-feature strong {
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+
+  .hero-feature__icon {
+    margin: 0 auto 6px;
+    width: 22px;
+    height: 22px;
+  }
+}
+</style>
+
+<div class="hero-plant-slider" id="heroPlantSlider-{{ section.id }}" data-section-id="{{ section.id }}">
   {% for slide in slide_blocks %}
-    <div class="hero-plant-slide {% if forloop.first %}active{% endif %}">
+    <div class="hero-plant-slide {% if forloop.first %}active{% endif %}" data-slide>
       <section class="hero-plant">
         <div class="hero-left">
           <h1>{{ section.settings.heading | replace: 'plants', '<span>plants</span>' }}</h1>
@@ -10,32 +218,34 @@
             {{ section.settings.button_text }}
           </a>
 
-          <div class="hero-features">
-            {% for feature in feature_blocks %}
-              <div class="hero-feature" {{ feature.shopify_attributes }}>
-                {% if feature.settings.icon %}
-                  <img
-                    src="{{ feature.settings.icon | image_url: width: 40 }}"
-                    alt="{{ feature.settings.title }}"
-                    width="{{ feature.settings.icon.width }}"
-                    height="{{ feature.settings.icon.height }}"
-                    loading="lazy"
-                    class="hero-feature__icon"
-                  >
-                {% endif %}
-                <strong>{{ feature.settings.title }}</strong>
-                {{ feature.settings.text }}
-              </div>
-            {% endfor %}
-          </div>
+          {% if feature_blocks.size > 0 %}
+            <div class="hero-features">
+              {% for feature in feature_blocks %}
+                <div class="hero-feature" {{ feature.shopify_attributes }}>
+                  {% if feature.settings.icon %}
+                    <img
+                      src="{{ feature.settings.icon | image_url: width: 48 }}"
+                      alt="{{ feature.settings.title | escape }}"
+                      width="{{ feature.settings.icon.width }}"
+                      height="{{ feature.settings.icon.height }}"
+                      loading="lazy"
+                      class="hero-feature__icon"
+                    >
+                  {% endif %}
+                  <strong>{{ feature.settings.title }}</strong>
+                  {{ feature.settings.text }}
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
         </div>
 
         <div class="hero-right">
           <div class="hero-img">
             {% if slide.settings.image %}
               <img
-                src="{{ slide.settings.image | image_url: width: 600 }}"
-                alt="Plant"
+                src="{{ slide.settings.image | image_url: width: 700 }}"
+                alt="{{ slide.settings.image.alt | escape }}"
                 width="{{ slide.settings.image.width }}"
                 height="{{ slide.settings.image.height }}"
                 loading="lazy"
@@ -48,7 +258,7 @@
   {% endfor %}
 
   {% if slide_blocks.size > 1 %}
-    <div class="hero-dots">
+    <div class="hero-dots" data-dots>
       {% for slide in slide_blocks %}
         <span class="hero-dot {% if forloop.first %}active{% endif %}" data-index="{{ forloop.index0 }}"></span>
       {% endfor %}
@@ -57,30 +267,46 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-  const slider = document.getElementById('heroPlantSlider');
-  if (!slider) return;
+(function () {
+  function initHeroPlantSlider(sectionId) {
+    const slider = document.getElementById('heroPlantSlider-' + sectionId);
+    if (!slider || slider.dataset.inited === "1") return;
+    slider.dataset.inited = "1";
 
-  const slides = slider.querySelectorAll('.hero-plant-slide');
-  const dots = slider.querySelectorAll('.hero-dot');
-  if (!slides.length) return;
+    const slides = slider.querySelectorAll('[data-slide]');
+    const dotsWrap = slider.querySelector('[data-dots]');
+    const dots = dotsWrap ? dotsWrap.querySelectorAll('.hero-dot') : [];
 
-  let current = 0;
+    if (!slides.length) return;
 
-  function show(i) {
-    slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
-    dots.forEach((d, idx) => d.classList.toggle('active', idx === i));
-    current = i;
+    let current = 0;
+
+    function show(i) {
+      slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
+      dots.forEach((d, idx) => d.classList.toggle('active', idx === i));
+      current = i;
+    }
+
+    dots.forEach(dot => {
+      dot.addEventListener('click', () => show(parseInt(dot.dataset.index, 10)));
+    });
+
+    if (slides.length > 1) {
+      setInterval(() => show((current + 1) % slides.length), 5000);
+    }
   }
 
-  dots.forEach(dot => {
-    dot.addEventListener('click', () => show(parseInt(dot.dataset.index, 10)));
+  // normal page load
+  document.addEventListener('DOMContentLoaded', function () {
+    const el = document.querySelector('[data-section-id]');
+    if (!el) return;
+    initHeroPlantSlider(el.dataset.sectionId);
   });
 
-  if (slides.length > 1) {
-    setInterval(() => {
-      show((current + 1) % slides.length);
-    }, 5000);
-  }
-});
+  // Shopify theme editor support
+  document.addEventListener('shopify:section:load', function (event) {
+    if (!event || !event.detail || !event.detail.sectionId) return;
+    initHeroPlantSlider(event.detail.sectionId);
+  });
+})();
 </script>
