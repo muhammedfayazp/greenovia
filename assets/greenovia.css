@@ -262,57 +262,52 @@ main img,
   --menu-parent-font-line-height: 1.2;
 }
 /* ======================================================
-   FIX: User / Account icon position in header
+   FIX: Restore & align header icons (safe)
    ====================================================== */
 
-/* Right actions container */
+/* Container for right-side icons */
 .header__icons,
 .header-actions {
   display: flex !important;
   align-items: center !important;
   justify-content: flex-end !important;
-  gap: 14px !important;
+  gap: 12px !important;
 }
 
-/* Each icon button (search, account, cart) */
+/* Each icon button */
 .header__icon,
 .header-actions__action,
 .header__icon-account,
-.header__icon--account {
+.header__icon--account,
+.header__icon-search,
+.header__icon-cart {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
   width: 36px;
   height: 36px;
-  line-height: 1;
-  border-radius: 50%;
-  position: relative;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
-/* SVG / img inside icon */
+/* Make sure SVG / IMG icons are visible */
 .header__icon svg,
 .header__icon img,
 .header-actions__action svg,
 .header-actions__action img {
+  display: block !important;
   width: 18px !important;
   height: 18px !important;
   max-width: 18px !important;
   max-height: 18px !important;
-  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
-/* Prevent text pushing icon */
-.header__icon span,
-.header-actions__action span {
-  display: none !important;
-}
-
-/* Desktop fine-tune */
-@media (min-width: 990px) {
-  .header__icons,
-  .header-actions {
-    margin-left: auto;
-  }
+/* Never hide header icons */
+.header__icons *,
+.header-actions * {
+  pointer-events: auto;
 }
 
 /* ====================================================== */
