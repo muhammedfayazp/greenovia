@@ -369,3 +369,28 @@ a[href*="/cart"] svg {
 }
 
 /* ====================================================== */
+/* ======================================================
+   HEADER VERTICAL PADDING TUNE
+   ====================================================== */
+
+/* Desktop */
+@media (min-width: 990px) {
+  .header,
+  header-component,
+  #header-group {
+    padding-top: 22px !important;
+    padding-bottom: 22px !important;
+  }
+}
+
+/* Mobile */
+@media (max-width: 989px) {
+  .header,
+  header-component,
+  #header-group {
+    padding-top: 14px !important;
+    padding-bottom: 14px !important;
+  }
+}
+
+/* ====================================================== */
