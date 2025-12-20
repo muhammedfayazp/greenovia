@@ -142,8 +142,15 @@
   <div class="hero-plant__right">
     <div class="hero-plant__image">
       {% if section.settings.plant_image %}
-        <img src="{{ section.settings.plant_image | img_url: '600x' }}" alt="Plant">
-      {% endif %}
+      <img
+        src="{{ section.settings.plant_image | image_url: width: 600 }}"
+        alt="Plant"
+        width="{{ section.settings.plant_image.width }}"
+        height="{{ section.settings.plant_image.height }}"
+        loading="lazy"
+      >
+    {% endif %}
+
     </div>
   </div>
 </section>
