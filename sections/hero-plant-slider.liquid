@@ -260,9 +260,10 @@
   {% endfor %}
 
   <div class="hero-dots">
-    {% for block in section.blocks %}
-      <span class="hero-dot {% if forloop.first %}active{% endif %}" data-index="{{ forloop.index0 }}"></span>
+    {% for block in slide_blocks %}
+    <span class="hero-dot {% if forloop.first %}active{% endif %}" data-index="{{ forloop.index0 }}"></span>
     {% endfor %}
+
   </div>
 </div>
 
