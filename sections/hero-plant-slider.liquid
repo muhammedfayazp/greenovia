@@ -182,19 +182,26 @@
           </a>
 
           <div class="hero-features">
-            <div class="hero-feature">
-              <strong>Light</strong>
-              Bright but Indirect Light
+            {% for block in section.blocks %}
+                {% if block.type == 'feature' %}
+                <div class="hero-feature" {{ block.shopify_attributes }}>
+                    {% if block.settings.icon %}
+                    <img
+                        src="{{ block.settings.icon | image_url: width: 40 }}"
+                        alt="{{ block.settings.title }}"
+                        width="{{ block.settings.icon.width }}"
+                        height="{{ block.settings.icon.height }}"
+                        loading="lazy"
+                        class="hero-feature__icon"
+                    >
+                    {% endif %}
+                    <strong>{{ block.settings.title }}</strong>
+                    {{ block.settings.text }}
+                </div>
+                {% endif %}
+            {% endfor %}
             </div>
-            <div class="hero-feature">
-              <strong>Water</strong>
-              Moderate Watering
-            </div>
-            <div class="hero-feature">
-              <strong>Care</strong>
-              Easy & Occasional
-            </div>
-          </div>
+
         </div>
 
         <div class="hero-right">
