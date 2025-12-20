@@ -268,14 +268,12 @@
 
 <script>
 (function () {
-  function initHeroPlantSlider(sectionId) {
-    const slider = document.getElementById('heroPlantSlider-' + sectionId);
+  function initOne(slider) {
     if (!slider || slider.dataset.inited === "1") return;
     slider.dataset.inited = "1";
 
-    const slides = slider.querySelectorAll('[data-slide]');
-    const dotsWrap = slider.querySelector('[data-dots]');
-    const dots = dotsWrap ? dotsWrap.querySelectorAll('.hero-dot') : [];
+    const slides = slider.querySelectorAll('.hero-plant-slide');
+    const dots = slider.querySelectorAll('.hero-dot');
 
     if (!slides.length) return;
 
@@ -288,7 +286,10 @@
     }
 
     dots.forEach(dot => {
-      dot.addEventListener('click', () => show(parseInt(dot.dataset.index, 10)));
+      dot.addEventListener('click', () => {
+        const idx = parseInt(dot.dataset.index, 10);
+        if (!Number.isNaN(idx)) show(idx);
+      });
     });
 
     if (slides.length > 1) {
@@ -296,17 +297,15 @@
     }
   }
 
-  // normal page load
-  document.addEventListener('DOMContentLoaded', function () {
-    const el = document.querySelector('[data-section-id]');
-    if (!el) return;
-    initHeroPlantSlider(el.dataset.sectionId);
-  });
+  function initAll() {
+    document.querySelectorAll('[id^="heroPlantSlider-"]').forEach(initOne);
+  }
 
-  // Shopify theme editor support
-  document.addEventListener('shopify:section:load', function (event) {
-    if (!event || !event.detail || !event.detail.sectionId) return;
-    initHeroPlantSlider(event.detail.sectionId);
-  });
+  // Normal load
+  document.addEventListener('DOMContentLoaded', initAll);
+
+  // Shopify editor re-render
+  document.addEventListener('shopify:section:load', initAll);
 })();
 </script>
+
