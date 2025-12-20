@@ -9,6 +9,34 @@
  */
 {
   "sections": {
+    "hero_plant_slider_D3Ke6b": {
+      "type": "hero-plant-slider",
+      "blocks": {
+        "slide_Rfq76M": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/plants-bold-4.jpg"
+          }
+        },
+        "slide_gYiHCh": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/plants-bold-3.jpg"
+          }
+        }
+      },
+      "block_order": [
+        "slide_Rfq76M",
+        "slide_gYiHCh"
+      ],
+      "name": "Hero Plant Slider",
+      "settings": {
+        "heading": "We Love helping to your Decorate home plants",
+        "subtext": "Patch helps you discover the best plants for your space, delivers them",
+        "button_text": "View all items →",
+        "button_link": ""
+      }
+    },
     "hero_plant_WdReax": {
       "type": "hero-plant",
       "name": "Hero Plant Exact",
@@ -942,6 +970,7 @@
     }
   },
   "order": [
+    "hero_plant_slider_D3Ke6b",
     "hero_plant_WdReax",
     "plant_landing_slider_w7ehJ7",
     "hero_p9CmMG",
