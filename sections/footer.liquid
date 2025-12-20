@@ -1,215 +1,254 @@
-{% comment %}
-  Footer Section
-{% endcomment %}
 
-<footer class="footer" data-section-id="{{ section.id }}">
-  <div class="container">
-    <div class="footer__main">
-      {%- for block in section.blocks -%}
-        {%- case block.type -%}
-          {%- when 'text' -%}
-            <div class="footer__column" {{ block.shopify_attributes }}>
-              {%- if block.settings.title != blank -%}
-                <h3 class="footer__column-title">{{ block.settings.title }}</h3>
-              {%- endif -%}
-              {%- if block.settings.text != blank -%}
-                <div class="footer__text">{{ block.settings.text }}</div>
-              {%- endif -%}
-              {%- if block.settings.show_social -%}
-                <div class="footer__social">
-                  {%- if settings.social_facebook_link != blank -%}
-                    <a href="{{ settings.social_facebook_link }}" class="footer__social-link" target="_blank" rel="noopener">
-                      <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
-                    </a>
-                  {%- endif -%}
-                  {%- if settings.social_instagram_link != blank -%}
-                    <a href="{{ settings.social_instagram_link }}" class="footer__social-link" target="_blank" rel="noopener">
-                      <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg>
-                    </a>
-                  {%- endif -%}
-                  {%- if settings.social_pinterest_link != blank -%}
-                    <a href="{{ settings.social_pinterest_link }}" class="footer__social-link" target="_blank" rel="noopener">
-                      <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.24 2.64 7.86 6.35 9.34-.09-.76-.17-1.95.03-2.79.18-.76 1.17-4.98 1.17-4.98s-.3-.6-.3-1.48c0-1.39.81-2.43 1.81-2.43.85 0 1.26.64 1.26 1.41 0 .86-.55 2.15-.83 3.35-.24.99.5 1.8 1.48 1.8 1.77 0 3.13-1.87 3.13-4.57 0-2.39-1.72-4.06-4.17-4.06-2.84 0-4.51 2.13-4.51 4.33 0 .86.33 1.78.74 2.28.08.1.09.19.07.29-.07.31-.24 1-.27 1.14-.04.18-.14.22-.32.13-1.24-.58-2.02-2.39-2.02-3.85 0-3.14 2.28-6.03 6.58-6.03 3.45 0 6.14 2.46 6.14 5.75 0 3.43-2.16 6.19-5.17 6.19-1.01 0-1.96-.52-2.28-1.14 0 0-.5 1.9-.62 2.36-.22.86-.83 1.94-1.24 2.6.93.29 1.93.44 2.97.44 5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>
-                    </a>
-                  {%- endif -%}
-                </div>
-              {%- endif -%}
-            </div>
 
-          {%- when 'menu' -%}
-            <div class="footer__column" {{ block.shopify_attributes }}>
-              {%- if block.settings.title != blank -%}
-                <h3 class="footer__column-title">{{ block.settings.title }}</h3>
-              {%- endif -%}
-              {%- if linklists[block.settings.menu].links.size > 0 -%}
-                <ul class="footer__list">
-                  {%- for link in linklists[block.settings.menu].links -%}
-                    <li class="footer__list-item">
-                      <a href="{{ link.url }}" class="footer__link">{{ link.title }}</a>
-                    </li>
-                  {%- endfor -%}
-                </ul>
-              {%- endif -%}
-            </div>
+<div class="section-background color-{{ section.settings.color_scheme }}"></div>
+<div
+  class="section section--{{ section.settings.section_width }} color-{{ section.settings.color_scheme }}"
+>
+  {% liquid
+    assign total_blocks = section.blocks.size
 
-          {%- when 'newsletter' -%}
-            <div class="footer__column" {{ block.shopify_attributes }}>
-              {%- if block.settings.title != blank -%}
-                <h3 class="footer__column-title">{{ block.settings.title }}</h3>
-              {%- endif -%}
-              {%- if block.settings.text != blank -%}
-                <div class="footer__text">{{ block.settings.text }}</div>
-              {%- endif -%}
-              {%- form 'customer', class: 'footer__newsletter-form' -%}
-                <input type="hidden" name="contact[tags]" value="newsletter">
-                <div class="newsletter-form">
-                  <input 
-                    type="email" 
-                    name="contact[email]" 
-                    placeholder="Your email"
-                    class="newsletter-form__input"
-                    required
-                  >
-                  <button type="submit" class="btn btn-primary">Subscribe</button>
-                </div>
-                {%- if form.posted_successfully? -%}
-                  <p class="form-success">Thanks for subscribing!</p>
-                {%- endif -%}
-              {%- endform -%}
-            </div>
-        {%- endcase -%}
-      {%- endfor -%}
-    </div>
+    # Grid layout calculations
+    assign grid_columns = total_blocks | at_most: 4
 
-    <div class="footer__bottom">
-      <p>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.</p>
-      <div class="footer__payment-icons">
-        {%- for type in shop.enabled_payment_types -%}
-          {{ type | payment_type_svg_tag: class: 'payment-icon' }}
-        {%- endfor -%}
-      </div>
-    </div>
+    # Calculate last row counts using modulo arithmetic
+    # last_row_count = (total_blocks - 1) % N + 1
+    assign last_row_count = total_blocks | minus: 1 | modulo: 4 | plus: 1
+    assign tablet_last_row_count = total_blocks | minus: 1 | modulo: 2 | plus: 1
+
+    # Check if there are orphaned elements (single item in last row)
+    assign has_isolated_grid_item_desktop = false
+    assign has_isolated_grid_item_tablet = false
+
+    if total_blocks > 4 and last_row_count == 1
+      assign has_isolated_grid_item_desktop = true
+    endif
+
+    if total_blocks == 5
+      assign has_isolated_grid_item_tablet = true
+    endif
+  %}
+  <div
+    class="
+      footer-content
+      spacing-style
+      {% if has_isolated_grid_item_desktop %}footer-content--isolated-grid-item-desktop{% endif %}
+      {% if has_isolated_grid_item_tablet %}footer-content--isolated-grid-item-tablet{% endif %}
+    "
+    style="
+      {%  render 'spacing-style', settings: section.settings %}
+      --footer-gap: {{ section.settings.gap }}px;
+      --grid-columns: {{ grid_columns }};
+      --last-row-count: {{ last_row_count }};
+      --tablet-last-row-count: {{ tablet_last_row_count }};
+    "
+  >
+    {% content_for 'blocks' %}
   </div>
-</footer>
+</div>
 
-<style>
-  .newsletter-form {
-    display: flex;
-    gap: var(--space-sm);
-    margin-top: var(--space-md);
+{% stylesheet %}
+  .footer-content {
+    contain: content;
+    content-visibility: auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--footer-gap);
   }
 
-  .newsletter-form__input {
-    flex: 1;
-    padding: 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: var(--radius-sm);
-    background-color: rgba(255, 255, 255, 0.1);
-    color: var(--color-white);
+  @media screen and (min-width: 750px) and (max-width: 989px) {
+    .footer-content {
+      grid-template-columns: repeat(min(var(--grid-columns), 3), 1fr);
+      grid-auto-flow: row;
+    }
+
+    .footer-content[style*='--grid-columns: 4'] {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .footer-content--isolated-grid-item-tablet > :last-child {
+      grid-column: 1 / -1;
+    }
   }
 
-  .newsletter-form__input::placeholder {
-    color: rgba(255, 255, 255, 0.6);
-  }
+  @media screen and (min-width: 990px) {
+    .footer-content {
+      grid-template-columns: repeat(var(--grid-columns), 1fr);
+    }
 
-  .footer__payment-icons {
-    display: flex;
-    gap: var(--space-sm);
-    justify-content: center;
-    margin-top: var(--space-md);
-  }
+    /* Single item centered */
+    .footer-content[style*='--grid-columns: 1'] {
+      justify-items: center;
+    }
 
-  .payment-icon {
-    height: 30px;
-    width: auto;
-    opacity: 0.6;
+    .footer-content--isolated-grid-item-desktop > :last-child {
+      grid-column: 1 / -1;
+    }
   }
-
-  .form-success {
-    color: var(--color-success);
-    margin-top: var(--space-sm);
-  }
-</style>
+{% endstylesheet %}
 
 {% schema %}
 {
-  "name": "Footer",
-  "settings": [],
+  "name": "t:names.footer",
+  "class": "section-wrapper",
+  "tag": "footer",
   "blocks": [
     {
-      "type": "text",
-      "name": "Text Column",
-      "settings": [
-        {
-          "type": "text",
-          "id": "title",
-          "label": "Heading",
-          "default": "About Greenovia"
-        },
-        {
-          "type": "richtext",
-          "id": "text",
-          "label": "Text",
-          "default": "<p>Your trusted source for premium plants and garden supplies in UAE.</p>"
-        },
-        {
-          "type": "checkbox",
-          "id": "show_social",
-          "label": "Show social media icons",
-          "default": true
-        }
-      ]
+      "type": "_divider"
     },
     {
-      "type": "menu",
-      "name": "Menu Column",
-      "settings": [
-        {
-          "type": "text",
-          "id": "title",
-          "label": "Heading",
-          "default": "Quick Links"
-        },
-        {
-          "type": "link_list",
-          "id": "menu",
-          "label": "Menu",
-          "default": "footer"
-        }
-      ]
+      "type": "@app"
     },
     {
-      "type": "newsletter",
-      "name": "Newsletter",
-      "limit": 1,
-      "settings": [
-        {
-          "type": "text",
-          "id": "title",
-          "label": "Heading",
-          "default": "Newsletter"
-        },
-        {
-          "type": "richtext",
-          "id": "text",
-          "label": "Text",
-          "default": "<p>Get 10% off your first order plus weekly plant care tips!</p>"
-        }
-      ]
+      "type": "button"
+    },
+    {
+      "type": "follow-on-shop"
+    },
+    {
+      "type": "group"
+    },
+    {
+      "type": "icon"
+    },
+    {
+      "type": "image"
+    },
+    {
+      "type": "menu"
+    },
+    {
+      "type": "payment-icons"
+    },
+    {
+      "type": "text"
+    },
+    {
+      "type": "logo"
+    },
+    {
+      "type": "jumbo-text"
+    },
+    {
+      "type": "social-links"
+    },
+    {
+      "type": "email-signup"
     }
   ],
-  "default": {
-    "blocks": [
-      {
-        "type": "text"
+  "enabled_on": {
+    "groups": ["footer"]
+  },
+  "settings": [
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "t:settings.width",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "t:options.page"
+        },
+        {
+          "value": "full-width",
+          "label": "t:options.full"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "t:settings.gap",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 20
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.footer",
+      "category": "t:categories.footer",
+      "settings": {
+        "gap": 20,
+        "color_scheme": "scheme-1",
+        "padding-block-start": 36,
+        "padding-block-end": 36
       },
-      {
-        "type": "menu"
+      "blocks": {
+        "newsletter-group": {
+          "type": "group",
+          "settings": {
+            "content_direction": "column",
+            "vertical_on_mobile": true,
+            "horizontal_alignment": "flex-start",
+            "vertical_alignment": "center",
+            "gap": 6,
+            "width": "fill",
+            "inherit_color_scheme": true
+          },
+          "blocks": {
+            "newsletter-heading": {
+              "type": "text",
+              "settings": {
+                "text": "t:html_defaults.join_our_email_list",
+                "width": "100%",
+                "alignment": "left",
+                "type_preset": "h3"
+              }
+            },
+            "newsletter-text": {
+              "type": "text",
+              "settings": {
+                "text": "t:html_defaults.get_exclusive_deals_and_early_access_to_new_products",
+                "width": "100%",
+                "alignment": "left",
+                "type_preset": "rte"
+              }
+            }
+          },
+          "block_order": ["newsletter-heading", "newsletter-text"]
+        },
+        "newsletter-form": {
+          "type": "email-signup",
+          "settings": {
+            "width": "fill"
+          }
+        }
       },
-      {
-        "type": "newsletter"
-      }
-    ]
-  }
+      "block_order": ["newsletter-group", "newsletter-form"]
+    }
+  ]
 }
 {% endschema %}
