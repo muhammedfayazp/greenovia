@@ -108,13 +108,22 @@
   </div>
 
   <div class="plant-hero__slider">
-    {% for block in section.blocks %}
+    {% assign slide_blocks = section.blocks | where: "type", "slide" %}
+
+    {% for block in slide_blocks %}
       <div class="plant-slide {% if forloop.first %}active{% endif %}">
         {% if block.settings.image %}
-          <img src="{{ block.settings.image | image_url: width: 900  }}" >
+          <img
+            src="{{ block.settings.image | image_url: width: 900 }}"
+            alt="{{ block.settings.image.alt | escape }}"
+            width="{{ block.settings.image.width }}"
+            height="{{ block.settings.image.height }}"
+            loading="lazy"
+          >
         {% endif %}
       </div>
     {% endfor %}
+
 
     <div class="plant-dots">
       {% for block in section.blocks %}
