@@ -15,13 +15,13 @@
         "slide_tpxDcE": {
           "type": "slide",
           "settings": {
-            "slide_image": "shopify://shop_images/plants-bold-3.jpg"
+            "image": "shopify://shop_images/plants-bold-2.jpg"
           }
         },
         "slide_dNbicj": {
           "type": "slide",
           "settings": {
-            "slide_image": "shopify://shop_images/plants-bold-2.jpg"
+            "image": "shopify://shop_images/plants-bold-3.jpg"
           }
         }
       },
@@ -33,8 +33,8 @@
       "settings": {
         "heading": "Grow Beautiful Plants at Home",
         "subtext": "<p>Shop our organic, hand-picked selection of plants & accessories.</p>",
-        "button_link": "shopify://collections/all",
-        "button_text": "Shop Now"
+        "button_text": "Shop Now",
+        "button_link": "shopify://collections/all"
       }
     },
     "hero_p9CmMG": {
