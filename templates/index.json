@@ -12,6 +12,12 @@
     "plant_landing_slider_w7ehJ7": {
       "type": "plant-landing-slider",
       "blocks": {
+        "slide_tpxDcE": {
+          "type": "slide",
+          "settings": {
+            "slide_image": "shopify://shop_images/plants-bold-3.jpg"
+          }
+        },
         "slide_dNbicj": {
           "type": "slide",
           "settings": {
@@ -20,6 +26,7 @@
         }
       },
       "block_order": [
+        "slide_tpxDcE",
         "slide_dNbicj"
       ],
       "name": "Plant Landing Slider",
