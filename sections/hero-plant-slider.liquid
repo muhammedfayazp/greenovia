@@ -175,6 +175,37 @@
     display: block;
   }
 }
+
+/* ✅ Mobile feature card redesign */
+@media (max-width: 768px) {
+  .hero-features {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-top: 30px;
+  }
+
+  .hero-feature {
+    padding: 14px 12px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    font-size: 13px;
+  }
+
+  .hero-feature strong {
+    font-size: 14px;
+    margin-bottom: 4px;
+    display: block;
+  }
+
+  .hero-feature__icon {
+    margin: 0 auto 6px;
+    width: 22px;
+    height: 22px;
+  }
+}
+
 </style>
 
 <div class="hero-plant-slider" id="heroPlantSlider">
