@@ -286,8 +286,11 @@ document.addEventListener('DOMContentLoaded', function () {
     dot.addEventListener('click', () => show(+dot.dataset.index));
   });
 
-  setInterval(() => {
-    show((current + 1) % slides.length);
-  }, 5000);
+    if (slides.length > 1) {
+    setInterval(() => {
+        show((current + 1) % slides.length);
+    }, 5000);
+    }
+
 });
 </script>
