@@ -209,8 +209,9 @@
 </style>
 
 <div class="hero-plant-slider" id="heroPlantSlider">
-  {% for block in section.blocks %}
-    <div class="hero-plant-slide {% if forloop.first %}active{% endif %}">
+{% for block in slide_blocks %}
+  <div class="hero-plant-slide {% if forloop.first %}active{% endif %}">
+
       <section class="hero-plant">
         <div class="hero-left">
           <h1>{{ section.settings.heading | replace: 'plants', '<span>plants</span>' }}</h1>
@@ -220,8 +221,7 @@
           </a>
 
           <div class="hero-features">
-            {% for block in section.blocks %}
-                {% if block.type == 'feature' %}
+            {% for block in feature_blocks %}
                 <div class="hero-feature" {{ block.shopify_attributes }}>
                     {% if block.settings.icon %}
                     <img
@@ -236,8 +236,8 @@
                     <strong>{{ block.settings.title }}</strong>
                     {{ block.settings.text }}
                 </div>
-                {% endif %}
-            {% endfor %}
+                {% endfor %}
+
             </div>
 
         </div>
