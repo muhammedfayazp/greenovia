@@ -262,10 +262,10 @@ main img,
   --menu-parent-font-line-height: 1.2;
 }
 /* ======================================================
-   FIX: Restore & align header icons (safe)
+   FINAL FIX: Align search, user & cart icons
    ====================================================== */
 
-/* Container for right-side icons */
+/* Right side container */
 .header__icons,
 .header-actions {
   display: flex !important;
@@ -274,40 +274,44 @@ main img,
   gap: 12px !important;
 }
 
-/* Each icon button */
+/* Normalize all icon buttons */
 .header__icon,
-.header-actions__action,
-.header__icon-account,
+.header__icon--search,
 .header__icon--account,
-.header__icon-search,
-.header__icon-cart {
+.header__icon--cart,
+.header-actions__action,
+a[href*="/account"],
+a[href*="/cart"] {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  width: 36px;
-  height: 36px;
-  opacity: 1 !important;
-  visibility: visible !important;
+  width: 36px !important;
+  height: 36px !important;
+  line-height: 1 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 50%;
 }
 
-/* Make sure SVG / IMG icons are visible */
+/* Ensure icon graphics are centered */
 .header__icon svg,
 .header__icon img,
 .header-actions__action svg,
-.header-actions__action img {
-  display: block !important;
+.header-actions__action img,
+a[href*="/account"] svg,
+a[href*="/cart"] svg {
   width: 18px !important;
   height: 18px !important;
-  max-width: 18px !important;
-  max-height: 18px !important;
-  opacity: 1 !important;
-  visibility: visible !important;
+  display: block !important;
 }
 
-/* Never hide header icons */
-.header__icons *,
-.header-actions * {
-  pointer-events: auto;
+/* Prevent cart count/text from shifting layout */
+.header__icon .cart-count,
+.header__icon .count,
+.header__icon span:not(svg) {
+  position: absolute;
+  top: -4px;
+  right: -4px;
 }
 
 /* ====================================================== */
