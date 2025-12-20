@@ -78,11 +78,16 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-img {
+/* Only content images should be responsive — NOT header icons */
+main img,
+.hero-plant-slider img,
+.product img,
+.collection img {
   max-width: 100%;
   height: auto;
   display: block;
 }
+
 
 a {
   color: inherit;
