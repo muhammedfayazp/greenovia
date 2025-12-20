@@ -12,6 +12,27 @@
     "hero_plant_slider_D3Ke6b": {
       "type": "hero-plant-slider",
       "blocks": {
+        "feature_eLJMfX": {
+          "type": "feature",
+          "settings": {
+            "title": "Light",
+            "text": "Bright but Indirect Light"
+          }
+        },
+        "feature_H7T8KJ": {
+          "type": "feature",
+          "settings": {
+            "title": "Light",
+            "text": "Bright but Indirect Light"
+          }
+        },
+        "feature_4QpzpE": {
+          "type": "feature",
+          "settings": {
+            "title": "Light",
+            "text": "Bright but Indirect Light"
+          }
+        },
         "slide_Rfq76M": {
           "type": "slide",
           "settings": {
@@ -26,6 +47,9 @@
         }
       },
       "block_order": [
+        "feature_eLJMfX",
+        "feature_H7T8KJ",
+        "feature_4QpzpE",
         "slide_Rfq76M",
         "slide_gYiHCh"
       ],
