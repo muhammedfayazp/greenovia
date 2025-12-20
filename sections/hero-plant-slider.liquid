@@ -1,255 +1,43 @@
-{% schema %}
-{
-  "name": "Hero Plant Slider",
-  "settings": [
-    { "type": "text", "id": "heading", "label": "Heading", "default": "We Love helping to your Decorate home plants" },
-    { "type": "textarea", "id": "subtext", "label": "Subtext", "default": "Patch helps you discover the best plants for your space, delivers them" },
-    { "type": "text", "id": "button_text", "label": "Button text", "default": "View all items →" },
-    { "type": "url", "id": "button_link", "label": "Button link" }
-  ],
-  "blocks": [
-    {
-      "type": "slide",
-      "name": "Plant Slide",
-      "settings": [
-        { "type": "image_picker", "id": "image", "label": "Plant image" }
-      ]
-    },
-    {
-      "type": "feature",
-      "name": "Feature Item",
-      "settings": [
-        { "type": "image_picker", "id": "icon", "label": "Icon" },
-        { "type": "text", "id": "title", "label": "Title", "default": "Light" },
-        { "type": "text", "id": "text", "label": "Description", "default": "Bright but Indirect Light" }
-      ]
-    }
-  ],
-  "presets": [{ "name": "Hero Plant Slider" }]
-}
-{% endschema %}
-
-
-<style>
-.hero-plant-slider {
-  position: relative;
-  overflow: hidden;
-}
-
-.hero-plant-slide {
-  display: none;
-}
-
-.hero-plant-slide.active {
-  display: block;
-}
-
-.hero-plant {
-  display: flex;
-  min-height: 80vh;
-  background: #f3f7f4;
-}
-
-.hero-left {
-  flex: 1;
-  padding: 80px 60px;
-  background: #fff;
-}
-
-.hero-right {
-  flex: 1;
-  background: #eef4f0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.hero-left h1 {
-  font-size: 48px;
-  line-height: 1.2;
-  color: #1f3d1b;
-  margin-bottom: 20px;
-}
-
-.hero-left h1 span {
-  color: #2e7d32;
-}
-
-.hero-left p {
-  color: #666;
-  max-width: 420px;
-}
-
-.hero-btn {
-  display: inline-block;
-  margin-top: 28px;
-  background: #1f3d1b;
-  color: #fff;
-  padding: 14px 34px;
-  border-radius: 6px;
-  font-weight: 600;
-}
-
-.hero-img img {
-  max-width: 360px;
-  width: 100%;
-  height: auto;
-}
-
-.hero-features {
-  display: flex;
-  gap: 20px;
-  margin-top: 60px;
-}
-
-.hero-feature {
-  background: #fff;
-  padding: 18px 22px;
-  border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.05);
-  flex: 1;
-  font-size: 14px;
-  color: #444;
-}
-
-.hero-feature strong {
-  display: block;
-  color: #1f3d1b;
-  margin-bottom: 6px;
-}
-
-/* Dots */
-.hero-dots {
-  position: absolute;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.hero-dot {
-  width: 10px;
-  height: 10px;
-  background: #b7cbbf;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-.hero-dot.active {
-  background: #1f3d1b;
-}
-
-/* Mobile */
-@media(max-width: 768px) {
-  .hero-plant {
-    flex-direction: column;
-  }
-  .hero-left {
-    padding: 40px 20px;
-    text-align: center;
-  }
-  .hero-left h1 {
-    font-size: 34px;
-  }
-  .hero-features {
-    flex-direction: column;
-    margin-top: 40px;
-  }
-  .hero-right {
-    padding: 30px 0;
-  }
-  .hero-dots {
-    position: static;
-    flex-direction: row;
-    justify-content: center;
-    margin: 15px 0;
-    transform: none;
-  }
-  .hero-feature__icon {
-    width: 26px;
-    height: 26px;
-    object-fit: contain;
-    margin-bottom: 8px;
-    display: block;
-  }
-}
-
-/* ✅ Mobile feature card redesign */
-@media (max-width: 768px) {
-  .hero-features {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
-    margin-top: 30px;
-  }
-
-  .hero-feature {
-    padding: 14px 12px;
-    border-radius: 12px;
-    text-align: center;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
-    font-size: 13px;
-  }
-
-  .hero-feature strong {
-    font-size: 14px;
-    margin-bottom: 4px;
-    display: block;
-  }
-
-  .hero-feature__icon {
-    margin: 0 auto 6px;
-    width: 22px;
-    height: 22px;
-  }
-}
-
-</style>
-
 <div class="hero-plant-slider" id="heroPlantSlider">
-{% for block in slide_blocks %}
-  <div class="hero-plant-slide {% if forloop.first %}active{% endif %}">
-
+  {% for slide in slide_blocks %}
+    <div class="hero-plant-slide {% if forloop.first %}active{% endif %}">
       <section class="hero-plant">
         <div class="hero-left">
           <h1>{{ section.settings.heading | replace: 'plants', '<span>plants</span>' }}</h1>
           <p>{{ section.settings.subtext }}</p>
+
           <a href="{{ section.settings.button_link }}" class="hero-btn">
             {{ section.settings.button_text }}
           </a>
 
           <div class="hero-features">
-            {% for block in feature_blocks %}
-                <div class="hero-feature" {{ block.shopify_attributes }}>
-                    {% if block.settings.icon %}
-                    <img
-                        src="{{ block.settings.icon | image_url: width: 40 }}"
-                        alt="{{ block.settings.title }}"
-                        width="{{ block.settings.icon.width }}"
-                        height="{{ block.settings.icon.height }}"
-                        loading="lazy"
-                        class="hero-feature__icon"
-                    >
-                    {% endif %}
-                    <strong>{{ block.settings.title }}</strong>
-                    {{ block.settings.text }}
-                </div>
-                {% endfor %}
-
-            </div>
-
+            {% for feature in feature_blocks %}
+              <div class="hero-feature" {{ feature.shopify_attributes }}>
+                {% if feature.settings.icon %}
+                  <img
+                    src="{{ feature.settings.icon | image_url: width: 40 }}"
+                    alt="{{ feature.settings.title }}"
+                    width="{{ feature.settings.icon.width }}"
+                    height="{{ feature.settings.icon.height }}"
+                    loading="lazy"
+                    class="hero-feature__icon"
+                  >
+                {% endif %}
+                <strong>{{ feature.settings.title }}</strong>
+                {{ feature.settings.text }}
+              </div>
+            {% endfor %}
+          </div>
         </div>
 
         <div class="hero-right">
           <div class="hero-img">
-            {% if block.settings.image %}
+            {% if slide.settings.image %}
               <img
-                src="{{ block.settings.image | image_url: width: 600 }}"
+                src="{{ slide.settings.image | image_url: width: 600 }}"
                 alt="Plant"
-                width="{{ block.settings.image.width }}"
-                height="{{ block.settings.image.height }}"
+                width="{{ slide.settings.image.width }}"
+                height="{{ slide.settings.image.height }}"
                 loading="lazy"
               >
             {% endif %}
@@ -259,12 +47,13 @@
     </div>
   {% endfor %}
 
-  <div class="hero-dots">
-    {% for block in slide_blocks %}
-    <span class="hero-dot {% if forloop.first %}active{% endif %}" data-index="{{ forloop.index0 }}"></span>
-    {% endfor %}
-
-  </div>
+  {% if slide_blocks.size > 1 %}
+    <div class="hero-dots">
+      {% for slide in slide_blocks %}
+        <span class="hero-dot {% if forloop.first %}active{% endif %}" data-index="{{ forloop.index0 }}"></span>
+      {% endfor %}
+    </div>
+  {% endif %}
 </div>
 
 <script>
@@ -274,6 +63,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
   const slides = slider.querySelectorAll('.hero-plant-slide');
   const dots = slider.querySelectorAll('.hero-dot');
+  if (!slides.length) return;
+
   let current = 0;
 
   function show(i) {
@@ -283,14 +74,13 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   dots.forEach(dot => {
-    dot.addEventListener('click', () => show(+dot.dataset.index));
+    dot.addEventListener('click', () => show(parseInt(dot.dataset.index, 10)));
   });
 
-    if (slides.length > 1) {
+  if (slides.length > 1) {
     setInterval(() => {
-        show((current + 1) % slides.length);
+      show((current + 1) % slides.length);
     }, 5000);
-    }
-
+  }
 });
 </script>
