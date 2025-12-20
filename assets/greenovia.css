@@ -233,3 +233,31 @@ main img,
   white-space: nowrap !important;
   border:0 !important;
 }
+/* ======================================================
+   GREENOVIA MENU + TYPOGRAPHY VARIABLES (SAFE)
+   ====================================================== */
+
+:root {
+  /* MENU – Top level */
+  --menu-top-level-font-family: "Montserrat", "Inter", system-ui, sans-serif;
+  --menu-top-level-font-weight: 600;
+  --menu-top-level-font-style: normal;
+  --menu-top-level-font-case: uppercase;
+  --menu-top-level-font-size: 0.875rem;        /* 14px mobile */
+  --menu-top-level-font-size-desktop: 0.9375rem; /* 15px desktop */
+  --menu-top-level-font-line-height: 1.2;
+  --menu-top-level-font-color: rgb(var(--color-foreground-rgb));
+  --menu-top-level-font-color-rgb: var(--color-foreground-rgb);
+
+  /* MENU – Sub menu */
+  --menu-child-font-family: "Inter", system-ui, sans-serif;
+  --menu-child-font-weight: 500;
+  --menu-child-font-size: 0.875rem;
+  --menu-child-font-line-height: 1.5;
+
+  /* MENU – Parent headings inside mega menu */
+  --menu-parent-font-family: "Playfair Display", serif;
+  --menu-parent-font-weight: 600;
+  --menu-parent-font-size: 1.125rem;
+  --menu-parent-font-line-height: 1.2;
+}
