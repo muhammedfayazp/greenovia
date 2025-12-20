@@ -1057,3 +1057,47 @@ header-component {
 /* ======================================================
    END FIX
    ====================================================== */
+/* ======================================================
+   HEADER HARD RESET — Greenovia
+   ====================================================== */
+
+.header,
+header-component {
+  position: relative;
+  z-index: 200;
+}
+
+/* Reset header images/icons */
+.header img,
+header-component img,
+.header__icon img,
+.header-logo img {
+  width: auto !important;
+  height: auto !important;
+  max-width: none !important;
+  display: inline-block !important;
+}
+
+/* Align header icons */
+.header__icons,
+.header-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+/* Hide accessibility text that became visible */
+.visually-hidden,
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* ====================================================== */
