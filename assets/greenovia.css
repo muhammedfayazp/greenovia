@@ -261,3 +261,58 @@ main img,
   --menu-parent-font-size: 1.125rem;
   --menu-parent-font-line-height: 1.2;
 }
+/* ======================================================
+   FIX: User / Account icon position in header
+   ====================================================== */
+
+/* Right actions container */
+.header__icons,
+.header-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 14px !important;
+}
+
+/* Each icon button (search, account, cart) */
+.header__icon,
+.header-actions__action,
+.header__icon-account,
+.header__icon--account {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 36px;
+  height: 36px;
+  line-height: 1;
+  border-radius: 50%;
+  position: relative;
+}
+
+/* SVG / img inside icon */
+.header__icon svg,
+.header__icon img,
+.header-actions__action svg,
+.header-actions__action img {
+  width: 18px !important;
+  height: 18px !important;
+  max-width: 18px !important;
+  max-height: 18px !important;
+  display: block !important;
+}
+
+/* Prevent text pushing icon */
+.header__icon span,
+.header-actions__action span {
+  display: none !important;
+}
+
+/* Desktop fine-tune */
+@media (min-width: 990px) {
+  .header__icons,
+  .header-actions {
+    margin-left: auto;
+  }
+}
+
+/* ====================================================== */
