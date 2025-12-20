@@ -1,0 +1,20 @@
+<section class="container">
+  <h2>Popular Plants</h2>
+  <div class="grid">
+    {% for product in collections.frontpage.products limit:4 %}
+      <div>
+        <img src="{{ product.featured_image | image_url: width: 400 }}">
+        <h3>{{ product.title }}</h3>
+        {% render 'price', product: product %}
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+<style>
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+  gap: 30px;
+}
+</style>

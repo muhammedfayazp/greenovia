@@ -1,41 +1,125 @@
-/* Shopify Base Styles */
-.visually-hidden {
-  position: absolute !important;
-  overflow: hidden;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  border: 0;
-  clip: rect(0 0 0 0);
-  word-wrap: normal !important;
+:root {
+  --green: #2f7d32;
+  --light-green: #e8f5e9;
+  --text: #222;
+  --muted: #777;
 }
 
-.skip-to-content-link {
-  position: absolute;
-  z-index: 9999;
-  left: -9999px;
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  color: var(--text);
+  background: #fff;
 }
 
-.skip-to-content-link:focus {
-  left: 50%;
-  transform: translateX(-50%);
-  top: 20px;
+.container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 0 20px;
 }
 
-/* Focus styles */
-*:focus {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
+.btn {
+  background: var(--green);
+  color: #fff;
+  padding: 12px 26px;
+  border-radius: 30px;
+  text-decoration: none;
+  display: inline-block;
 }
 
-button:focus,
-a:focus {
-  outline: 2px solid var(--color-primary);
+.product-page {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 50px;
 }
 
-/* Loading state */
-.loading {
-  opacity: 0.5;
-  pointer-events: none;
+.gallery img {
+  width: 100%;
+  border-radius: 14px;
+  margin-bottom: 10px;
+}
+
+.details select {
+  padding: 10px;
+  margin: 15px 0;
+}
+
+.tabs button {
+  background: none;
+  border: none;
+  font-weight: bold;
+  margin-right: 15px;
+  cursor: pointer;
+}
+
+.tab-content {
+  margin-top: 20px;
+}
+
+.sticky-btn {
+  position: sticky;
+  bottom: 10px;
+  width: 100%;
+}
+
+.cart-drawer {
+  position: fixed;
+  right: -400px;
+  top: 0;
+  width: 350px;
+  height: 100%;
+  background: #fff;
+  padding: 20px;
+  transition: right .3s;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, .1);
+  z-index: 999;
+}
+
+.cart-drawer.open {
+  right: 0;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 100;
+  border-bottom: 1px solid #eee;
+}
+
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+}
+
+.card {
+  border: 1px solid #eee;
+  padding: 15px;
+  border-radius: 16px;
+  transition: all .3s;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, .08);
+}
+
+@media(max-width: 768px) {
+  .product-page {
+    grid-template-columns: 1fr;
+  }
+
+  .filters {
+    display: none;
+  }
+
+  .sticky-btn {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    z-index: 999;
+  }
 }

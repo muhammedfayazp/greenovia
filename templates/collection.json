@@ -1,16 +1,10 @@
 {
   "sections": {
-    "banner": {
-      "type": "collection-banner",
-      "settings": {}
-    },
-    "main": {
-      "type": "main-collection",
-      "settings": {}
+    "filters": {
+      "type": "collection-filters"
     }
   },
   "order": [
-    "banner",
-    "main"
+    "filters"
   ]
 }
