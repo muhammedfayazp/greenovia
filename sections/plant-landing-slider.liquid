@@ -113,77 +113,60 @@
   }
 }
 
-/* ================= MOBILE MOCKUP CARD UI ================= */
+/* ================= MOBILE IMAGE FIX ================= */
 @media (max-width: 768px) {
+  /* Make sure absolute elements stay inside hero */
   .plant-hero {
-    padding: 20px 14px 40px;
-    background: #ffffff;
-    min-height: auto;
+    position: relative !important;
+    overflow: visible !important;
   }
 
-  .plant-hero__content,
-  .plant-hero__slider {
-    width: 100%;
-  }
-
-  .plant-hero {
-    flex-direction: column;
-  }
-
-  /* Big rounded card */
+  /* Keep the content card as a real container */
   .plant-hero__content {
-    background: #f4faf4;
-    border-radius: 36px;
-    padding: 28px 22px 180px;
-    box-shadow: 0 16px 40px rgba(0,0,0,0.08);
-    position: relative;
-    order: 1;
+    position: relative !important;
+    padding-bottom: 220px !important; /* space for plant image */
   }
 
-  .plant-hero__content h1 {
-    font-size: 30px;
-    line-height: 1.25;
-    margin-bottom: 16px;
-    color: #1f3d1b;
-  }
-
-  .plant-hero__content p {
-    font-size: 15px;
-    line-height: 1.7;
-    margin-bottom: 22px;
-    color: #555;
-  }
-
-  .plant-hero__btn {
-    width: 100%;
-    text-align: center;
-    padding: 14px 0;
-    font-size: 15px;
-    border-radius: 12px;
-  }
-
-  /* Image inside card, floating right */
+  /* Place slider inside the card */
   .plant-hero__slider {
-    position: absolute;
-    right: 26px;
-    bottom: 28px;
-    width: auto;
-    order: 2;
+    position: absolute !important;
+    right: 22px !important;
+    bottom: 28px !important;
+    width: 180px !important;
+    height: 200px !important;
+    display: flex !important;
+    align-items: flex-end !important;
+    justify-content: center !important;
+    z-index: 3 !important;
   }
 
+  /* Show only active slide */
+  .plant-slide {
+    display: none !important;
+  }
+  .plant-slide.active {
+    display: block !important;
+  }
+
+  /* Correct image scaling */
   .plant-slide img {
-    max-width: 160px;
-    margin: 0;
+    width: 180px !important;
+    max-width: 180px !important;
+    height: auto !important;
+    display: block !important;
+    margin: 0 !important;
   }
 
-  /* Dots under image */
+  /* Dots under the image (like mockup) */
   .plant-dots {
-    position: absolute;
-    right: 40px;
-    bottom: 10px;
-    transform: none;
-    flex-direction: row;
-    gap: 6px;
+    position: absolute !important;
+    right: 40px !important;
+    bottom: 10px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 6px !important;
+    transform: none !important;
+    z-index: 4 !important;
   }
 }
 
