@@ -113,72 +113,80 @@
   }
 }
 
-/* ================= MOBILE CARD UI ================= */
+/* ================= MOBILE MOCKUP CARD UI ================= */
 @media (max-width: 768px) {
   .plant-hero {
-    flex-direction: column;
-    padding: 20px 16px 36px;
-    background: #f3f8f4;
+    padding: 20px 14px 40px;
+    background: #ffffff;
     min-height: auto;
   }
 
-  .plant-hero__content {
+  .plant-hero__content,
+  .plant-hero__slider {
     width: 100%;
-    background: #fff;
-    border-radius: 30px;
-    padding: 26px 22px 30px;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+  }
+
+  .plant-hero {
+    flex-direction: column;
+  }
+
+  /* Big rounded card */
+  .plant-hero__content {
+    background: #f4faf4;
+    border-radius: 36px;
+    padding: 28px 22px 180px;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.08);
+    position: relative;
     order: 1;
   }
 
   .plant-hero__content h1 {
-    font-size: 28px;
+    font-size: 30px;
     line-height: 1.25;
-    margin-bottom: 14px;
+    margin-bottom: 16px;
+    color: #1f3d1b;
   }
 
   .plant-hero__content p {
     font-size: 15px;
-    margin-bottom: 18px;
+    line-height: 1.7;
+    margin-bottom: 22px;
+    color: #555;
   }
 
   .plant-hero__btn {
-    padding: 12px 26px;
-    font-size: 14px;
-  }
-
-  .plant-hero__slider {
-    order: 2;
     width: 100%;
-    margin-top: -14px;
     text-align: center;
+    padding: 14px 0;
+    font-size: 15px;
+    border-radius: 12px;
+  }
+
+  /* Image inside card, floating right */
+  .plant-hero__slider {
+    position: absolute;
+    right: 26px;
+    bottom: 28px;
+    width: auto;
+    order: 2;
   }
 
   .plant-slide img {
-    max-width: 180px;
-    margin: 0 auto 12px;
+    max-width: 160px;
+    margin: 0;
   }
 
+  /* Dots under image */
   .plant-dots {
-    position: static;
-    flex-direction: row;
-    justify-content: center;
+    position: absolute;
+    right: 40px;
+    bottom: 10px;
     transform: none;
-    gap: 8px;
-    margin-top: 10px;
+    flex-direction: row;
+    gap: 6px;
   }
 }
 
-/* ================= SMALL PHONES ================= */
-@media (max-width: 480px) {
-  .plant-hero__content h1 {
-    font-size: 24px;
-  }
-
-  .plant-slide img {
-    max-width: 150px;
-  }
-}
 </style>
 
 <section class="plant-hero" id="plantHero">
