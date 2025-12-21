@@ -1,50 +1,24 @@
-/* ======================================================
-   GREENOVIA OVERRIDES (SAFE)
-   - No global reset
-   - No html { font-size: 62.5% }
-   - No global img rules that break header icons
-   Load AFTER base.css
-   ====================================================== */
-
 @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap");
 
 :root{
-  /* Brand */
   --gv-primary:#2D5016;
   --gv-secondary:#5A7C3E;
-  --gv-accent:#D97D54;
   --gv-bg:#FAFAF8;
   --gv-white:#FFFFFF;
   --gv-text:#2C2C2C;
   --gv-muted:#6B6B6B;
-  --gv-border:#E8E8E3;
 
-  /* Type */
   --gv-font-heading:"Playfair Display", serif;
   --gv-font-body:"Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  --gv-font-ui:"Montserrat", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-
-  /* UI */
-  --gv-radius-sm:6px;
-  --gv-radius-md:12px;
-  --gv-radius-full:9999px;
-
-  --gv-shadow-sm:0 2px 10px rgba(0,0,0,.06);
-  --gv-shadow-md:0 10px 30px rgba(0,0,0,.10);
-
-  /* Layout rhythm */
-  --gv-container: 1200px;
+  --gv-font-ui:"Montserrat", "Inter", system-ui, sans-serif;
 }
 
-/* -------------------------
-   Base typography (safe)
-------------------------- */
+/* Base typography */
 body{
   font-family: var(--gv-font-body);
   color: var(--gv-text);
   background: var(--gv-bg);
   line-height: 1.6;
-  text-rendering: optimizeLegibility;
 }
 
 h1,h2,h3,h4,h5,h6{
@@ -52,36 +26,12 @@ h1,h2,h3,h4,h5,h6{
   font-weight: 600;
   line-height: 1.15;
   color: var(--gv-primary);
-  letter-spacing: -0.02em;
 }
 
-h1{ font-size: clamp(30px, 3.6vw, 56px); }
-h2{ font-size: clamp(24px, 2.8vw, 42px); }
-h3{ font-size: clamp(20px, 2.2vw, 32px); }
-h4{ font-size: clamp(18px, 1.8vw, 24px); }
-
-p,li,dd,dt{
-  color: var(--gv-text);
-  line-height: 1.75;
-}
-
-a{
-  color: inherit;
-  text-decoration: none;
-}
+a{ text-decoration:none; color:inherit; }
 a:hover{ color: var(--gv-secondary); }
 
-/* -------------------------
-   Container helpers
-------------------------- */
-.gv-container{
-  width: min(var(--gv-container), calc(100% - 40px));
-  margin-inline: auto;
-}
-
-/* -------------------------
-   Buttons (site-wide)
-------------------------- */
+/* Buttons */
 button,
 input[type="submit"],
 .button,
@@ -89,308 +39,88 @@ input[type="submit"],
 .hero-btn{
   font-family: var(--gv-font-ui);
   font-weight: 600;
-  letter-spacing: .03em;
+  letter-spacing:.03em;
 }
 
-.button,
-.btn,
-.hero-btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:.5rem;
-  border-radius: var(--gv-radius-sm);
-  padding: 12px 28px;
-  border: 1px solid transparent;
-  cursor:pointer;
-  transition: transform .15s ease, box-shadow .2s ease, background-color .2s ease, border-color .2s ease, color .2s ease;
-}
-
-.button--primary,
-.btn-primary,
-.hero-btn{
-  background: var(--gv-primary);
-  color: var(--gv-white);
-  box-shadow: var(--gv-shadow-sm);
-}
-.button--primary:hover,
-.btn-primary:hover,
-.hero-btn:hover{
-  transform: translateY(-1px);
-  box-shadow: var(--gv-shadow-md);
-  background: var(--gv-secondary);
-  color: var(--gv-white);
-}
-
-.button--secondary,
-.btn-secondary{
-  background: transparent;
-  border-color: var(--gv-primary);
-  color: var(--gv-primary);
-}
-.button--secondary:hover,
-.btn-secondary:hover{
-  background: var(--gv-primary);
-  color: var(--gv-white);
-}
-
-/* -------------------------
-   Header / Menu fixes (IMPORTANT)
-   Prevent hero/img rules from breaking header icons
-------------------------- */
-
-/* Keep header above hero/sections */
+/* Header safety */
 .header,
 header-component{
   position: relative;
   z-index: 200;
 }
 
-/* Header icons/logo must NOT inherit "responsive image full width" styles */
 .header img,
-header-component img,
-.header__icon img,
-.header-logo img{
-  width: auto !important;
-  height: auto !important;
-  max-width: none !important;
-  display: inline-block !important;
+header-component img{
+  width:auto !important;
+  height:auto !important;
+  max-width:none !important;
+  display:inline-block !important;
 }
 
-/* Header actions alignment */
+/* Header icons alignment */
 .header__icons,
-.header-actions,
-.header-actions__action{
+.header-actions{
   display:flex !important;
   align-items:center !important;
-  gap: 12px;
+  gap:12px !important;
 }
 
-/* Menu typography */
-.navigation__link,
-.header nav a,
-.menu a,
-.header__menu-item a{
-  font-family: var(--gv-font-ui);
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: .06em;
-  text-transform: uppercase;
+.header__icon,
+.header__icon--search,
+.header__icon--account,
+.header__icon--cart{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:36px !important;
+  height:36px !important;
+  padding:0 !important;
 }
 
-/* -------------------------
-   SAFE responsive images (content only)
-   (Do NOT target img globally)
-------------------------- */
+/* Icon graphics */
+.header__icon svg,
+.header__icon img{
+  width:18px !important;
+  height:18px !important;
+  display:block !important;
+}
+
+/* Menu typography via variables */
+:root {
+  --menu-top-level-font-family: "Montserrat", "Inter", system-ui, sans-serif;
+  --menu-top-level-font-weight: 600;
+  --menu-top-level-font-case: uppercase;
+  --menu-top-level-font-size: 0.875rem;
+  --menu-top-level-font-size-desktop: 0.9375rem;
+}
+
+/* Content images only */
 main img,
 .product img,
 .collection img,
 .card img,
-.article img{
-  max-width: 100%;
-  height: auto;
-  display: block;
+.article img,
+.plant-hero img{
+  max-width:100%;
+  height:auto;
+  display:block;
 }
 
-/* Hero slider images only */
-.hero-plant-slider img{
-  max-width: 100%;
-  height: auto;
-  display: block;
+/* Mobile tweaks */
+@media (max-width:768px){
+  body{ font-size:15px; }
 }
 
-/* -------------------------
-   Mobile readability
-------------------------- */
-@media (max-width: 768px){
-  body{ font-size: 15px; }
-
-  .navigation__link,
-  .header nav a,
-  .menu a{
-    font-size: 12px;
-    letter-spacing: .04em;
-  }
-
-  .button,.btn,.hero-btn{
-    padding: 11px 22px;
-    font-size: 13px;
-  }
-}
-
-/* -------------------------
-   Optional: hide accidental visible accessibility labels
-------------------------- */
-.visually-hidden,
-.sr-only{
-  position:absolute !important;
-  width:1px !important;
-  height:1px !important;
-  margin:-1px !important;
-  padding:0 !important;
-  overflow:hidden !important;
-  clip: rect(0 0 0 0) !important;
-  white-space: nowrap !important;
-  border:0 !important;
-}
-/* ======================================================
-   GREENOVIA MENU + TYPOGRAPHY VARIABLES (SAFE)
-   ====================================================== */
-
-:root {
-  /* MENU – Top level */
-  --menu-top-level-font-family: "Montserrat", "Inter", system-ui, sans-serif;
-  --menu-top-level-font-weight: 600;
-  --menu-top-level-font-style: normal;
-  --menu-top-level-font-case: uppercase;
-  --menu-top-level-font-size: 0.875rem;        /* 14px mobile */
-  --menu-top-level-font-size-desktop: 0.9375rem; /* 15px desktop */
-  --menu-top-level-font-line-height: 1.2;
-  --menu-top-level-font-color: rgb(var(--color-foreground-rgb));
-  --menu-top-level-font-color-rgb: var(--color-foreground-rgb);
-
-  /* MENU – Sub menu */
-  --menu-child-font-family: "Inter", system-ui, sans-serif;
-  --menu-child-font-weight: 500;
-  --menu-child-font-size: 0.875rem;
-  --menu-child-font-line-height: 1.5;
-
-  /* MENU – Parent headings inside mega menu */
-  --menu-parent-font-family: "Playfair Display", serif;
-  --menu-parent-font-weight: 600;
-  --menu-parent-font-size: 1.125rem;
-  --menu-parent-font-line-height: 1.2;
-}
-/* ======================================================
-   FINAL FIX: Align search, user & cart icons
-   ====================================================== */
-
-/* Right side container */
-.header__icons,
-.header-actions {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
-  gap: 12px !important;
-}
-
-/* Normalize all icon buttons */
-.header__icon,
-.header__icon--search,
-.header__icon--account,
-.header__icon--cart,
-.header-actions__action,
-a[href*="/account"],
-a[href*="/cart"] {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 36px !important;
-  height: 36px !important;
-  line-height: 1 !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  border-radius: 50%;
-}
-
-/* Ensure icon graphics are centered */
-.header__icon svg,
-.header__icon img,
-.header-actions__action svg,
-.header-actions__action img,
-a[href*="/account"] svg,
-a[href*="/cart"] svg {
-  width: 18px !important;
-  height: 18px !important;
-  display: block !important;
-}
-
-/* Prevent cart count/text from shifting layout */
-.header__icon .cart-count,
-.header__icon .count,
-.header__icon span:not(svg) {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-}
-
-/* ====================================================== */
-/* ======================================================
-   FINAL FIX: Align search, user & cart icons
-   ====================================================== */
-
-/* Right side container */
-.header__icons,
-.header-actions {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
-  gap: 12px !important;
-}
-
-/* Normalize all icon buttons */
-.header__icon,
-.header__icon--search,
-.header__icon--account,
-.header__icon--cart,
-.header-actions__action,
-a[href*="/account"],
-a[href*="/cart"] {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 36px !important;
-  height: 36px !important;
-  line-height: 1 !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  border-radius: 50%;
-}
-
-/* Ensure icon graphics are centered */
-.header__icon svg,
-.header__icon img,
-.header-actions__action svg,
-.header-actions__action img,
-a[href*="/account"] svg,
-a[href*="/cart"] svg {
-  width: 18px !important;
-  height: 18px !important;
-  display: block !important;
-}
-
-/* Prevent cart count/text from shifting layout */
-.header__icon .cart-count,
-.header__icon .count,
-.header__icon span:not(svg) {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-}
-
-/* ====================================================== */
-/* ======================================================
-   HEADER VERTICAL PADDING TUNE
-   ====================================================== */
-
-/* Desktop */
+/* Header vertical padding */
 @media (min-width: 990px) {
-  .header,
-  header-component,
-  #header-group {
+  .header, header-component, #header-group {
     padding-top: 22px !important;
     padding-bottom: 22px !important;
   }
 }
-
-/* Mobile */
 @media (max-width: 989px) {
-  .header,
-  header-component,
-  #header-group {
+  .header, header-component, #header-group {
     padding-top: 14px !important;
     padding-bottom: 14px !important;
   }
 }
-
-/* ====================================================== */
