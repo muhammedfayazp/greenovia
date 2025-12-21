@@ -20,10 +20,16 @@
 }
 {% endschema %}
 
+{% assign slide_blocks = section.blocks | where: "type", "slide" %}
+
 <style>
+/* ================= BASE ================= */
+.plant-hero { width: 100%; }
+.hero-desktop { display: flex; }
+.hero-mobile { display: none; }
+
 /* ================= DESKTOP ================= */
-.plant-hero {
-  display: flex;
+.hero-desktop {
   align-items: center;
   justify-content: space-between;
   min-height: 80vh;
@@ -32,25 +38,25 @@
   gap: 40px;
 }
 
-.plant-hero__content {
+.hero-left {
   flex: 1;
   max-width: 520px;
 }
 
-.plant-hero__content h1 {
+.hero-left h1 {
   font-size: 56px;
   line-height: 1.1;
   color: #1f3d1b;
   margin-bottom: 18px;
 }
 
-.plant-hero__content p {
+.hero-left p {
   font-size: 18px;
   color: #555;
   line-height: 1.6;
 }
 
-.plant-hero__btn {
+.hero-btn {
   display: inline-block;
   margin-top: 26px;
   background: #1f3d1b;
@@ -60,19 +66,20 @@
   font-weight: 600;
 }
 
-.plant-hero__slider {
+.hero-right {
   flex: 1;
   position: relative;
   text-align: center;
 }
 
+/* Slider */
 .plant-slide { display: none; }
 .plant-slide.active { display: block; }
 
 .plant-slide img {
   max-width: 380px;
-  height: auto;
   margin: 0 auto;
+  height: auto;
 }
 
 .plant-dots {
@@ -92,141 +99,142 @@
   border-radius: 50%;
   cursor: pointer;
 }
+.plant-dot.active { background: #1f3d1b; }
 
-.plant-dot.active {
-  background: #1f3d1b;
-}
-
-/* ================= TABLET ================= */
-@media (max-width: 1024px) {
-  .plant-hero {
-    padding: 40px 30px;
-    gap: 30px;
-  }
-
-  .plant-hero__content h1 {
-    font-size: 42px;
-  }
-
-  .plant-slide img {
-    max-width: 300px;
-  }
-}
-/* ============================
-   SIMPLE MOBILE HERO LAYOUT
-============================ */
+/* ================= MOBILE ================= */
 @media (max-width: 768px) {
-  .plant-hero {
-    flex-direction: column !important;
-    padding: 20px 16px 32px !important;
-    background: #f3f8f4 !important;
-    min-height: auto !important;
+  .hero-desktop { display: none !important; }
+  .hero-mobile { display: block !important; }
+
+  .hero-mobile {
+    padding: 20px 14px 36px;
+    background: #ffffff;
   }
 
-  .plant-hero__content {
-    max-width: 100% !important;
-    width: 100% !important;
-    background: #ffffff !important;
-    border-radius: 28px !important;
-    padding: 24px 20px !important;
-    box-shadow: 0 12px 32px rgba(0,0,0,0.08) !important;
-    order: 1 !important;
-    text-align: left !important;
+  .hero-mobile-card {
+    background: #f4faf4;
+    border-radius: 36px;
+    padding: 28px 22px 32px;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.08);
+    text-align: left;
   }
 
-  .plant-hero__content h1 {
-    font-size: 26px !important;
-    line-height: 1.25 !important;
-    margin-bottom: 12px !important;
+  .hero-mobile-card h1 {
+    font-size: 28px;
+    line-height: 1.25;
+    margin-bottom: 16px;
+    color: #1f3d1b;
   }
 
-  .plant-hero__content p {
-    font-size: 14px !important;
-    margin-bottom: 18px !important;
+  .hero-mobile-card p {
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: 20px;
+    color: #555;
   }
 
-  .plant-hero__btn {
-    width: 100% !important;
-    padding: 12px 0 !important;
-    text-align: center !important;
-    font-size: 14px !important;
-    border-radius: 12px !important;
+  .hero-mobile-card .hero-btn {
+    width: 100%;
+    text-align: center;
+    padding: 14px 0;
+    border-radius: 12px;
+    font-size: 15px;
   }
 
-  /* Image BELOW content */
-  .plant-hero__slider {
-    width: 100% !important;
-    margin-top: 20px !important;
-    order: 2 !important;
-    text-align: center !important;
-    position: static !important;
+  .hero-mobile-image {
+    margin-top: 24px;
+    text-align: center;
   }
 
-  .plant-slide {
-    display: none !important;
+  .hero-mobile-image img {
+    max-width: 180px;
+    height: auto;
+    margin: 0 auto;
   }
 
-  .plant-slide.active {
-    display: block !important;
-  }
-
-  .plant-slide img {
-    max-width: 180px !important;
-    width: 100% !important;
-    height: auto !important;
-    margin: 0 auto !important;
-    display: block !important;
-  }
-
-  /* Dots under image */
-  .plant-dots {
-    position: static !important;
-    margin-top: 10px !important;
-    display: flex !important;
-    justify-content: center !important;
-    flex-direction: row !important;
-    gap: 8px !important;
-    transform: none !important;
+  .hero-mobile .plant-dots {
+    position: static;
+    transform: none;
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 12px;
+    gap: 8px;
   }
 }
-
-
 </style>
 
 <section class="plant-hero" id="plantHero">
-  <div class="plant-hero__content">
-    <h1>{{ section.settings.heading }}</h1>
-    <p>{{ section.settings.subtext }}</p>
-    <a href="{{ section.settings.button_link }}" class="plant-hero__btn">
-      {{ section.settings.button_text }}
-    </a>
+
+  <!-- ============ DESKTOP HTML ============ -->
+  <div class="hero-desktop">
+    <div class="hero-left">
+      <h1>{{ section.settings.heading }}</h1>
+      <p>{{ section.settings.subtext }}</p>
+      <a href="{{ section.settings.button_link }}" class="hero-btn">
+        {{ section.settings.button_text }}
+      </a>
+    </div>
+
+    <div class="hero-right">
+      {% for block in slide_blocks %}
+        <div class="plant-slide {% if forloop.first %}active{% endif %}">
+          {% if block.settings.image %}
+            <img
+              src="{{ block.settings.image | image_url: width: 600 }}"
+              alt="{{ block.settings.image.alt | escape }}"
+              width="{{ block.settings.image.width }}"
+              height="{{ block.settings.image.height }}"
+              loading="lazy"
+            >
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      {% if slide_blocks.size > 1 %}
+        <div class="plant-dots">
+          {% for block in slide_blocks %}
+            <span class="plant-dot {% if forloop.first %}active{% endif %}" data-index="{{ forloop.index0 }}"></span>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
   </div>
 
-  <div class="plant-hero__slider">
-    {% assign slide_blocks = section.blocks | where: "type", "slide" %}
+  <!-- ============ MOBILE HTML ============ -->
+  <div class="hero-mobile">
+    <div class="hero-mobile-card">
+      <h1>{{ section.settings.heading }}</h1>
+      <p>{{ section.settings.subtext }}</p>
+      <a href="{{ section.settings.button_link }}" class="hero-btn">
+        {{ section.settings.button_text }}
+      </a>
 
-    {% for block in slide_blocks %}
-      <div class="plant-slide {% if forloop.first %}active{% endif %}">
-        {% if block.settings.image %}
-          <img
-            src="{{ block.settings.image | image_url: width: 600 }}"
-            alt="{{ block.settings.image.alt | escape }}"
-            width="{{ block.settings.image.width }}"
-            height="{{ block.settings.image.height }}"
-            loading="lazy"
-          >
-        {% endif %}
-      </div>
-    {% endfor %}
-
-    {% if slide_blocks.size > 1 %}
-      <div class="plant-dots">
+      <div class="hero-mobile-image">
         {% for block in slide_blocks %}
-          <span class="plant-dot {% if forloop.first %}active{% endif %}" data-index="{{ forloop.index0 }}"></span>
+          <div class="plant-slide {% if forloop.first %}active{% endif %}">
+            {% if block.settings.image %}
+              <img
+                src="{{ block.settings.image | image_url: width: 400 }}"
+                alt="{{ block.settings.image.alt | escape }}"
+                width="{{ block.settings.image.width }}"
+                height="{{ block.settings.image.height }}"
+                loading="lazy"
+              >
+            {% endif %}
+          </div>
         {% endfor %}
       </div>
-    {% endif %}
+
+      {% if slide_blocks.size > 1 %}
+        <div class="plant-dots">
+          {% for block in slide_blocks %}
+            <span class="plant-dot {% if forloop.first %}active{% endif %}" data-index="{{ forloop.index0 }}"></span>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
   </div>
+
 </section>
 
 <script>
