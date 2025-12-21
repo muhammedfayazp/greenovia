@@ -204,7 +204,7 @@
         {% for block in slide_blocks %}
           <div class="plant-slide {% if forloop.first %}active{% endif %}">
             {% if block.settings.image %}
-              <img src="{{ block.settings.image | image_url: width: 400 }}" >
+              <img src="{{ block.settings.image | image_url: width: 400 }}" alt="">
             {% endif %}
           </div>
         {% endfor %}
