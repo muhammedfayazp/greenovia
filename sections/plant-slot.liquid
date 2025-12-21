@@ -1,0 +1,174 @@
+{% schema %}
+{
+  "name": "Plant Slot Section",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Decorate your home with plants" },
+    { "type": "textarea", "id": "text", "label": "Description", "default": "Bring nature into your space with our hand-picked plants that inspire comfort and beauty." },
+    { "type": "image_picker", "id": "image", "label": "Right Image" }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature",
+      "settings": [
+        { "type": "image_picker", "id": "icon", "label": "Icon" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Unbeatable quality" },
+        { "type": "text", "id": "text", "label": "Text", "default": "Greater productivity and relaxation" }
+      ]
+    }
+  ],
+  "max_blocks": 3,
+  "presets": [
+    { "name": "Plant Slot Section" }
+  ]
+}
+{% endschema %}
+
+<style>
+.plant-slot {
+  background: #f6efe7;
+  padding: 80px 60px;
+}
+
+.plant-slot__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 60px;
+}
+
+.plant-slot__left {
+  flex: 1;
+}
+
+.plant-slot__left h2 {
+  font-size: 52px;
+  line-height: 1.15;
+  color: #2c2c2c;
+  margin-bottom: 20px;
+}
+
+.plant-slot__left p {
+  color: #6b6b6b;
+  max-width: 520px;
+  margin-bottom: 40px;
+}
+
+.plant-slot__features {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.plant-slot__feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+.plant-slot__feature-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #1f3d1b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.plant-slot__feature-icon img {
+  width: 26px;
+  height: 26px;
+}
+
+.plant-slot__feature h4 {
+  margin: 0;
+  font-size: 22px;
+  color: #2c2c2c;
+}
+
+.plant-slot__feature p {
+  margin: 4px 0 0;
+  color: #777;
+  font-size: 15px;
+}
+
+.plant-slot__right {
+  flex: 1;
+  text-align: center;
+}
+
+.plant-slot__right img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ================= MOBILE ================= */
+@media (max-width: 768px) {
+  .plant-slot {
+    padding: 50px 20px;
+  }
+
+  .plant-slot__inner {
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  .plant-slot__left h2 {
+    font-size: 32px;
+  }
+
+  .plant-slot__features {
+    gap: 22px;
+  }
+
+  .plant-slot__right img {
+    max-width: 260px;
+    margin: 0 auto;
+  }
+}
+</style>
+
+<section class="plant-slot">
+  <div class="plant-slot__inner">
+    <div class="plant-slot__left">
+      <h2>{{ section.settings.heading }}</h2>
+      <p>{{ section.settings.text }}</p>
+
+      <div class="plant-slot__features">
+        {% for block in section.blocks %}
+          <div class="plant-slot__feature" {{ block.shopify_attributes }}>
+            <div class="plant-slot__feature-icon">
+              {% if block.settings.icon %}
+                <img
+                  src="{{ block.settings.icon | image_url: width: 60 }}"
+                  alt="{{ block.settings.title }}"
+                  width="26"
+                  height="26"
+                >
+              {% endif %}
+            </div>
+            <div>
+              <h4>{{ block.settings.title }}</h4>
+              <p>{{ block.settings.text }}</p>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="plant-slot__right">
+      {% if section.settings.image %}
+        <img
+          src="{{ section.settings.image | image_url: width: 800 }}"
+          alt="Plant"
+          width="{{ section.settings.image.width }}"
+          height="{{ section.settings.image.height }}"
+          loading="lazy"
+        >
+      {% endif %}
+    </div>
+  </div>
+</section>
