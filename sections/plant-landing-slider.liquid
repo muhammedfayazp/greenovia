@@ -2,9 +2,9 @@
 {
   "name": "Plant Landing Slider",
   "settings": [
-    { "type": "text", "id": "heading", "label": "Heading", "default": "Grow Beautiful Plants at Home" },
-    { "type": "textarea", "id": "subtext", "label": "Subtext", "default": "Shop our organic, hand-picked selection of plants & accessories." },
-    { "type": "text", "id": "button_text", "label": "Button text", "default": "Shop Now" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Shop Beautiful Plants for Every Home" },
+    { "type": "textarea", "id": "subtext", "label": "Subtext", "default": "Premium plants, easy care, and fast delivery — everything you need to grow with confidence." },
+    { "type": "text", "id": "button_text", "label": "Button text", "default": "View all items" },
     { "type": "url", "id": "button_link", "label": "Button link" }
   ],
   "blocks": [
@@ -21,6 +21,7 @@
 {% endschema %}
 
 <style>
+/* ================= DESKTOP ================= */
 .plant-hero {
   display: flex;
   align-items: center;
@@ -50,29 +51,26 @@
 .plant-hero__btn {
   display: inline-block;
   margin-top: 25px;
-  background: #4caf50;
+  background: #1f3d1b;
   color: #fff;
   padding: 14px 34px;
-  border-radius: 6px;
+  border-radius: 10px;
   font-weight: 600;
 }
 
 .plant-hero__slider {
   flex: 1;
   position: relative;
+  text-align: center;
 }
 
-.plant-slide {
-  display: none;
-}
-
-.plant-slide.active {
-  display: block;
-}
+.plant-slide { display: none; }
+.plant-slide.active { display: block; }
 
 .plant-slide img {
-  max-width: 100%;
+  max-width: 360px;
   height: auto;
+  margin: 0 auto;
 }
 
 .plant-dots {
@@ -86,15 +84,71 @@
 }
 
 .plant-dot {
-  width: 12px;
-  height: 12px;
-  background: #ccc;
+  width: 10px;
+  height: 10px;
+  background: #cfd8cf;
   border-radius: 50%;
   cursor: pointer;
 }
 
-.plant-dot.active {
-  background: #4caf50;
+.plant-dot.active { background: #1f3d1b; }
+
+/* ================= MOBILE CARD UI ================= */
+@media (max-width: 768px) {
+  .plant-hero {
+    flex-direction: column;
+    padding: 20px 16px 40px;
+    background: #f3f8f4;
+  }
+
+  .plant-hero__content,
+  .plant-hero__slider {
+    width: 100%;
+  }
+
+  .plant-hero__content {
+    background: #fff;
+    border-radius: 28px;
+    padding: 24px 20px 28px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+    text-align: left;
+    order: 1;
+  }
+
+  .plant-hero__content h1 {
+    font-size: 26px;
+    line-height: 1.2;
+    margin-bottom: 12px;
+  }
+
+  .plant-hero__content p {
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 18px;
+  }
+
+  .plant-hero__btn {
+    padding: 12px 22px;
+    font-size: 14px;
+  }
+
+  .plant-hero__slider {
+    order: 2;
+    margin-top: -10px;
+  }
+
+  .plant-slide img {
+    max-width: 160px;
+    margin: 0 auto 10px;
+  }
+
+  .plant-dots {
+    position: static;
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 10px;
+    transform: none;
+  }
 }
 </style>
 
@@ -114,7 +168,7 @@
       <div class="plant-slide {% if forloop.first %}active{% endif %}">
         {% if block.settings.image %}
           <img
-            src="{{ block.settings.image | image_url: width: 900 }}"
+            src="{{ block.settings.image | image_url: width: 600 }}"
             alt="{{ block.settings.image.alt | escape }}"
             width="{{ block.settings.image.width }}"
             height="{{ block.settings.image.height }}"
@@ -124,19 +178,23 @@
       </div>
     {% endfor %}
 
-
-    <div class="plant-dots">
-      {% for block in section.blocks %}
-        <span class="plant-dot {% if forloop.first %}active{% endif %}" data-index="{{ forloop.index0 }}"></span>
-      {% endfor %}
-    </div>
+    {% if slide_blocks.size > 1 %}
+      <div class="plant-dots">
+        {% for block in slide_blocks %}
+          <span class="plant-dot {% if forloop.first %}active{% endif %}" data-index="{{ forloop.index0 }}"></span>
+        {% endfor %}
+      </div>
+    {% endif %}
   </div>
 </section>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-  const slides = document.querySelectorAll('#plantHero .plant-slide');
-  const dots = document.querySelectorAll('#plantHero .plant-dot');
+  const slider = document.getElementById('plantHero');
+  if (!slider) return;
+
+  const slides = slider.querySelectorAll('.plant-slide');
+  const dots = slider.querySelectorAll('.plant-dot');
   let current = 0;
 
   function showSlide(i) {
@@ -147,12 +205,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
   dots.forEach(dot => {
     dot.addEventListener('click', () => {
-      showSlide(parseInt(dot.dataset.index));
+      showSlide(parseInt(dot.dataset.index, 10));
     });
   });
 
-  setInterval(() => {
-    showSlide((current + 1) % slides.length);
-  }, 4000);
+  if (slides.length > 1) {
+    setInterval(() => {
+      showSlide((current + 1) % slides.length);
+    }, 4000);
+  }
 });
 </script>
