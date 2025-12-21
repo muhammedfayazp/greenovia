@@ -116,7 +116,6 @@ main img,
 }
 @media (max-width: 989px) {
   .header, header-component, #header-group {
-    padding-top: 14px !important;
     padding-bottom: 14px !important;
   }
 }
