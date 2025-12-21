@@ -394,3 +394,163 @@ a[href*="/cart"] svg {
 }
 
 /* ====================================================== */
+/* =============== MOBILE RESPONSIVE =============== */
+@media (max-width: 990px) {
+
+  /* ---------- Header layout ---------- */
+  .header,
+  .site-header,
+  header.header {
+    padding: 12px 16px !important;
+  }
+
+  .header__inline-menu,
+  nav.header__inline-menu,
+  .header-menu,
+  .menu {
+    display: none !important; /* hide desktop menu */
+  }
+
+  /* Make header content align properly */
+  .header__heading,
+  .header__heading-link,
+  .header__logo {
+    max-width: 140px;
+  }
+
+  /* Right side icons align */
+  .header__icons,
+  .header-icons {
+    display: flex !important;
+    align-items: center;
+    gap: 12px;
+  }
+
+  /* Add hamburger button (if exists in theme) */
+  .header__icon--menu,
+  .menu-drawer-toggle,
+  .icon-hamburger {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+  }
+
+  /* ---------- HERO section ---------- */
+  .hero,
+  .banner,
+  .home-hero,
+  .slideshow {
+    padding: 18px 16px !important;
+  }
+
+  /* If hero is grid/2-column */
+  .hero__grid,
+  .banner__content,
+  .home-hero__inner,
+  .slideshow__slide {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 18px !important;
+  }
+
+  /* Text block */
+  .hero__content,
+  .banner__box,
+  .home-hero__content {
+    order: 2; /* text after image */
+    text-align: left;
+  }
+
+  /* Title sizing */
+  .hero__title,
+  .banner__heading,
+  .home-hero h1 {
+    font-size: clamp(28px, 7vw, 40px) !important;
+    line-height: 1.1 !important;
+    margin-bottom: 10px !important;
+  }
+
+  /* Subtitle */
+  .hero__text,
+  .banner__text,
+  .home-hero p {
+    font-size: 15px !important;
+    line-height: 1.55 !important;
+    max-width: 34ch !important;
+  }
+
+  /* Button full width on mobile */
+  .hero .button,
+  .banner .button,
+  .home-hero .button,
+  .hero__button {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 14px 16px !important;
+    border-radius: 12px !important;
+  }
+
+  /* Image block */
+  .hero__media,
+  .banner__media,
+  .home-hero__media,
+  .slideshow__media {
+    order: 1;
+    border-radius: 18px !important;
+    overflow: hidden;
+    min-height: 260px;
+  }
+
+  /* Image fit */
+  .hero__media img,
+  .banner__media img,
+  .home-hero__media img,
+  .slideshow__media img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important; /* plant stays centered */
+  }
+
+  /* ---------- Features cards under hero ---------- */
+  .hero__features,
+  .feature-list,
+  .features {
+    margin-top: 16px !important;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .hero__feature,
+  .feature-item,
+  .features .card {
+    padding: 14px !important;
+    border-radius: 14px !important;
+    box-shadow: 0 6px 16px rgba(0,0,0,.06) !important;
+  }
+}
+
+
+/* ---------- Small phones ---------- */
+@media (max-width: 420px) {
+  .header,
+  .site-header,
+  header.header {
+    padding: 10px 12px !important;
+  }
+
+  .hero,
+  .banner,
+  .home-hero {
+    padding: 16px 12px !important;
+  }
+
+  .hero__media,
+  .banner__media,
+  .home-hero__media {
+    min-height: 220px;
+  }
+}
