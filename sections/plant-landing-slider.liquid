@@ -1,208 +1,649 @@
 {% schema %}
 {
-  "name": "Plant Hero Slider",
+  "name": "Plant Landing Slider",
   "settings": [
-    { "type": "text", "id": "heading", "label": "Heading", "default": "Shop Beautiful Plants for Every Home" },
-    { "type": "textarea", "id": "subtext", "label": "Subtext", "default": "Premium plants, easy care, and fast delivery — everything you need to grow with confidence." },
-    { "type": "text", "id": "button_text", "label": "Button text", "default": "View all items" },
-    { "type": "url", "id": "button_link", "label": "Button link" }
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Shop Beautiful Plants for Every Home"
+    },
+    {
+      "type": "textarea",
+      "id": "subtext",
+      "label": "Subtext",
+      "default": "Premium plants, easy care, and fast delivery — everything you need to grow with confidence."
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text",
+      "default": "View all items"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    }
   ],
   "blocks": [
     {
       "type": "slide",
       "name": "Slide",
       "settings": [
-        { "type": "image_picker", "id": "image", "label": "Slide image" }
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Slide image"
+        }
       ]
     }
   ],
-  "presets": [{ "name": "Plant Hero Slider" }]
+  "presets": [{
+    "name": "Plant Landing Slider"
+  }]
 }
 {% endschema %}
 
-{% assign slides = section.blocks | where: "type", "slide" %}
+{% assign slide_blocks = section.blocks | where: "type", "slide" %}
 
-<section class="plant-hero" id="plantHero-{{ section.id }}">
-  <div class="hero-wrapper">
+<style>
+/* ===== CSS VARIABLES ===== */
+:root {
+  --hero-green: #1f3d1b;
+  --hero-light-green: #f4faf4;
+  --hero-text-gray: #555;
+  --hero-dot-inactive: #cfd8cf;
+  --hero-border-radius: 10px;
+}
 
-    <!-- ===== TEXT ===== -->
-    <div class="hero-text">
+/* ===== RESET & BASE ===== */
+.plant-hero * {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.plant-hero {
+  width: 100%;
+  overflow: hidden;
+}
+
+/* ===== DESKTOP LAYOUT ===== */
+.hero-desktop {
+  display: flex;
+  min-height: 80vh;
+  padding: 60px;
+  gap: 60px;
+  background: #fff;
+  align-items: center;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.hero-left {
+  flex: 1;
+  max-width: 550px;
+}
+
+.hero-left h1 {
+  font-size: 56px;
+  line-height: 1.2;
+  color: var(--hero-green);
+  margin-bottom: 20px;
+  font-weight: 700;
+}
+
+.hero-left p {
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--hero-text-gray);
+  margin-bottom: 30px;
+}
+
+.hero-btn {
+  display: inline-block;
+  background: var(--hero-green);
+  color: #fff;
+  padding: 16px 40px;
+  border-radius: var(--hero-border-radius);
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.hero-btn:hover {
+  background: #2d5a27;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(31, 61, 27, 0.2);
+}
+
+/* Desktop Features */
+.hero-desktop-features {
+  display: flex;
+  gap: 40px;
+  margin-top: 50px;
+}
+
+.desktop-feature-item {
+  flex: 1;
+}
+
+.desktop-feature-item span {
+  font-size: 28px;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.desktop-feature-item strong {
+  display: block;
+  font-size: 16px;
+  color: var(--hero-green);
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.desktop-feature-item p {
+  font-size: 14px;
+  color: var(--hero-text-gray);
+  margin: 0;
+}
+
+/* Desktop Slider Right Side */
+.hero-right {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.plant-slider-container {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  height: 500px;
+}
+
+.plant-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.6s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.plant-slide.active {
+  opacity: 1;
+  z-index: 1;
+}
+
+.plant-slide img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Desktop Dots */
+.plant-dots {
+  position: absolute;
+  right: -40px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 2;
+}
+
+.plant-dot {
+  width: 12px;
+  height: 12px;
+  background: var(--hero-dot-inactive);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.plant-dot:hover {
+  background: #a0b5a0;
+  transform: scale(1.2);
+}
+
+.plant-dot.active {
+  background: var(--hero-green);
+  height: 36px;
+  border-radius: 6px;
+}
+
+/* ===== MOBILE LAYOUT ===== */
+.hero-mobile {
+  display: none;
+}
+
+/* ===== RESPONSIVE BREAKPOINTS ===== */
+@media (max-width: 1024px) {
+  .hero-desktop {
+    padding: 40px;
+    gap: 40px;
+  }
+
+  .hero-left h1 {
+    font-size: 44px;
+  }
+
+  .plant-slider-container {
+    max-width: 400px;
+    height: 400px;
+  }
+
+  .plant-dots {
+    right: -30px;
+  }
+}
+
+/* ===== MOBILE STYLES ===== */
+@media (max-width: 768px) {
+  /* Hide desktop */
+  .hero-desktop {
+    display: none !important;
+  }
+
+  /* Show mobile */
+  .hero-mobile {
+    display: block !important;
+    width: 100%;
+    background: #ffffff;
+    padding: 20px 16px;
+  }
+
+  /* Mobile Card Container */
+  .hero-mobile-card {
+    background: var(--hero-light-green);
+    border-radius: 32px;
+    padding: 28px 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Mobile Top Section */
+  .hero-mobile-top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .hero-mobile-text {
+    flex: 1;
+  }
+
+  .hero-mobile-text h1 {
+    font-size: 28px;
+    line-height: 1.25;
+    color: var(--hero-green);
+    margin-bottom: 12px;
+    font-weight: 700;
+  }
+
+  .hero-mobile-text p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--hero-text-gray);
+    margin-bottom: 16px;
+  }
+
+  .hero-btn.full {
+    width: 100%;
+    padding: 14px 0;
+    text-align: center;
+    display: block;
+    border-radius: 12px;
+  }
+
+  /* Mobile Image Slider */
+  .hero-mobile-image {
+    flex-shrink: 0;
+    width: 140px;
+    height: 140px;
+    position: relative;
+  }
+
+  .hero-mobile-image .plant-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+  }
+
+  .hero-mobile-image .plant-slide.active {
+    opacity: 1;
+    z-index: 1;
+  }
+
+  .hero-mobile-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+
+  /* Mobile Dots */
+  .hero-mobile .plant-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin: 16px 0 24px;
+    position: static;
+    transform: none;
+    flex-direction: row;
+  }
+
+  .hero-mobile .plant-dot {
+    width: 8px;
+    height: 8px;
+  }
+
+  .hero-mobile .plant-dot.active {
+    width: 24px;
+    height: 8px;
+    border-radius: 4px;
+  }
+
+  /* Mobile Features */
+  .hero-mobile-features {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .feature-item span {
+    font-size: 26px;
+    flex-shrink: 0;
+  }
+
+  .feature-item strong {
+    display: block;
+    font-size: 15px;
+    color: var(--hero-green);
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+
+  .feature-item p {
+    font-size: 13px;
+    color: var(--hero-text-gray);
+    margin: 0;
+    line-height: 1.4;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-mobile-text h1 {
+    font-size: 24px;
+  }
+
+  .hero-mobile-image {
+    width: 120px;
+    height: 120px;
+  }
+
+  .hero-mobile-card {
+    padding: 24px 20px;
+    border-radius: 28px;
+  }
+}
+</style>
+
+<section class="plant-hero" id="plantHero">
+  <!-- ================= DESKTOP HERO ================= -->
+  <div class="hero-desktop">
+    <div class="hero-left">
       <h1>{{ section.settings.heading }}</h1>
       <p>{{ section.settings.subtext }}</p>
       <a href="{{ section.settings.button_link }}" class="hero-btn">
         {{ section.settings.button_text }}
       </a>
 
-      <div class="hero-features">
-        <div><span>🚚</span> Fast Delivery</div>
-        <div><span>🌱</span> Healthy Plants</div>
-        <div><span>⭐</span> Premium Quality</div>
+      <div class="hero-desktop-features">
+        <div class="desktop-feature-item">
+          <span>🚚</span>
+          <strong>Fast Delivery</strong>
+          <p>Fresh plants at your doorstep</p>
+        </div>
+        <div class="desktop-feature-item">
+          <span>🌱</span>
+          <strong>Healthy Plants</strong>
+          <p>Grown with expert care</p>
+        </div>
+        <div class="desktop-feature-item">
+          <span>⭐</span>
+          <strong>Premium Quality</strong>
+          <p>Hand-picked for your home</p>
+        </div>
       </div>
     </div>
 
-    <!-- ===== SLIDER ===== -->
-    <div class="hero-slider">
-      <div class="slides">
-        {% for block in slides %}
-          <div class="slide {% if forloop.first %}active{% endif %}">
-            {% if block.settings.image %}
-              <img src="{{ block.settings.image | image_url: width: 600 }}" alt="">
-            {% endif %}
-          </div>
+    <div class="hero-right">
+      <div class="plant-slider-container">
+        {% for block in slide_blocks %}
+        <div class="plant-slide {% if forloop.first %}active{% endif %}" data-slide="{{ forloop.index0 }}">
+          {% if block.settings.image %}
+          <img 
+            src="{{ block.settings.image | image_url: width: 800 }}" 
+            alt="{{ block.settings.image.alt | escape | default: 'Plant image' }}"
+            loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+          >
+          {% endif %}
+        </div>
         {% endfor %}
       </div>
 
-      {% if slides.size > 1 %}
-      <div class="dots">
-        {% for block in slides %}
-          <span class="dot {% if forloop.first %}active{% endif %}" data-index="{{ forloop.index0 }}"></span>
+      {% if slide_blocks.size > 1 %}
+      <div class="plant-dots">
+        {% for block in slide_blocks %}
+        <span class="plant-dot {% if forloop.first %}active{% endif %}" data-index="{{ forloop.index0 }}"></span>
         {% endfor %}
       </div>
       {% endif %}
     </div>
+  </div>
 
+  <!-- ================= MOBILE HERO ================= -->
+  <div class="hero-mobile">
+    <div class="hero-mobile-card">
+      <div class="hero-mobile-top">
+        <div class="hero-mobile-text">
+          <h1>{{ section.settings.heading }}</h1>
+          <p>{{ section.settings.subtext }}</p>
+          <a href="{{ section.settings.button_link }}" class="hero-btn full">
+            {{ section.settings.button_text }}
+          </a>
+        </div>
+
+        <div class="hero-mobile-image">
+          {% for block in slide_blocks %}
+          <div class="plant-slide {% if forloop.first %}active{% endif %}" data-slide="{{ forloop.index0 }}">
+            {% if block.settings.image %}
+            <img 
+              src="{{ block.settings.image | image_url: width: 400 }}" 
+              alt="{{ block.settings.image.alt | escape | default: 'Plant image' }}"
+              loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+            >
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      {% if slide_blocks.size > 1 %}
+      <div class="plant-dots">
+        {% for block in slide_blocks %}
+        <span class="plant-dot {% if forloop.first %}active{% endif %}" data-index="{{ forloop.index0 }}"></span>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="hero-mobile-features">
+        <div class="feature-item">
+          <span>🚚</span>
+          <div>
+            <strong>Fast Delivery</strong>
+            <p>Fresh plants at your doorstep</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <span>🌱</span>
+          <div>
+            <strong>Healthy Plants</strong>
+            <p>Grown with expert care</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <span>⭐</span>
+          <div>
+            <strong>Premium Quality</strong>
+            <p>Hand-picked for your home</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
-<style>
-.plant-hero {
-  background: #fff;
-  padding: 60px 20px;
-}
-.hero-wrapper {
-  max-width: 1200px;
-  margin: auto;
-  display: flex;
-  align-items: center;
-  gap: 40px;
-}
-
-/* TEXT */
-.hero-text { max-width: 520px; }
-.hero-text h1 {
-  font-size: 56px;
-  line-height: 1.1;
-  color: #1f3d1b;
-}
-.hero-text p {
-  font-size: 18px;
-  color: #555;
-  margin: 16px 0 24px;
-}
-.hero-btn {
-  display: inline-block;
-  background: #1f3d1b;
-  color: #fff;
-  padding: 14px 34px;
-  border-radius: 12px;
-}
-.hero-features {
-  display: flex;
-  gap: 20px;
-  margin-top: 30px;
-  font-size: 14px;
-  color: #333;
-}
-
-/* SLIDER */
-.hero-slider {
-  flex: 1;
-  position: relative;
-  background: #f2f7f2;
-  border-radius: 32px;
-  padding: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.slides { position: relative; width: 100%; text-align: center; }
-.slide { display: none; }
-.slide.active { display: block; }
-.slide img {
-  max-width: 360px;
-  width: 100%;
-  margin: auto;
-}
-
-/* DOTS */
-.dots {
-  position: absolute;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #cfd8cf;
-  cursor: pointer;
-}
-.dot.active { background: #1f3d1b; }
-
-/* ===== MOBILE CARD ===== */
-@media (max-width: 768px) {
-  .hero-wrapper {
-    flex-direction: column;
-    background: #f4faf4;
-    border-radius: 36px;
-    padding: 24px 20px;
-    box-shadow: 0 16px 40px rgba(0,0,0,.08);
-  }
-
-  .hero-text h1 { font-size: 26px; }
-  .hero-text p { font-size: 14px; }
-  .hero-btn { width: 100%; text-align: center; }
-
-  .hero-features {
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 16px;
-  }
-
-  .hero-slider {
-    background: transparent;
-    padding: 0;
-    margin-top: 16px;
-  }
-  .slide img { max-width: 150px; }
-
-  .dots {
-    position: static;
-    flex-direction: row;
-    justify-content: center;
-    transform: none;
-    margin-top: 12px;
-  }
-}
-</style>
-
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const hero = document.getElementById('plantHero-{{ section.id }}');
-  if (!hero) return;
+(function() {
+  'use strict';
+  
+  document.addEventListener('DOMContentLoaded', function() {
+    const heroSection = document.getElementById('plantHero');
+    if (!heroSection) return;
 
-  const slides = hero.querySelectorAll('.slide');
-  const dots = hero.querySelectorAll('.dot');
-  let current = 0;
+    // Get all slides and dots in both desktop and mobile versions
+    const allSlides = heroSection.querySelectorAll('.plant-slide');
+    const allDots = heroSection.querySelectorAll('.plant-dot');
+    
+    if (allSlides.length === 0) return;
 
-  function show(i) {
-    slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
-    dots.forEach((d, idx) => d.classList.toggle('active', idx === i));
-    current = i;
-  }
+    let currentSlide = 0;
+    let autoplayInterval;
 
-  dots.forEach(dot => {
-    dot.addEventListener('click', () => show(+dot.dataset.index));
+    // Function to show specific slide
+    function showSlide(index) {
+      // Ensure index is within bounds
+      if (index < 0) index = allSlides.length - 1;
+      if (index >= allSlides.length) index = 0;
+
+      currentSlide = index;
+
+      // Update all slides (both desktop and mobile)
+      allSlides.forEach((slide, i) => {
+        if (parseInt(slide.dataset.slide) === currentSlide) {
+          slide.classList.add('active');
+        } else {
+          slide.classList.remove('active');
+        }
+      });
+
+      // Update all dots (both desktop and mobile)
+      allDots.forEach((dot, i) => {
+        if (parseInt(dot.dataset.index) === currentSlide) {
+          dot.classList.add('active');
+        } else {
+          dot.classList.remove('active');
+        }
+      });
+    }
+
+    // Next slide
+    function nextSlide() {
+      showSlide(currentSlide + 1);
+    }
+
+    // Start autoplay
+    function startAutoplay() {
+      if (allSlides.length <= 1) return;
+      autoplayInterval = setInterval(nextSlide, 4000);
+    }
+
+    // Stop autoplay
+    function stopAutoplay() {
+      clearInterval(autoplayInterval);
+    }
+
+    // Dot click handlers
+    allDots.forEach(dot => {
+      dot.addEventListener('click', function() {
+        const index = parseInt(this.dataset.index);
+        showSlide(index);
+        stopAutoplay();
+        startAutoplay(); // Restart autoplay after manual interaction
+      });
+    });
+
+    // Touch/swipe support for mobile
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    heroSection.addEventListener('touchstart', function(e) {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    heroSection.addEventListener('touchend', function(e) {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    }, { passive: true });
+
+    function handleSwipe() {
+      const swipeThreshold = 50;
+      const diff = touchStartX - touchEndX;
+
+      if (Math.abs(diff) > swipeThreshold) {
+        if (diff > 0) {
+          // Swipe left - next slide
+          nextSlide();
+        } else {
+          // Swipe right - previous slide
+          showSlide(currentSlide - 1);
+        }
+        stopAutoplay();
+        startAutoplay();
+      }
+    }
+
+    // Pause autoplay on hover (desktop only)
+    if (window.matchMedia('(min-width: 769px)').matches) {
+      heroSection.addEventListener('mouseenter', stopAutoplay);
+      heroSection.addEventListener('mouseleave', startAutoplay);
+    }
+
+    // Initialize
+    showSlide(0);
+    startAutoplay();
+
+    // Pause when tab is not visible
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden) {
+        stopAutoplay();
+      } else {
+        startAutoplay();
+      }
+    });
   });
-
-  if (slides.length > 1) {
-    setInterval(() => {
-      show((current + 1) % slides.length);
-    }, 4000);
-  }
-});
+})();
 </script>
