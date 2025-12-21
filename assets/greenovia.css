@@ -120,3 +120,38 @@ main img,
     padding-bottom: 14px !important;
   }
 }
+/* ===============================
+   REMOVE TOP GAP ON SCROLL
+================================ */
+
+/* Reset default browser spacing */
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Prevent background showing on overscroll */
+body {
+  background: #ffffff !important;
+  overflow-x: hidden;
+}
+
+/* Make sure main content starts right after header */
+#MainContent,
+main,
+.content-for-layout {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* If hero adds space */
+.plant-hero,
+.hero-desktop,
+.hero-mobile {
+  margin-top: 0 !important;
+}
+
+/* Fix iOS/Chrome overscroll glow gap */
+html {
+  overscroll-behavior: none;
+}
