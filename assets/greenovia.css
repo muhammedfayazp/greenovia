@@ -31,16 +31,7 @@ h1,h2,h3,h4,h5,h6{
 a{ text-decoration:none; color:inherit; }
 a:hover{ color: var(--gv-secondary); }
 
-/* Buttons */
-button,
-input[type="submit"],
-.button,
-.btn,
-.hero-btn{
-  font-family: var(--gv-font-ui);
-  font-weight: 600;
-  letter-spacing:.03em;
-}
+ 
 
 /* Header safety */
 .header,
@@ -94,18 +85,7 @@ header-component img{
   --menu-top-level-font-size-desktop: 0.9375rem;
 }
 
-/* Content images only */
-main img,
-.product img,
-.collection img,
-.card img,
-.article img,
-.plant-hero img{
-  max-width:100%;
-  height:auto;
-  display:block;
-}
-
+ 
 
 /* Header vertical padding */
 @media (min-width: 990px) {
