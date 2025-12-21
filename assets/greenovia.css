@@ -106,10 +106,6 @@ main img,
   display:block;
 }
 
-/* Mobile tweaks */
-@media (max-width:768px){
-  body{ font-size:15px; }
-}
 
 /* Header vertical padding */
 @media (min-width: 990px) {
