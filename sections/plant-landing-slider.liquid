@@ -23,73 +23,46 @@
 {% assign slide_blocks = section.blocks | where: "type", "slide" %}
 
 <style>
-/* ================= BASE ================= */
-.plant-hero { width: 100%; }
+/* Base */
 .hero-desktop { display: flex; }
 .hero-mobile { display: none; }
 
-/* ================= DESKTOP ================= */
+/* ===== Desktop ===== */
 .hero-desktop {
-  align-items: center;
-  justify-content: space-between;
   min-height: 80vh;
   padding: 60px;
-  background: #fff;
   gap: 40px;
+  background: #fff;
+  align-items: center;
 }
 
-.hero-left {
-  flex: 1;
-  max-width: 520px;
-}
-
-.hero-left h1 {
-  font-size: 56px;
-  line-height: 1.1;
-  color: #1f3d1b;
-  margin-bottom: 18px;
-}
-
-.hero-left p {
-  font-size: 18px;
-  color: #555;
-  line-height: 1.6;
-}
+.hero-left { max-width: 520px; }
+.hero-left h1 { font-size: 56px; color: #1f3d1b; }
+.hero-left p { font-size: 18px; color: #555; }
 
 .hero-btn {
   display: inline-block;
-  margin-top: 26px;
+  margin-top: 24px;
   background: #1f3d1b;
   color: #fff;
-  padding: 14px 36px;
+  padding: 14px 34px;
   border-radius: 10px;
-  font-weight: 600;
 }
 
-.hero-right {
-  flex: 1;
-  position: relative;
-  text-align: center;
-}
+.hero-right { flex: 1; text-align: center; position: relative; }
 
-/* Slider */
 .plant-slide { display: none; }
 .plant-slide.active { display: block; }
 
-.plant-slide img {
-  max-width: 380px;
-  margin: 0 auto;
-  height: auto;
-}
+.plant-slide img { max-width: 360px; margin: auto; }
 
 .plant-dots {
   position: absolute;
   right: -30px;
   top: 50%;
-  transform: translateY(-50%);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .plant-dot {
@@ -97,70 +70,63 @@
   height: 10px;
   background: #cfd8cf;
   border-radius: 50%;
-  cursor: pointer;
 }
 .plant-dot.active { background: #1f3d1b; }
 
-/* ================= MOBILE ================= */
+/* ===== Mobile ===== */
 @media (max-width: 768px) {
   .hero-desktop { display: none !important; }
   .hero-mobile { display: block !important; }
 
   .hero-mobile {
-    padding: 20px 14px 36px;
-    background: #ffffff;
+    padding: 20px 14px 32px;
+    background: #fff;
   }
 
   .hero-mobile-card {
     background: #f4faf4;
     border-radius: 36px;
-    padding: 28px 22px 32px;
-    box-shadow: 0 16px 40px rgba(0,0,0,0.08);
-    text-align: left;
+    padding: 28px 22px;
+    box-shadow: 0 16px 40px rgba(0,0,0,.08);
   }
 
   .hero-mobile-card h1 {
-    font-size: 28px;
-    line-height: 1.25;
-    margin-bottom: 16px;
+    font-size: 26px;
     color: #1f3d1b;
+    margin-bottom: 12px;
   }
 
   .hero-mobile-card p {
-    font-size: 15px;
-    line-height: 1.7;
-    margin-bottom: 20px;
+    font-size: 14px;
+    margin-bottom: 16px;
     color: #555;
   }
 
-  .hero-mobile-card .hero-btn {
-    width: 100%;
-    text-align: center;
-    padding: 14px 0;
-    border-radius: 12px;
-    font-size: 15px;
-  }
-
   .hero-mobile-image {
-    margin-top: 24px;
     text-align: center;
+    margin: 20px 0;
   }
 
   .hero-mobile-image img {
     max-width: 180px;
-    height: auto;
-    margin: 0 auto;
+    margin: auto;
+  }
+
+  .hero-btn.full {
+    width: 100%;
+    text-align: center;
+    margin-top: 10px;
   }
 
   .hero-mobile .plant-dots {
     position: static;
-    transform: none;
     flex-direction: row;
     justify-content: center;
     margin-top: 12px;
     gap: 8px;
   }
 }
+
 </style>
 
 <section class="plant-hero" id="plantHero">
