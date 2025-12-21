@@ -1,0 +1,163 @@
+{% schema %}
+{
+  "name": "Daily Deals",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Section title", "default": "Daily Deals" },
+    { "type": "text", "id": "view_text", "label": "View more text", "default": "View more →" },
+    { "type": "url", "id": "view_link", "label": "View more link" },
+    { "type": "collection", "id": "collection", "label": "Collection" },
+    { "type": "range", "id": "limit", "min": 2, "max": 8, "step": 1, "label": "Products to show", "default": 4 }
+  ],
+  "presets": [
+    { "name": "Daily Deals" }
+  ]
+}
+{% endschema %}
+
+<style>
+.daily-deals {
+  background: #f6efe7;
+  padding: 70px 60px;
+}
+
+.daily-deals__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.daily-deals__header h2 {
+  font-size: 42px;
+  font-family: var(--gv-font-heading, serif);
+  color: #2c2c2c;
+}
+
+.daily-deals__view {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2c2c2c;
+  border: 1px solid #2c2c2c;
+  border-radius: 50px;
+  padding: 10px 18px;
+  transition: .2s;
+}
+.daily-deals__view:hover {
+  background: #2c2c2c;
+  color: #fff;
+}
+
+.daily-deals__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 30px;
+}
+
+.deal-card {
+  background: #fff;
+  padding: 16px;
+  text-align: center;
+  position: relative;
+}
+
+.deal-card img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.deal-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 12px;
+  padding: 4px 10px;
+  background: orange;
+  color: #fff;
+  font-weight: 600;
+}
+.deal-badge.out {
+  background: #999;
+}
+
+.deal-title {
+  margin-top: 16px;
+  font-size: 16px;
+  color: #2c2c2c;
+}
+
+.deal-price {
+  margin-top: 6px;
+  font-weight: 600;
+  color: #1f3d1b;
+}
+
+/* ============ Responsive ============ */
+@media (max-width: 1024px) {
+  .daily-deals__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .daily-deals {
+    padding: 50px 20px;
+  }
+
+  .daily-deals__header h2 {
+    font-size: 30px;
+  }
+
+  .daily-deals__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .daily-deals__grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+
+<section class="daily-deals">
+  <div class="daily-deals__header">
+    <h2>{{ section.settings.title }}</h2>
+    {% if section.settings.view_link != blank %}
+      <a href="{{ section.settings.view_link }}" class="daily-deals__view">
+        {{ section.settings.view_text }}
+      </a>
+    {% endif %}
+  </div>
+
+  <div class="daily-deals__grid">
+    {% assign products = section.settings.collection.products | slice: 0, section.settings.limit %}
+    {% for product in products %}
+      <div class="deal-card">
+        <a href="{{ product.url }}">
+          {% if product.featured_image %}
+            <img
+              src="{{ product.featured_image | image_url: width: 600 }}"
+              alt="{{ product.title }}"
+              width="{{ product.featured_image.width }}"
+              height="{{ product.featured_image.height }}"
+              loading="lazy"
+            >
+          {% endif %}
+        </a>
+
+        {% if product.available %}
+          <span class="deal-badge">Hot</span>
+        {% else %}
+          <span class="deal-badge out">Out of stock</span>
+        {% endif %}
+
+        <div class="deal-title">{{ product.title }}</div>
+        <div class="deal-price">
+          {{ product.price | money }}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</section>
