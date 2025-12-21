@@ -24,11 +24,13 @@
 /* ================= DESKTOP ================= */
 .plant-hero {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   min-height: 80vh;
   padding: 60px;
-  background: #fff;
+  background: #ffffff;
   overflow: hidden;
+  gap: 40px;
 }
 
 .plant-hero__content {
@@ -90,92 +92,21 @@
   border-radius: 50%;
   cursor: pointer;
 }
-
 .plant-dot.active { background: #1f3d1b; }
 
-/* ================= MOBILE CARD UI ================= */
-@media (max-width: 768px) {
-  .plant-hero {
-    flex-direction: column;
-    padding: 20px 16px 40px;
-    background: #f3f8f4;
-  }
-
-  .plant-hero__content,
-  .plant-hero__slider {
-    width: 100%;
-  }
-
-  .plant-hero__content {
-    background: #fff;
-    border-radius: 28px;
-    padding: 24px 20px 28px;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.08);
-    text-align: left;
-    order: 1;
-  }
-
-  .plant-hero__content h1 {
-    font-size: 26px;
-    line-height: 1.2;
-    margin-bottom: 12px;
-  }
-
-  .plant-hero__content p {
-    font-size: 14px;
-    line-height: 1.6;
-    margin-bottom: 18px;
-  }
-
-  .plant-hero__btn {
-    padding: 12px 22px;
-    font-size: 14px;
-  }
-
-  .plant-hero__slider {
-    order: 2;
-    margin-top: -10px;
-  }
-
-  .plant-slide img {
-    max-width: 160px;
-    margin: 0 auto 10px;
-  }
-
-  .plant-dots {
-    position: static;
-    flex-direction: row;
-    justify-content: center;
-    margin-top: 10px;
-    transform: none;
-  }
-}
-
-/* ================================
-   RESPONSIVE FIXES
-================================ */
-
-/* Tablets */
+/* ================= TABLET ================= */
 @media (max-width: 1024px) {
   .plant-hero {
     padding: 40px 30px;
     gap: 30px;
   }
 
-  .plant-hero__content h1 {
-    font-size: 42px;
-  }
-
-  .plant-hero__content p {
-    font-size: 16px;
-  }
-
-  .plant-slide img {
-    max-width: 300px;
-  }
+  .plant-hero__content h1 { font-size: 42px; }
+  .plant-hero__content p { font-size: 16px; }
+  .plant-slide img { max-width: 300px; }
 }
 
-/* Mobile */
+/* ================= MOBILE CARD UI ================= */
 @media (max-width: 768px) {
   .plant-hero {
     flex-direction: column;
@@ -186,11 +117,10 @@
 
   .plant-hero__content {
     max-width: 100%;
-    text-align: left;
     background: #ffffff;
-    border-radius: 26px;
-    padding: 22px 20px 26px;
-    box-shadow: 0 10px 32px rgba(0,0,0,0.08);
+    border-radius: 28px;
+    padding: 24px 20px 28px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.08);
     order: 1;
   }
 
@@ -213,9 +143,8 @@
 
   .plant-hero__slider {
     order: 2;
-    margin-top: -8px;
+    margin-top: -10px;
     width: 100%;
-    text-align: center;
   }
 
   .plant-slide img {
@@ -235,15 +164,9 @@
 
 /* Small phones */
 @media (max-width: 480px) {
-  .plant-hero__content h1 {
-    font-size: 24px;
-  }
-
-  .plant-slide img {
-    max-width: 150px;
-  }
+  .plant-hero__content h1 { font-size: 24px; }
+  .plant-slide img { max-width: 150px; }
 }
-
 </style>
 
 <section class="plant-hero" id="plantHero">
