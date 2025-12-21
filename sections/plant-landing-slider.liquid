@@ -160,33 +160,74 @@
     </div>
   </div>
 
-  <!-- ================= MOBILE HERO ================= -->
-  <div class="hero-mobile">
-    <div class="hero-mobile-card">
-      <h1>{{ section.settings.heading }}</h1>
-      <p>{{ section.settings.subtext }}</p>
+  <!-- ============ MOBILE HERO ============ -->
+<div class="hero-mobile">
+  <div class="hero-mobile-card">
+
+    <div class="hero-mobile-top">
+      <div class="hero-mobile-text">
+        <h1>{{ section.settings.heading }}</h1>
+        <p>{{ section.settings.subtext }}</p>
+        <a href="{{ section.settings.button_link }}" class="hero-btn full">
+          {{ section.settings.button_text }}
+        </a>
+      </div>
 
       <div class="hero-mobile-image">
         {% for block in slide_blocks %}
           <div class="plant-slide {% if forloop.first %}active{% endif %}">
             {% if block.settings.image %}
-              <img src="{{ block.settings.image | image_url: width: 400 }}" alt="">
+              <img
+                src="{{ block.settings.image | image_url: width: 400 }}"
+                alt="{{ block.settings.image.alt | escape }}"
+                width="{{ block.settings.image.width }}"
+                height="{{ block.settings.image.height }}"
+                loading="lazy"
+              >
             {% endif %}
           </div>
         {% endfor %}
       </div>
+    </div>
 
-      <a href="{{ section.settings.button_link }}" class="hero-btn full">
-        {{ section.settings.button_text }}
-      </a>
-
+    {% if slide_blocks.size > 1 %}
       <div class="plant-dots">
         {% for block in slide_blocks %}
           <span class="plant-dot {% if forloop.first %}active{% endif %}" data-index="{{ forloop.index0 }}"></span>
         {% endfor %}
       </div>
+    {% endif %}
+
+    <!-- Features -->
+    <div class="hero-mobile-features">
+      <div class="feature-item">
+        <span>🚚</span>
+        <div>
+          <strong>Fast Delivery</strong>
+          <p>Fresh plants at your doorstep</p>
+        </div>
+      </div>
+
+      <div class="feature-item">
+        <span>🌱</span>
+        <div>
+          <strong>Healthy Plants</strong>
+          <p>Grown with expert care</p>
+        </div>
+      </div>
+
+      <div class="feature-item">
+        <span>⭐</span>
+        <div>
+          <strong>Premium Quality</strong>
+          <p>Hand-picked for your home</p>
+        </div>
+      </div>
     </div>
+
   </div>
+</div>
+
 
 </section>
 
