@@ -165,7 +165,9 @@
 
 <section class="plant-hero" id="plantHero">
 
-  <!-- ============ DESKTOP HTML ============ -->
+  {% assign slide_blocks = section.blocks | where: "type", "slide" %}
+
+  <!-- ================= DESKTOP HERO ================= -->
   <div class="hero-desktop">
     <div class="hero-left">
       <h1>{{ section.settings.heading }}</h1>
@@ -179,63 +181,49 @@
       {% for block in slide_blocks %}
         <div class="plant-slide {% if forloop.first %}active{% endif %}">
           {% if block.settings.image %}
-            <img
-              src="{{ block.settings.image | image_url: width: 600 }}"
-              alt="{{ block.settings.image.alt | escape }}"
-              width="{{ block.settings.image.width }}"
-              height="{{ block.settings.image.height }}"
-              loading="lazy"
-            >
+            <img src="{{ block.settings.image | image_url: width: 600 }}" alt="">
           {% endif %}
         </div>
       {% endfor %}
 
-      {% if slide_blocks.size > 1 %}
-        <div class="plant-dots">
-          {% for block in slide_blocks %}
-            <span class="plant-dot {% if forloop.first %}active{% endif %}" data-index="{{ forloop.index0 }}"></span>
-          {% endfor %}
-        </div>
-      {% endif %}
+      <div class="plant-dots">
+        {% for block in slide_blocks %}
+          <span class="plant-dot {% if forloop.first %}active{% endif %}" data-index="{{ forloop.index0 }}"></span>
+        {% endfor %}
+      </div>
     </div>
   </div>
 
-  <!-- ============ MOBILE HTML ============ -->
+  <!-- ================= MOBILE HERO ================= -->
   <div class="hero-mobile">
     <div class="hero-mobile-card">
       <h1>{{ section.settings.heading }}</h1>
       <p>{{ section.settings.subtext }}</p>
-      <a href="{{ section.settings.button_link }}" class="hero-btn">
-        {{ section.settings.button_text }}
-      </a>
 
       <div class="hero-mobile-image">
         {% for block in slide_blocks %}
           <div class="plant-slide {% if forloop.first %}active{% endif %}">
             {% if block.settings.image %}
-              <img
-                src="{{ block.settings.image | image_url: width: 400 }}"
-                alt="{{ block.settings.image.alt | escape }}"
-                width="{{ block.settings.image.width }}"
-                height="{{ block.settings.image.height }}"
-                loading="lazy"
-              >
+              <img src="{{ block.settings.image | image_url: width: 400 }}" >
             {% endif %}
           </div>
         {% endfor %}
       </div>
 
-      {% if slide_blocks.size > 1 %}
-        <div class="plant-dots">
-          {% for block in slide_blocks %}
-            <span class="plant-dot {% if forloop.first %}active{% endif %}" data-index="{{ forloop.index0 }}"></span>
-          {% endfor %}
-        </div>
-      {% endif %}
+      <a href="{{ section.settings.button_link }}" class="hero-btn full">
+        {{ section.settings.button_text }}
+      </a>
+
+      <div class="plant-dots">
+        {% for block in slide_blocks %}
+          <span class="plant-dot {% if forloop.first %}active{% endif %}" data-index="{{ forloop.index0 }}"></span>
+        {% endfor %}
+      </div>
     </div>
   </div>
 
 </section>
+
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
