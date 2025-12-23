@@ -443,7 +443,7 @@
       "name": "Daily Deals",
       "settings": {
         "heading": "Daily Deals",
-        "collection": "",
+        "collection": "automated-collection",
         "products_limit": 6,
         "view_all_text": "View all",
         "view_all_link": "shopify://collections/all"
