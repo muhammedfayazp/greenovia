@@ -35,15 +35,11 @@
         },
         "slide_Rfq76M": {
           "type": "slide",
-          "settings": {
-            "image": "shopify://shop_images/plant.png"
-          }
+          "settings": {}
         },
         "slide_gYiHCh": {
           "type": "slide",
-          "settings": {
-            "image": "shopify://shop_images/plant-1.png"
-          }
+          "settings": {}
         }
       },
       "block_order": [
@@ -66,7 +62,6 @@
       "disabled": true,
       "name": "Hero Plant Exact",
       "settings": {
-        "plant_image": "shopify://shop_images/GoldenPhothos01.jpg",
         "heading": "We Love helping to your Decorate home plants",
         "subtext": "Patch helps you discover the best plants for your space, delivers them",
         "button_text": "View all items",
@@ -78,15 +73,11 @@
       "blocks": {
         "slide_tpxDcE": {
           "type": "slide",
-          "settings": {
-            "image": "shopify://shop_images/plants-bold-2.jpg"
-          }
+          "settings": {}
         },
         "slide_dNbicj": {
           "type": "slide",
-          "settings": {
-            "image": "shopify://shop_images/plants-bold-3.jpg"
-          }
+          "settings": {}
         }
       },
       "block_order": [
@@ -994,6 +985,13 @@
         "padding-block-end": 24,
         "gap_between_elements": 24
       }
+    },
+    "shop_by_category_e8ipig": {
+      "type": "shop-by-category",
+      "name": "Shop by Category",
+      "settings": {
+        "heading": "Shop by Category"
+      }
     }
   },
   "order": [
@@ -1005,6 +1003,7 @@
     "section_x8mrnx",
     "media_with_content_xMM9EF",
     "media_with_content_nrnzPh",
-    "marquee_KN4PYb"
+    "marquee_KN4PYb",
+    "shop_by_category_e8ipig"
   ]
 }
