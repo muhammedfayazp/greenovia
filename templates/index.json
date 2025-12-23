@@ -445,9 +445,8 @@
         "heading": "Daily Deals",
         "collection": "",
         "products_limit": 6,
-        "show_badge": true,
-        "view_more_text": "View more",
-        "view_more_link": ""
+        "view_all_text": "View all",
+        "view_all_link": "shopify://collections/all"
       }
     }
   },
