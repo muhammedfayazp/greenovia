@@ -38,10 +38,27 @@
 
             <form method="post" action="/cart/add" class="dailydeals__form">
               <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
-              <button type="submit" class="dailydeals__btn">
-                Add to cart
-              </button>
+
+              <div class="dailydeals__actions">
+                <!-- Quantity counter -->
+                <div class="qty">
+                  <button type="button" class="qty__btn" data-action="minus">−</button>
+                  <input type="number" name="quantity" value="1" min="1" class="qty__input">
+                  <button type="button" class="qty__btn" data-action="plus">+</button>
+                </div>
+
+                <!-- Add to cart icon button -->
+                <button type="submit" class="dailydeals__cartbtn" aria-label="Add to cart">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M3 3h2l2.2 11.4a2 2 0 0 0 2 1.6h7.5a2 2 0 0 0 2-1.6L21 7H6"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="10" cy="20" r="1.5" fill="currentColor"/>
+                    <circle cx="18" cy="20" r="1.5" fill="currentColor"/>
+                  </svg>
+                </button>
+              </div>
             </form>
+
           </div>
 
         </div>
@@ -69,18 +86,15 @@
   align-items:center;
   margin-bottom: 26px;
 }
-
 .dailydeals__title{
   margin:0;
   font-size: 28px;
   color:#1f3d2b;
 }
-
 .dailydeals__more{
   font-size:14px;
   color:#1f3d2b;
   text-decoration:none;
-  white-space:nowrap;
 }
 .dailydeals__more:hover{ text-decoration: underline; }
 
@@ -108,7 +122,7 @@
 /* Image */
 .dailydeals__img{
   display:block;
-  aspect-ratio: 1/1;
+  aspect-ratio:1/1;
   background:#eee;
 }
 .dailydeals__img img{
@@ -128,9 +142,7 @@
   font-weight:600;
   color:#1f3d2b;
 }
-.dailydeals__info a{
-  text-decoration:none;
-}
+.dailydeals__info a{ text-decoration:none; }
 
 .dailydeals__price{
   font-size:15px;
@@ -139,19 +151,58 @@
   font-weight:500;
 }
 
-/* Button */
-.dailydeals__btn{
-  width:100%;
+/* Actions row */
+.dailydeals__actions{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap: 10px;
+}
+
+/* Quantity counter */
+.qty{
+  display:flex;
+  align-items:center;
+  border:1px solid #e0e0e0;
+  border-radius:999px;
+  overflow:hidden;
+}
+.qty__btn{
+  width:32px;
+  height:32px;
   border:none;
-  border-radius: 999px;
-  padding: 10px 14px;
+  background:#f2f2f2;
+  font-size:18px;
+  cursor:pointer;
+  color:#1f3d2b;
+}
+.qty__input{
+  width:40px;
+  text-align:center;
+  border:none;
+  outline:none;
+  font-size:14px;
+}
+
+/* Cart icon button */
+.dailydeals__cartbtn{
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  border:none;
   background:#1f3d2b;
   color:#fff;
-  font-size:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   cursor:pointer;
   transition: background .25s ease, transform .2s ease;
 }
-.dailydeals__btn:hover{
+.dailydeals__cartbtn svg{
+  width:20px;
+  height:20px;
+}
+.dailydeals__cartbtn:hover{
   background:#163022;
   transform: translateY(-2px);
 }
@@ -162,11 +213,24 @@
     padding-left: 16px !important;
     padding-right: 16px !important;
   }
-  .dailydeals__title{
-    font-size:24px;
-  }
+  .dailydeals__title{ font-size:24px; }
 }
 </style>
+
+<script>
+document.addEventListener('click', function(e){
+  const btn = e.target.closest('.qty__btn');
+  if(!btn) return;
+
+  const input = btn.parentElement.querySelector('.qty__input');
+  let value = parseInt(input.value) || 1;
+
+  if(btn.dataset.action === 'plus') value++;
+  if(btn.dataset.action === 'minus' && value > 1) value--;
+
+  input.value = value;
+});
+</script>
 
 {% schema %}
 {
