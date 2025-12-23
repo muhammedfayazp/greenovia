@@ -1,41 +1,36 @@
-{% if section.settings.collection != blank %}
-  {% assign products = collections[section.settings.collection].products %}
+{% assign products = collections.all.products %}
 
-  <div class="dailydeals__grid">
-    {% for product in products %}
-      <div class="dailydeals__card">
+<div class="dailydeals__grid">
+  {% for product in products %}
+    <div class="dailydeals__card">
 
-        <a href="{{ product.url }}" class="dailydeals__img">
-          {% if product.featured_image %}
-            <img
-              src="{{ product.featured_image | image_url: width: 600 }}"
-              alt="{{ product.title | escape }}"
-              loading="lazy"
-            >
-          {% endif %}
+      <a href="{{ product.url }}" class="dailydeals__img">
+        {% if product.featured_image %}
+          <img
+            src="{{ product.featured_image | image_url: width: 600 }}"
+            alt="{{ product.title | escape }}"
+            loading="lazy"
+          >
+        {% endif %}
+      </a>
+
+      <div class="dailydeals__info">
+        <a href="{{ product.url }}">
+          <h3>{{ product.title }}</h3>
         </a>
 
-        <div class="dailydeals__info">
-          <a href="{{ product.url }}">
-            <h3>{{ product.title }}</h3>
-          </a>
-
-          <div class="dailydeals__price">
-            {{ product.price | money }}
-          </div>
-
-          <form method="post" action="/cart/add">
-            <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
-            <button type="submit" class="dailydeals__btn">
-              Add to cart
-            </button>
-          </form>
+        <div class="dailydeals__price">
+          {{ product.price | money }}
         </div>
 
+        <form method="post" action="/cart/add">
+          <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+          <button type="submit" class="dailydeals__btn">
+            Add to cart
+          </button>
+        </form>
       </div>
-    {% endfor %}
-  </div>
 
-{% else %}
-  <p>Please select a collection.</p>
-{% endif %}
+    </div>
+  {% endfor %}
+</div>
