@@ -1043,6 +1043,17 @@
         "padding-block-end": 24,
         "gap_between_elements": 24
       }
+    },
+    "daily_deals_WpJVGc": {
+      "type": "daily-deals",
+      "name": "Daily Deals",
+      "settings": {
+        "title": "Daily Deals",
+        "view_text": "View more →",
+        "view_link": "",
+        "collection": "",
+        "limit": 4
+      }
     }
   },
   "order": [
@@ -1055,6 +1066,7 @@
     "section_x8mrnx",
     "media_with_content_xMM9EF",
     "media_with_content_nrnzPh",
-    "marquee_KN4PYb"
+    "marquee_KN4PYb",
+    "daily_deals_WpJVGc"
   ]
 }
