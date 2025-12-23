@@ -4,19 +4,20 @@
     <div class="dailydeals__head">
       <h2 class="dailydeals__title">{{ section.settings.heading }}</h2>
 
-      {% if section.settings.view_more_link != blank %}
-        <a href="{{ section.settings.view_more_link }}" class="dailydeals__more">
-          {{ section.settings.view_more_text }} →
+      {% if section.settings.view_all_link != blank %}
+        <a href="{{ section.settings.view_all_link }}" class="dailydeals__more">
+          {{ section.settings.view_all_text }} →
         </a>
       {% endif %}
     </div>
 
     {% if section.settings.collection != blank %}
       {% assign products = collections[section.settings.collection].products %}
-      <div class="dailydeals__list">
+      <div class="dailydeals__grid">
         {% for product in products limit: section.settings.products_limit %}
-          <a href="{{ product.url }}" class="dailydeals__card">
-            <div class="dailydeals__img">
+          <div class="dailydeals__card">
+
+            <a href="{{ product.url }}" class="dailydeals__img">
               {% if product.featured_image %}
                 <img
                   src="{{ product.featured_image | image_url: width: 600 }}"
@@ -24,25 +25,29 @@
                   loading="lazy"
                 >
               {% endif %}
-
-              {% if section.settings.show_badge and product.tags.size > 0 %}
-                <span class="dailydeals__badge">
-                  {{ product.tags.first }}
-                </span>
-              {% endif %}
-            </div>
+            </a>
 
             <div class="dailydeals__info">
-              <h3>{{ product.title }}</h3>
-              <span class="dailydeals__price">
+              <a href="{{ product.url }}">
+                <h3>{{ product.title }}</h3>
+              </a>
+              <div class="dailydeals__price">
                 {{ product.price | money }}
-              </span>
+              </div>
+
+              <form method="post" action="/cart/add">
+                <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+                <button type="submit" class="dailydeals__btn">
+                  Add to cart
+                </button>
+              </form>
             </div>
-          </a>
+
+          </div>
         {% endfor %}
       </div>
     {% else %}
-      <p>Please select a collection for Daily Deals.</p>
+      <p>Select a collection to show products.</p>
     {% endif %}
 
   </div>
@@ -50,8 +55,8 @@
 
 <style>
 .dailydeals{
-  background: #f6f7f2;
-  padding: 20px 0 50px;
+  background:#f6f7f2;
+  padding: 20px 0 60px;
 }
 
 .dailydeals__container{
@@ -62,9 +67,9 @@
 /* Header */
 .dailydeals__head{
   display:flex;
-  justify-content: space-between;
+  justify-content:space-between;
   align-items:center;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 }
 
 .dailydeals__title{
@@ -77,45 +82,33 @@
   font-size:14px;
   color:#1f3d2b;
   text-decoration:none;
-  white-space:nowrap;
 }
 .dailydeals__more:hover{ text-decoration: underline; }
 
-/* Product row */
-.dailydeals__list{
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(200px, 1fr);
-  gap: 20px;
-  overflow-x: auto;
-  padding-bottom: 6px;
-  scroll-snap-type: x mandatory;
-}
-.dailydeals__list::-webkit-scrollbar{
-  height: 6px;
-}
-.dailydeals__list::-webkit-scrollbar-thumb{
-  background: rgba(0,0,0,.2);
-  border-radius: 10px;
+/* Grid */
+.dailydeals__grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 22px;
 }
 
 /* Card */
 .dailydeals__card{
-  scroll-snap-align: start;
   background:#fff;
   border-radius:18px;
   overflow:hidden;
   box-shadow: 0 6px 18px rgba(0,0,0,.08);
-  text-decoration:none;
-  color: inherit;
+  display:flex;
+  flex-direction:column;
   transition: transform .25s ease;
 }
 .dailydeals__card:hover{
-  transform: translateY(-4px);
+  transform: translateY(-6px);
 }
 
+/* Image */
 .dailydeals__img{
-  position:relative;
+  display:block;
   aspect-ratio: 1/1;
   background:#eee;
 }
@@ -123,19 +116,6 @@
   width:100%;
   height:100%;
   object-fit:cover;
-  display:block;
-}
-
-/* Badge */
-.dailydeals__badge{
-  position:absolute;
-  top:12px;
-  left:12px;
-  background:#ff9f1c;
-  color:#fff;
-  font-size:12px;
-  padding:4px 8px;
-  border-radius:8px;
 }
 
 /* Info */
@@ -145,26 +125,40 @@
 }
 .dailydeals__info h3{
   margin:0 0 6px;
-  font-size:14px;
+  font-size:15px;
   font-weight:600;
+  color:#1f3d2b;
 }
+.dailydeals__info a{
+  text-decoration:none;
+}
+
 .dailydeals__price{
-  font-size:14px;
+  font-size:15px;
+  margin-bottom: 12px;
   color:#1f3d2b;
   font-weight:500;
 }
 
-/* Desktop grid feel */
-@media (min-width: 990px){
-  .dailydeals__list{
-    grid-auto-flow: initial;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    overflow-x: hidden;
-  }
+/* Button */
+.dailydeals__btn{
+  width:100%;
+  border:none;
+  border-radius: 999px;
+  padding: 10px 14px;
+  background:#1f3d2b;
+  color:#fff;
+  font-size:14px;
+  cursor:pointer;
+  transition: background .25s ease, transform .2s ease;
+}
+.dailydeals__btn:hover{
+  background:#163022;
+  transform: translateY(-2px);
 }
 
 /* Mobile */
-@media (max-width: 768px){
+@media (max-width:768px){
   .dailydeals__container{
     padding-left: 16px !important;
     padding-right: 16px !important;
@@ -195,26 +189,20 @@
       "id": "products_limit",
       "label": "Products to show",
       "min": 4,
-      "max": 12,
+      "max": 20,
       "step": 1,
-      "default": 6
-    },
-    {
-      "type": "checkbox",
-      "id": "show_badge",
-      "label": "Show tag badge",
-      "default": true
+      "default": 8
     },
     {
       "type": "text",
-      "id": "view_more_text",
-      "label": "View more text",
-      "default": "View more"
+      "id": "view_all_text",
+      "label": "View all text",
+      "default": "View all"
     },
     {
       "type": "url",
-      "id": "view_more_link",
-      "label": "View more link"
+      "id": "view_all_link",
+      "label": "View all link"
     }
   ],
   "presets": [
