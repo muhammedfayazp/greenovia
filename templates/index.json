@@ -380,6 +380,53 @@
         "padding-block-end": 100
       }
     },
+    "shop_by_category_e8ipig": {
+      "type": "shop-by-category",
+      "blocks": {
+        "category_7hHWzN": {
+          "type": "category",
+          "settings": {
+            "title": "Indoor Plants",
+            "subtitle": "Shop Now",
+            "link": ""
+          }
+        },
+        "category_itmBbV": {
+          "type": "category",
+          "settings": {
+            "title": "Indoor Plants",
+            "subtitle": "Shop Now",
+            "link": ""
+          }
+        },
+        "category_xFUqCB": {
+          "type": "category",
+          "settings": {
+            "title": "Indoor Plants",
+            "subtitle": "Shop Now",
+            "link": ""
+          }
+        },
+        "category_m3WimR": {
+          "type": "category",
+          "settings": {
+            "title": "Indoor Plants",
+            "subtitle": "Shop Now",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "category_7hHWzN",
+        "category_itmBbV",
+        "category_xFUqCB",
+        "category_m3WimR"
+      ],
+      "name": "Shop by Category",
+      "settings": {
+        "heading": "Shop by Category"
+      }
+    },
     "product_list_themegen": {
       "type": "product-list",
       "blocks": {
@@ -985,13 +1032,6 @@
         "padding-block-end": 24,
         "gap_between_elements": 24
       }
-    },
-    "shop_by_category_e8ipig": {
-      "type": "shop-by-category",
-      "name": "Shop by Category",
-      "settings": {
-        "heading": "Shop by Category"
-      }
     }
   },
   "order": [
@@ -999,11 +1039,11 @@
     "hero_plant_WdReax",
     "plant_landing_slider_w7ehJ7",
     "hero_p9CmMG",
+    "shop_by_category_e8ipig",
     "product_list_themegen",
     "section_x8mrnx",
     "media_with_content_xMM9EF",
     "media_with_content_nrnzPh",
-    "marquee_KN4PYb",
-    "shop_by_category_e8ipig"
+    "marquee_KN4PYb"
   ]
 }
