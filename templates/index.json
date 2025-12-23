@@ -383,6 +383,14 @@
     "shop_by_category_e8ipig": {
       "type": "shop-by-category",
       "blocks": {
+        "category_PdYMxy": {
+          "type": "category",
+          "settings": {
+            "title": "Indoor Plants",
+            "subtitle": "Shop Now",
+            "link": ""
+          }
+        },
         "category_7hHWzN": {
           "type": "category",
           "settings": {
@@ -417,6 +425,7 @@
         }
       },
       "block_order": [
+        "category_PdYMxy",
         "category_7hHWzN",
         "category_itmBbV",
         "category_xFUqCB",
@@ -424,7 +433,9 @@
       ],
       "name": "Shop by Category",
       "settings": {
-        "heading": "Shop by Category"
+        "heading": "Shop by Category",
+        "view_more_text": "View more",
+        "view_more_link": ""
       }
     },
     "product_list_themegen": {
