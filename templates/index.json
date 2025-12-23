@@ -435,7 +435,7 @@
       "settings": {
         "heading": "Shop by Category",
         "view_more_text": "View more",
-        "view_more_link": ""
+        "view_more_link": "shopify://collections"
       }
     },
     "product_list_themegen": {
