@@ -1,163 +1,224 @@
+<section class="dailydeals">
+  <div class="dailydeals__container page-width">
+
+    <div class="dailydeals__head">
+      <h2 class="dailydeals__title">{{ section.settings.heading }}</h2>
+
+      {% if section.settings.view_more_link != blank %}
+        <a href="{{ section.settings.view_more_link }}" class="dailydeals__more">
+          {{ section.settings.view_more_text }} →
+        </a>
+      {% endif %}
+    </div>
+
+    {% if section.settings.collection != blank %}
+      {% assign products = collections[section.settings.collection].products %}
+      <div class="dailydeals__list">
+        {% for product in products limit: section.settings.products_limit %}
+          <a href="{{ product.url }}" class="dailydeals__card">
+            <div class="dailydeals__img">
+              {% if product.featured_image %}
+                <img
+                  src="{{ product.featured_image | image_url: width: 600 }}"
+                  alt="{{ product.title | escape }}"
+                  loading="lazy"
+                >
+              {% endif %}
+
+              {% if section.settings.show_badge and product.tags.size > 0 %}
+                <span class="dailydeals__badge">
+                  {{ product.tags.first }}
+                </span>
+              {% endif %}
+            </div>
+
+            <div class="dailydeals__info">
+              <h3>{{ product.title }}</h3>
+              <span class="dailydeals__price">
+                {{ product.price | money }}
+              </span>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p>Please select a collection for Daily Deals.</p>
+    {% endif %}
+
+  </div>
+</section>
+
+<style>
+.dailydeals{
+  background: #f6f7f2;
+  padding: 20px 0 50px;
+}
+
+.dailydeals__container{
+  padding-left: 24px !important;
+  padding-right: 24px !important;
+}
+
+/* Header */
+.dailydeals__head{
+  display:flex;
+  justify-content: space-between;
+  align-items:center;
+  margin-bottom: 24px;
+}
+
+.dailydeals__title{
+  margin:0;
+  font-size: 28px;
+  color:#1f3d2b;
+}
+
+.dailydeals__more{
+  font-size:14px;
+  color:#1f3d2b;
+  text-decoration:none;
+  white-space:nowrap;
+}
+.dailydeals__more:hover{ text-decoration: underline; }
+
+/* Product row */
+.dailydeals__list{
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(200px, 1fr);
+  gap: 20px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scroll-snap-type: x mandatory;
+}
+.dailydeals__list::-webkit-scrollbar{
+  height: 6px;
+}
+.dailydeals__list::-webkit-scrollbar-thumb{
+  background: rgba(0,0,0,.2);
+  border-radius: 10px;
+}
+
+/* Card */
+.dailydeals__card{
+  scroll-snap-align: start;
+  background:#fff;
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow: 0 6px 18px rgba(0,0,0,.08);
+  text-decoration:none;
+  color: inherit;
+  transition: transform .25s ease;
+}
+.dailydeals__card:hover{
+  transform: translateY(-4px);
+}
+
+.dailydeals__img{
+  position:relative;
+  aspect-ratio: 1/1;
+  background:#eee;
+}
+.dailydeals__img img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+/* Badge */
+.dailydeals__badge{
+  position:absolute;
+  top:12px;
+  left:12px;
+  background:#ff9f1c;
+  color:#fff;
+  font-size:12px;
+  padding:4px 8px;
+  border-radius:8px;
+}
+
+/* Info */
+.dailydeals__info{
+  padding: 14px;
+  text-align:center;
+}
+.dailydeals__info h3{
+  margin:0 0 6px;
+  font-size:14px;
+  font-weight:600;
+}
+.dailydeals__price{
+  font-size:14px;
+  color:#1f3d2b;
+  font-weight:500;
+}
+
+/* Desktop grid feel */
+@media (min-width: 990px){
+  .dailydeals__list{
+    grid-auto-flow: initial;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    overflow-x: hidden;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px){
+  .dailydeals__container{
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  .dailydeals__title{
+    font-size:24px;
+  }
+}
+</style>
+
 {% schema %}
 {
   "name": "Daily Deals",
   "settings": [
-    { "type": "text", "id": "title", "label": "Section title", "default": "Daily Deals" },
-    { "type": "text", "id": "view_text", "label": "View more text", "default": "View more →" },
-    { "type": "url", "id": "view_link", "label": "View more link" },
-    { "type": "collection", "id": "collection", "label": "Collection" },
-    { "type": "range", "id": "limit", "min": 2, "max": 8, "step": 1, "label": "Products to show", "default": 4 }
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Daily Deals"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Select collection"
+    },
+    {
+      "type": "range",
+      "id": "products_limit",
+      "label": "Products to show",
+      "min": 4,
+      "max": 12,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "checkbox",
+      "id": "show_badge",
+      "label": "Show tag badge",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "view_more_text",
+      "label": "View more text",
+      "default": "View more"
+    },
+    {
+      "type": "url",
+      "id": "view_more_link",
+      "label": "View more link"
+    }
   ],
   "presets": [
     { "name": "Daily Deals" }
   ]
 }
 {% endschema %}
-
-<style>
-.daily-deals {
-  background: #f6efe7;
-  padding: 70px 60px;
-}
-
-.daily-deals__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 40px;
-}
-
-.daily-deals__header h2 {
-  font-size: 42px;
-  font-family: var(--gv-font-heading, serif);
-  color: #2c2c2c;
-}
-
-.daily-deals__view {
-  font-size: 14px;
-  font-weight: 600;
-  color: #2c2c2c;
-  border: 1px solid #2c2c2c;
-  border-radius: 50px;
-  padding: 10px 18px;
-  transition: .2s;
-}
-.daily-deals__view:hover {
-  background: #2c2c2c;
-  color: #fff;
-}
-
-.daily-deals__grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 30px;
-}
-
-.deal-card {
-  background: #fff;
-  padding: 16px;
-  text-align: center;
-  position: relative;
-}
-
-.deal-card img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-.deal-badge {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  font-size: 12px;
-  padding: 4px 10px;
-  background: orange;
-  color: #fff;
-  font-weight: 600;
-}
-.deal-badge.out {
-  background: #999;
-}
-
-.deal-title {
-  margin-top: 16px;
-  font-size: 16px;
-  color: #2c2c2c;
-}
-
-.deal-price {
-  margin-top: 6px;
-  font-weight: 600;
-  color: #1f3d1b;
-}
-
-/* ============ Responsive ============ */
-@media (max-width: 1024px) {
-  .daily-deals__grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .daily-deals {
-    padding: 50px 20px;
-  }
-
-  .daily-deals__header h2 {
-    font-size: 30px;
-  }
-
-  .daily-deals__grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-  }
-}
-
-@media (max-width: 480px) {
-  .daily-deals__grid {
-    grid-template-columns: 1fr;
-  }
-}
-</style>
-
-<section class="daily-deals">
-  <div class="daily-deals__header">
-    <h2>{{ section.settings.title }}</h2>
-    {% if section.settings.view_link != blank %}
-      <a href="{{ section.settings.view_link }}" class="daily-deals__view">
-        {{ section.settings.view_text }}
-      </a>
-    {% endif %}
-  </div>
-
-  <div class="daily-deals__grid">
-    {% assign products = section.settings.collection.products | slice: 0, section.settings.limit %}
-    {% for product in products %}
-      <div class="deal-card">
-        <a href="{{ product.url }}">
-          {% if product.featured_image %}
-            <img
-              src="{{ product.featured_image | image_url: width: 600 }}"
-              alt="{{ product.title }}"
-              width="{{ product.featured_image.width }}"
-              height="{{ product.featured_image.height }}"
-              loading="lazy"
-            >
-          {% endif %}
-        </a>
-
-        {% if product.available %}
-          <span class="deal-badge">Hot</span>
-        {% else %}
-          <span class="deal-badge out">Out of stock</span>
-        {% endif %}
-
-        <div class="deal-title">{{ product.title }}</div>
-        <div class="deal-price">
-          {{ product.price | money }}
-        </div>
-      </div>
-    {% endfor %}
-  </div>
-</section>
