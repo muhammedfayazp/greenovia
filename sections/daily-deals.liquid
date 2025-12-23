@@ -1,40 +1,41 @@
 {% if section.settings.collection != blank %}
-  {% paginate collections[section.settings.collection].products by 50 %}
-    <div class="dailydeals__grid">
-      {% for product in paginate.items %}
-        <div class="dailydeals__card">
+  {% assign products = collections[section.settings.collection].products %}
 
-          <a href="{{ product.url }}" class="dailydeals__img">
-            {% if product.featured_image %}
-              <img
-                src="{{ product.featured_image | image_url: width: 600 }}"
-                alt="{{ product.title | escape }}"
-                loading="lazy"
-              >
-            {% endif %}
+  <div class="dailydeals__grid">
+    {% for product in products %}
+      <div class="dailydeals__card">
+
+        <a href="{{ product.url }}" class="dailydeals__img">
+          {% if product.featured_image %}
+            <img
+              src="{{ product.featured_image | image_url: width: 600 }}"
+              alt="{{ product.title | escape }}"
+              loading="lazy"
+            >
+          {% endif %}
+        </a>
+
+        <div class="dailydeals__info">
+          <a href="{{ product.url }}">
+            <h3>{{ product.title }}</h3>
           </a>
 
-          <div class="dailydeals__info">
-            <a href="{{ product.url }}">
-              <h3>{{ product.title }}</h3>
-            </a>
-
-            <div class="dailydeals__price">
-              {{ product.price | money }}
-            </div>
-
-            <form method="post" action="/cart/add">
-              <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
-              <button type="submit" class="dailydeals__btn">
-                Add to cart
-              </button>
-            </form>
+          <div class="dailydeals__price">
+            {{ product.price | money }}
           </div>
 
+          <form method="post" action="/cart/add">
+            <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+            <button type="submit" class="dailydeals__btn">
+              Add to cart
+            </button>
+          </form>
         </div>
-      {% endfor %}
-    </div>
-  {% endpaginate %}
+
+      </div>
+    {% endfor %}
+  </div>
+
 {% else %}
-  <p>Select a collection to show products.</p>
+  <p>Please select a collection.</p>
 {% endif %}
