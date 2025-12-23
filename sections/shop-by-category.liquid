@@ -40,6 +40,14 @@
   background: #f6f7f2;
 }
 
+/* ✅ boxed spacing */
+.shopbycat .page-width {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
 .shopbycat__head {
   display: flex;
   justify-content: space-between;
@@ -57,6 +65,10 @@
   font-size: 14px;
   color: #1f3d2b;
   text-decoration: none;
+  white-space: nowrap;
+}
+.shopbycat__more:hover {
+  text-decoration: underline;
 }
 
 .shopbycat__grid {
@@ -64,7 +76,7 @@
   gap: 20px;
 }
 
-/* 🔹 Default grid (auto) */
+/* 🔹 Auto grid for ≤4 categories */
 .shopbycat__grid--1,
 .shopbycat__grid--2,
 .shopbycat__grid--3,
@@ -72,11 +84,15 @@
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
-/* 🔹 Featured layout when 5 or more */
+/* 🔹 Featured layout for ≥5 categories */
 .shopbycat__grid--5,
 .shopbycat__grid--6,
 .shopbycat__grid--7,
-.shopbycat__grid--8 {
+.shopbycat__grid--8,
+.shopbycat__grid--9,
+.shopbycat__grid--10,
+.shopbycat__grid--11,
+.shopbycat__grid--12 {
   grid-template-columns: 1fr 2fr 1fr 1fr;
   grid-template-rows: repeat(2, 220px);
 }
@@ -94,9 +110,14 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform .4s ease;
 }
 
-/* Light label */
+.shopbycat__item:hover img {
+  transform: scale(1.05);
+}
+
+/* Light overlay label */
 .shopbycat__overlay {
   position: absolute;
   top: 14px;
@@ -105,40 +126,54 @@
   border-radius: 12px;
   padding: 10px 14px;
   color: #1f3d2b;
+  max-width: 75%;
 }
 
 .shopbycat__overlay h3 {
   margin: 0;
   font-size: 16px;
+  font-weight: 600;
 }
 .shopbycat__overlay span {
   font-size: 13px;
   opacity: .8;
 }
 
-/* 🔹 Only apply special spans if featured layout */
+/* 🔹 Featured spans only when ≥5 */
 .shopbycat__grid--5 .item-1,
 .shopbycat__grid--6 .item-1,
 .shopbycat__grid--7 .item-1,
-.shopbycat__grid--8 .item-1 {
+.shopbycat__grid--8 .item-1,
+.shopbycat__grid--9 .item-1,
+.shopbycat__grid--10 .item-1,
+.shopbycat__grid--11 .item-1,
+.shopbycat__grid--12 .item-1 {
   grid-row: span 2;
 }
 
 .shopbycat__grid--5 .item-2,
 .shopbycat__grid--6 .item-2,
 .shopbycat__grid--7 .item-2,
-.shopbycat__grid--8 .item-2 {
+.shopbycat__grid--8 .item-2,
+.shopbycat__grid--9 .item-2,
+.shopbycat__grid--10 .item-2,
+.shopbycat__grid--11 .item-2,
+.shopbycat__grid--12 .item-2 {
   grid-row: span 2;
 }
 
 .shopbycat__grid--5 .item-5,
 .shopbycat__grid--6 .item-5,
 .shopbycat__grid--7 .item-5,
-.shopbycat__grid--8 .item-5 {
+.shopbycat__grid--8 .item-5,
+.shopbycat__grid--9 .item-5,
+.shopbycat__grid--10 .item-5,
+.shopbycat__grid--11 .item-5,
+.shopbycat__grid--12 .item-5 {
   grid-column: span 2;
 }
 
-/* Mobile */
+/* 📱 Mobile */
 @media (max-width: 768px) {
   .shopbycat__grid {
     grid-template-columns: repeat(2, 1fr) !important;
@@ -147,6 +182,10 @@
   .shopbycat__item {
     grid-column: span 1 !important;
     grid-row: span 1 !important;
+  }
+
+  .shopbycat__overlay {
+    max-width: 85%;
   }
 }
 </style>
