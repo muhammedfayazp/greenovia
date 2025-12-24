@@ -1,9 +1,10 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+
 <section class="dailydeals">
   <div class="dailydeals__container page-width">
 
     <div class="dailydeals__head">
       <h2 class="dailydeals__title">{{ section.settings.heading }}</h2>
-
       {% if section.settings.view_all_link != blank %}
         <a href="{{ section.settings.view_all_link }}" class="dailydeals__more">
           {{ section.settings.view_all_text }} →
@@ -13,56 +14,57 @@
 
     {% assign products = collections.all.products %}
 
-    <div class="dailydeals__grid">
-      {% for product in products %}
-        <div class="dailydeals__card">
+    <div class="dailydeals__swiper swiper">
+      <div class="swiper-wrapper">
+        {% for product in products %}
+          <div class="dailydeals__card swiper-slide">
 
-          <a href="{{ product.url }}" class="dailydeals__img">
-            {% if product.featured_image %}
-              <img
-                src="{{ product.featured_image | image_url: width: 600 }}"
-                alt="{{ product.title | escape }}"
-                loading="lazy"
-              >
-            {% endif %}
-          </a>
-
-          <div class="dailydeals__info">
-            <a href="{{ product.url }}">
-              <h3>{{ product.title }}</h3>
+            <a href="{{ product.url }}" class="dailydeals__img">
+              {% if product.featured_image %}
+                <img
+                  src="{{ product.featured_image | image_url: width: 600 }}"
+                  alt="{{ product.title | escape }}"
+                  loading="lazy"
+                >
+              {% endif %}
             </a>
 
-            <div class="dailydeals__price">
-              {{ product.price | money }}
+            <div class="dailydeals__info">
+              <a href="{{ product.url }}">
+                <h3>{{ product.title }}</h3>
+              </a>
+
+              <div class="dailydeals__price">
+                {{ product.price | money }}
+              </div>
+
+              <form method="post" action="/cart/add" class="dailydeals__form">
+                <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+
+                <div class="dailydeals__actions">
+                  <!-- Modern counter -->
+                  <div class="qty qty--modern">
+                    <button type="button" class="qty__btn" data-action="minus">−</button>
+                    <input type="number" name="quantity" value="1" min="1" class="qty__input">
+                    <button type="button" class="qty__btn" data-action="plus">+</button>
+                  </div>
+
+                  <!-- Cart icon -->
+                  <button type="submit" class="dailydeals__cartbtn" aria-label="Add to cart">
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M3 3h2l2.2 11.4a2 2 0 0 0 2 1.6h7.5a2 2 0 0 0 2-1.6L21 7H6"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <circle cx="10" cy="20" r="1.5" fill="currentColor"/>
+                      <circle cx="18" cy="20" r="1.5" fill="currentColor"/>
+                    </svg>
+                  </button>
+                </div>
+              </form>
             </div>
 
-            <form method="post" action="/cart/add" class="dailydeals__form">
-              <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
-
-              <div class="dailydeals__actions">
-                <!-- Quantity counter -->
-                <div class="qty">
-                  <button type="button" class="qty__btn" data-action="minus">−</button>
-                  <input type="number" name="quantity" value="1" min="1" class="qty__input">
-                  <button type="button" class="qty__btn" data-action="plus">+</button>
-                </div>
-
-                <!-- Add to cart icon button -->
-                <button type="submit" class="dailydeals__cartbtn" aria-label="Add to cart">
-                  <svg viewBox="0 0 24 24" fill="none">
-                    <path d="M3 3h2l2.2 11.4a2 2 0 0 0 2 1.6h7.5a2 2 0 0 0 2-1.6L21 7H6"
-                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <circle cx="10" cy="20" r="1.5" fill="currentColor"/>
-                    <circle cx="18" cy="20" r="1.5" fill="currentColor"/>
-                  </svg>
-                </button>
-              </div>
-            </form>
-
           </div>
-
-        </div>
-      {% endfor %}
+        {% endfor %}
+      </div>
     </div>
 
   </div>
@@ -73,7 +75,6 @@
   background:#f6f7f2;
   padding: 20px 0 60px;
 }
-
 .dailydeals__container{
   padding-left: 24px !important;
   padding-right: 24px !important;
@@ -98,31 +99,24 @@
 }
 .dailydeals__more:hover{ text-decoration: underline; }
 
-/* Grid */
-.dailydeals__grid{
-  display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 22px;
-}
+/* Swiper */
+.dailydeals__swiper{ width:100%; }
 
 /* Card */
 .dailydeals__card{
+  height:100%;
+  display:flex;
+  flex-direction:column;
   background:#fff;
   border-radius:18px;
   overflow:hidden;
   box-shadow: 0 6px 18px rgba(0,0,0,.08);
-  display:flex;
-  flex-direction:column;
-  transition: transform .25s ease;
-}
-.dailydeals__card:hover{
-  transform: translateY(-6px);
 }
 
-/* Image */
+/* Image ratio */
 .dailydeals__img{
   display:block;
-  aspect-ratio:1/1;
+  aspect-ratio: 1/1;
   background:#eee;
 }
 .dailydeals__img img{
@@ -133,8 +127,12 @@
 
 /* Info */
 .dailydeals__info{
-  padding: 14px;
+  padding: 12px;
   text-align:center;
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
 }
 .dailydeals__info h3{
   margin:0 0 6px;
@@ -146,12 +144,12 @@
 
 .dailydeals__price{
   font-size:15px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   color:#1f3d2b;
   font-weight:500;
 }
 
-/* Actions row */
+/* Actions */
 .dailydeals__actions{
   display:flex;
   justify-content:space-between;
@@ -159,35 +157,45 @@
   gap: 10px;
 }
 
-/* Quantity counter */
-.qty{
+/* Counter */
+.qty--modern{
   display:flex;
   align-items:center;
-  border:1px solid #e0e0e0;
+  background:#f6f7f2;
   border-radius:999px;
-  overflow:hidden;
+  padding:4px;
+  gap:4px;
+  box-shadow: inset 0 0 0 1px #e3e6de;
 }
-.qty__btn{
-  width:32px;
-  height:32px;
+.qty--modern .qty__btn{
+  width:28px;
+  height:28px;
   border:none;
-  background:#f2f2f2;
+  border-radius:50%;
+  background:#fff;
+  color:#1f3d2b;
   font-size:18px;
   cursor:pointer;
-  color:#1f3d2b;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow: 0 2px 6px rgba(0,0,0,.08);
 }
-.qty__input{
-  width:40px;
+.qty--modern .qty__input{
+  width:36px;
   text-align:center;
   border:none;
-  outline:none;
+  background:transparent;
   font-size:14px;
+  font-weight:600;
+  color:#1f3d2b;
+  outline:none;
 }
 
-/* Cart icon button */
+/* Cart icon */
 .dailydeals__cartbtn{
-  width:42px;
-  height:42px;
+  width:40px;
+  height:40px;
   border-radius:50%;
   border:none;
   background:#1f3d2b;
@@ -196,75 +204,50 @@
   align-items:center;
   justify-content:center;
   cursor:pointer;
-  transition: background .25s ease, transform .2s ease;
 }
 .dailydeals__cartbtn svg{
   width:20px;
   height:20px;
 }
-.dailydeals__cartbtn:hover{
-  background:#163022;
-  transform: translateY(-2px);
-}
 
-/* Mobile */
-@media (max-width:768px){
+/* Mobile compact */
+@media (max-width: 768px){
   .dailydeals__container{
     padding-left: 16px !important;
     padding-right: 16px !important;
   }
+  .dailydeals__card{
+    max-width: 260px;
+  }
   .dailydeals__title{ font-size:24px; }
 }
-
-/* Grid – desktop */
-.dailydeals__grid{
-  display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 18px;
-}
-
-/* 📱 Mobile: horizontal swipe */
-@media (max-width: 768px){
-  .dailydeals__grid{
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: 70%;
-    overflow-x: auto;
-    gap: 16px;
-    padding-bottom: 10px;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .dailydeals__card{
-    scroll-snap-align: start;
-  }
-
-  .dailydeals__grid::-webkit-scrollbar{
-    display: none;
-  }
-}
-@media (max-width: 768px){
-  .dailydeals__grid{
-    padding-left: 16px;
-    padding-right: 16px;
-  }
-}
-
 </style>
 
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
-document.addEventListener('click', function(e){
-  const btn = e.target.closest('.qty__btn');
-  if(!btn) return;
+document.addEventListener('DOMContentLoaded', function () {
+  new Swiper('.dailydeals__swiper', {
+    slidesPerView: 1.2,
+    spaceBetween: 16,
+    grabCursor: true,
+    freeMode: true,
+    breakpoints: {
+      480: { slidesPerView: 1.5 },
+      640: { slidesPerView: 2.2 },
+      990: { slidesPerView: 4, freeMode: false }
+    }
+  });
 
-  const input = btn.parentElement.querySelector('.qty__input');
-  let value = parseInt(input.value) || 1;
-
-  if(btn.dataset.action === 'plus') value++;
-  if(btn.dataset.action === 'minus' && value > 1) value--;
-
-  input.value = value;
+  // Counter logic
+  document.addEventListener('click', function(e){
+    const btn = e.target.closest('.qty__btn');
+    if(!btn) return;
+    const input = btn.parentElement.querySelector('.qty__input');
+    let value = parseInt(input.value) || 1;
+    if(btn.dataset.action === 'plus') value++;
+    if(btn.dataset.action === 'minus' && value > 1) value--;
+    input.value = value;
+  });
 });
 </script>
 
