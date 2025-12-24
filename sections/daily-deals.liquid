@@ -215,6 +215,42 @@
   }
   .dailydeals__title{ font-size:24px; }
 }
+
+/* Grid – desktop */
+.dailydeals__grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+/* 📱 Mobile: horizontal swipe */
+@media (max-width: 768px){
+  .dailydeals__grid{
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 70%;
+    overflow-x: auto;
+    gap: 16px;
+    padding-bottom: 10px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .dailydeals__card{
+    scroll-snap-align: start;
+  }
+
+  .dailydeals__grid::-webkit-scrollbar{
+    display: none;
+  }
+}
+@media (max-width: 768px){
+  .dailydeals__grid{
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
 </style>
 
 <script>
