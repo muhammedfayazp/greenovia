@@ -1,0 +1,316 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+
+<section class="catprodrows">
+  <div class="catprodrows__container page-width">
+
+    {% for block in section.blocks %}
+      {% assign col = collections[block.settings.collection] %}
+      {% if col != blank and col.products.size > 0 %}
+        
+        <div class="catprodrows__section" {{ block.shopify_attributes }}>
+          
+          {%- comment -%} Category Header {%- endcomment -%}
+          <div class="catprodrows__head">
+            <h2 class="catprodrows__title">{{ col.title }}</h2>
+            <a href="{{ col.url }}" class="catprodrows__more">
+              View all →
+            </a>
+          </div>
+
+          {%- comment -%} Products Slider {%- endcomment -%}
+          <div class="catprodrows__swiper swiper swiper-{{ block.id }}">
+            <div class="swiper-wrapper">
+              {% for product in col.products limit: 12 %}
+                <div class="catprodrows__card swiper-slide">
+                  
+                  <a href="{{ product.url }}" class="catprodrows__img">
+                    {% if product.featured_image %}
+                      <img
+                        src="{{ product.featured_image | image_url: width: 600 }}"
+                        alt="{{ product.title | escape }}"
+                        loading="lazy"
+                      >
+                    {% endif %}
+                  </a>
+
+                  <div class="catprodrows__info">
+                    <a href="{{ product.url }}">
+                      <h3>{{ product.title }}</h3>
+                    </a>
+
+                    <div class="catprodrows__price">
+                      {{ product.price | money }}
+                    </div>
+
+                    <form method="post" action="/cart/add" class="catprodrows__form">
+                      <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+
+                      <div class="catprodrows__actions">
+                        {%- comment -%} Counter {%- endcomment -%}
+                        <div class="qty qty--modern">
+                          <button type="button" class="qty__btn" data-action="minus">−</button>
+                          <input type="number" name="quantity" value="1" min="1" class="qty__input">
+                          <button type="button" class="qty__btn" data-action="plus">+</button>
+                        </div>
+
+                        {%- comment -%} Cart Button {%- endcomment -%}
+                        <button type="submit" class="catprodrows__cartbtn" aria-label="Add to cart">
+                          <svg viewBox="0 0 24 24" fill="none">
+                            <path d="M3 3h2l2.2 11.4a2 2 0 0 0 2 1.6h7.5a2 2 0 0 0 2-1.6L21 7H6"
+                              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="10" cy="20" r="1.5" fill="currentColor"/>
+                            <circle cx="18" cy="20" r="1.5" fill="currentColor"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+
+        </div>
+      {% endif %}
+    {% endfor %}
+
+  </div>
+</section>
+
+<style>
+.catprodrows{
+  background:#f6f7f2;
+  padding: 30px 0 50px;
+}
+.catprodrows__container{
+  padding-left: 24px !important;
+  padding-right: 24px !important;
+}
+
+/* Each category section */
+.catprodrows__section{
+  margin-bottom: 50px;
+}
+.catprodrows__section:last-child{
+  margin-bottom: 0;
+}
+
+/* Category Header */
+.catprodrows__head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom: 26px;
+}
+.catprodrows__title{
+  margin:0;
+  font-size: 28px;
+  color:#1f3d2b;
+}
+.catprodrows__more{
+  font-size:14px;
+  color:#1f3d2b;
+  text-decoration:none;
+  white-space:nowrap;
+}
+.catprodrows__more:hover{ text-decoration: underline; }
+
+/* Swiper */
+.catprodrows__swiper{ width:100%; }
+
+/* Product Card */
+.catprodrows__card{
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  background:#fff;
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow: 0 6px 18px rgba(0,0,0,.08);
+  transition: transform .25s ease;
+}
+.catprodrows__card:hover{
+  transform: translateY(-4px);
+}
+
+/* Image */
+.catprodrows__img{
+  display:block;
+  aspect-ratio: 1/1;
+  background:#eee;
+}
+.catprodrows__img img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+/* Info */
+.catprodrows__info{
+  padding: 12px;
+  text-align:center;
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+.catprodrows__info h3{
+  margin:0 0 6px;
+  font-size:15px;
+  font-weight:600;
+  color:#1f3d2b;
+}
+.catprodrows__info a{ text-decoration:none; }
+
+.catprodrows__price{
+  font-size:15px;
+  margin-bottom: 10px;
+  color:#1f3d2b;
+  font-weight:500;
+}
+
+/* Actions */
+.catprodrows__actions{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap: 10px;
+}
+
+/* Counter */
+.qty--modern{
+  display:flex;
+  align-items:center;
+  background:#f6f7f2;
+  border-radius:999px;
+  padding:4px;
+  gap:4px;
+  box-shadow: inset 0 0 0 1px #e3e6de;
+}
+.qty--modern .qty__btn{
+  width:28px;
+  height:28px;
+  border:none;
+  border-radius:50%;
+  background:#fff;
+  color:#1f3d2b;
+  font-size:18px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow: 0 2px 6px rgba(0,0,0,.08);
+}
+.qty--modern .qty__input{
+  width:36px;
+  text-align:center;
+  border:none;
+  background:transparent;
+  font-size:14px;
+  font-weight:600;
+  color:#1f3d2b;
+  outline:none;
+}
+
+/* Cart Button */
+.catprodrows__cartbtn{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  border:none;
+  background:#1f3d2b;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition: background .2s ease;
+}
+.catprodrows__cartbtn:hover{
+  background:#2d5940;
+}
+.catprodrows__cartbtn svg{
+  width:20px;
+  height:20px;
+}
+
+/* Mobile */
+@media (max-width: 768px){
+  .catprodrows__container{
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  .catprodrows__card{
+    max-width: 260px;
+  }
+  .catprodrows__title{ font-size:24px; }
+  .catprodrows__section{
+    margin-bottom: 40px;
+  }
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // Initialize each category slider
+  {% for block in section.blocks %}
+    {% assign col = collections[block.settings.collection] %}
+    {% if col != blank and col.products.size > 0 %}
+      new Swiper('.swiper-{{ block.id }}', {
+        slidesPerView: 1.2,
+        spaceBetween: 16,
+        grabCursor: true,
+        freeMode: true,
+        breakpoints: {
+          480: { slidesPerView: 1.5 },
+          640: { slidesPerView: 2.2 },
+          990: { slidesPerView: 4, freeMode: false }
+        }
+      });
+    {% endif %}
+  {% endfor %}
+
+  // Counter logic
+  document.addEventListener('click', function(e){
+    const btn = e.target.closest('.qty__btn');
+    if(!btn) return;
+    const input = btn.parentElement.querySelector('.qty__input');
+    let value = parseInt(input.value) || 1;
+    if(btn.dataset.action === 'plus') value++;
+    if(btn.dataset.action === 'minus' && value > 1) value--;
+    input.value = value;
+  });
+});
+</script>
+
+{% schema %}
+{
+  "name": "Category Product Rows",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Select collection"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Category Product Rows",
+      "blocks": [
+        { "type": "category" },
+        { "type": "category" },
+        { "type": "category" }
+      ]
+    }
+  ]
+}
+{% endschema %}
