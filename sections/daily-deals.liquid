@@ -1,22 +1,25 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+
 <section class="dailydeals">
   <div class="dailydeals__container page-width">
 
     <div class="dailydeals__head">
       <h2 class="dailydeals__title">{{ section.settings.heading }}</h2>
-
-      {% if section.settings.view_more_link != blank %}
-        <a href="{{ section.settings.view_more_link }}" class="dailydeals__more">
-          {{ section.settings.view_more_text }} →
+      {% if section.settings.view_all_link != blank %}
+        <a href="{{ section.settings.view_all_link }}" class="dailydeals__more">
+          {{ section.settings.view_all_text }} →
         </a>
       {% endif %}
     </div>
 
-    {% if section.settings.collection != blank %}
-      {% assign products = collections[section.settings.collection].products %}
-      <div class="dailydeals__list">
-        {% for product in products limit: section.settings.products_limit %}
-          <a href="{{ product.url }}" class="dailydeals__card">
-            <div class="dailydeals__img">
+    {% assign products = collections.all.products %}
+
+    <div class="dailydeals__swiper swiper">
+      <div class="swiper-wrapper">
+        {% for product in products %}
+          <div class="dailydeals__card swiper-slide">
+
+            <a href="{{ product.url }}" class="dailydeals__img">
               {% if product.featured_image %}
                 <img
                   src="{{ product.featured_image | image_url: width: 600 }}"
@@ -24,36 +27,54 @@
                   loading="lazy"
                 >
               {% endif %}
-
-              {% if section.settings.show_badge and product.tags.size > 0 %}
-                <span class="dailydeals__badge">
-                  {{ product.tags.first }}
-                </span>
-              {% endif %}
-            </div>
+            </a>
 
             <div class="dailydeals__info">
-              <h3>{{ product.title }}</h3>
-              <span class="dailydeals__price">
+              <a href="{{ product.url }}">
+                <h3>{{ product.title }}</h3>
+              </a>
+
+              <div class="dailydeals__price">
                 {{ product.price | money }}
-              </span>
+              </div>
+
+              <form method="post" action="/cart/add" class="dailydeals__form">
+                <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+
+                <div class="dailydeals__actions">
+                  <!-- Modern counter -->
+                  <div class="qty qty--modern">
+                    <button type="button" class="qty__btn" data-action="minus">−</button>
+                    <input type="number" name="quantity" value="1" min="1" class="qty__input">
+                    <button type="button" class="qty__btn" data-action="plus">+</button>
+                  </div>
+
+                  <!-- Cart icon -->
+                  <button type="submit" class="dailydeals__cartbtn" aria-label="Add to cart">
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M3 3h2l2.2 11.4a2 2 0 0 0 2 1.6h7.5a2 2 0 0 0 2-1.6L21 7H6"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <circle cx="10" cy="20" r="1.5" fill="currentColor"/>
+                      <circle cx="18" cy="20" r="1.5" fill="currentColor"/>
+                    </svg>
+                  </button>
+                </div>
+              </form>
             </div>
-          </a>
+
+          </div>
         {% endfor %}
       </div>
-    {% else %}
-      <p>Please select a collection for Daily Deals.</p>
-    {% endif %}
+    </div>
 
   </div>
 </section>
 
 <style>
 .dailydeals{
-  background: #f6f7f2;
-  padding: 20px 0 50px;
+  background:#f6f7f2;
+  padding: 20px 0 60px;
 }
-
 .dailydeals__container{
   padding-left: 24px !important;
   padding-right: 24px !important;
@@ -62,60 +83,39 @@
 /* Header */
 .dailydeals__head{
   display:flex;
-  justify-content: space-between;
+  justify-content:space-between;
   align-items:center;
-  margin-bottom: 24px;
+  margin-bottom: 26px;
 }
-
 .dailydeals__title{
   margin:0;
   font-size: 28px;
   color:#1f3d2b;
 }
-
 .dailydeals__more{
   font-size:14px;
   color:#1f3d2b;
   text-decoration:none;
-  white-space:nowrap;
 }
 .dailydeals__more:hover{ text-decoration: underline; }
 
-/* Product row */
-.dailydeals__list{
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(200px, 1fr);
-  gap: 20px;
-  overflow-x: auto;
-  padding-bottom: 6px;
-  scroll-snap-type: x mandatory;
-}
-.dailydeals__list::-webkit-scrollbar{
-  height: 6px;
-}
-.dailydeals__list::-webkit-scrollbar-thumb{
-  background: rgba(0,0,0,.2);
-  border-radius: 10px;
-}
+/* Swiper */
+.dailydeals__swiper{ width:100%; }
 
 /* Card */
 .dailydeals__card{
-  scroll-snap-align: start;
+  height:100%;
+  display:flex;
+  flex-direction:column;
   background:#fff;
   border-radius:18px;
   overflow:hidden;
   box-shadow: 0 6px 18px rgba(0,0,0,.08);
-  text-decoration:none;
-  color: inherit;
-  transition: transform .25s ease;
-}
-.dailydeals__card:hover{
-  transform: translateY(-4px);
 }
 
+/* Image ratio */
 .dailydeals__img{
-  position:relative;
+  display:block;
   aspect-ratio: 1/1;
   background:#eee;
 }
@@ -123,57 +123,133 @@
   width:100%;
   height:100%;
   object-fit:cover;
-  display:block;
-}
-
-/* Badge */
-.dailydeals__badge{
-  position:absolute;
-  top:12px;
-  left:12px;
-  background:#ff9f1c;
-  color:#fff;
-  font-size:12px;
-  padding:4px 8px;
-  border-radius:8px;
 }
 
 /* Info */
 .dailydeals__info{
-  padding: 14px;
+  padding: 12px;
   text-align:center;
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
 }
 .dailydeals__info h3{
   margin:0 0 6px;
-  font-size:14px;
+  font-size:15px;
   font-weight:600;
+  color:#1f3d2b;
 }
+.dailydeals__info a{ text-decoration:none; }
+
 .dailydeals__price{
-  font-size:14px;
+  font-size:15px;
+  margin-bottom: 10px;
   color:#1f3d2b;
   font-weight:500;
 }
 
-/* Desktop grid feel */
-@media (min-width: 990px){
-  .dailydeals__list{
-    grid-auto-flow: initial;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    overflow-x: hidden;
-  }
+/* Actions */
+.dailydeals__actions{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap: 10px;
 }
 
-/* Mobile */
+/* Counter */
+.qty--modern{
+  display:flex;
+  align-items:center;
+  background:#f6f7f2;
+  border-radius:999px;
+  padding:4px;
+  gap:4px;
+  box-shadow: inset 0 0 0 1px #e3e6de;
+}
+.qty--modern .qty__btn{
+  width:28px;
+  height:28px;
+  border:none;
+  border-radius:50%;
+  background:#fff;
+  color:#1f3d2b;
+  font-size:18px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow: 0 2px 6px rgba(0,0,0,.08);
+}
+.qty--modern .qty__input{
+  width:36px;
+  text-align:center;
+  border:none;
+  background:transparent;
+  font-size:14px;
+  font-weight:600;
+  color:#1f3d2b;
+  outline:none;
+}
+
+/* Cart icon */
+.dailydeals__cartbtn{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  border:none;
+  background:#1f3d2b;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+.dailydeals__cartbtn svg{
+  width:20px;
+  height:20px;
+}
+
+/* Mobile compact */
 @media (max-width: 768px){
   .dailydeals__container{
     padding-left: 16px !important;
     padding-right: 16px !important;
   }
-  .dailydeals__title{
-    font-size:24px;
+  .dailydeals__card{
+    max-width: 260px;
   }
+  .dailydeals__title{ font-size:24px; }
 }
 </style>
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  new Swiper('.dailydeals__swiper', {
+    slidesPerView: 1.2,
+    spaceBetween: 16,
+    grabCursor: true,
+    freeMode: true,
+    breakpoints: {
+      480: { slidesPerView: 1.5 },
+      640: { slidesPerView: 2.2 },
+      990: { slidesPerView: 4, freeMode: false }
+    }
+  });
+
+  // Counter logic
+  document.addEventListener('click', function(e){
+    const btn = e.target.closest('.qty__btn');
+    if(!btn) return;
+    const input = btn.parentElement.querySelector('.qty__input');
+    let value = parseInt(input.value) || 1;
+    if(btn.dataset.action === 'plus') value++;
+    if(btn.dataset.action === 'minus' && value > 1) value--;
+    input.value = value;
+  });
+});
+</script>
 
 {% schema %}
 {
@@ -186,35 +262,15 @@
       "default": "Daily Deals"
     },
     {
-      "type": "collection",
-      "id": "collection",
-      "label": "Select collection"
-    },
-    {
-      "type": "range",
-      "id": "products_limit",
-      "label": "Products to show",
-      "min": 4,
-      "max": 12,
-      "step": 1,
-      "default": 6
-    },
-    {
-      "type": "checkbox",
-      "id": "show_badge",
-      "label": "Show tag badge",
-      "default": true
-    },
-    {
       "type": "text",
-      "id": "view_more_text",
-      "label": "View more text",
-      "default": "View more"
+      "id": "view_all_text",
+      "label": "View all text",
+      "default": "View all"
     },
     {
       "type": "url",
-      "id": "view_more_link",
-      "label": "View more link"
+      "id": "view_all_link",
+      "label": "View all link"
     }
   ],
   "presets": [
