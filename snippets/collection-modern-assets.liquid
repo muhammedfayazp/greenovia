@@ -1,0 +1,9 @@
+{% comment %}
+  Load modern collection page styles and scripts
+  Only loads on collection template pages
+{% endcomment %}
+
+{% if template contains 'collection' %}
+  {{ 'collection-modern.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'collection-modern.js' | asset_url }}" defer></script>
+{% endif %}
