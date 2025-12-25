@@ -426,7 +426,7 @@
       "name": "Shop by Category",
       "settings": {
         "heading": "Shop by Category",
-        "view_more_text": "View more",
+        "view_more_text": "",
         "view_more_link": "shopify://collections"
       }
     },
