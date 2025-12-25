@@ -386,6 +386,7 @@
         "category_PdYMxy": {
           "type": "category",
           "settings": {
+            "image": "shopify://shop_images/beautiful-shot-botanical-garden-with-exotic-tropical-plants-trees.jpg",
             "title": "Indoor Plants",
             "subtitle": "Shop Now",
             "link": ""
@@ -394,6 +395,7 @@
         "category_7hHWzN": {
           "type": "category",
           "settings": {
+            "image": "shopify://shop_images/indoor-plants-studio.jpg",
             "title": "Indoor Plants",
             "subtitle": "Shop Now",
             "link": "shopify://collections/all"
@@ -402,6 +404,7 @@
         "category_itmBbV": {
           "type": "category",
           "settings": {
+            "image": "shopify://shop_images/freddie-marriage-UcfKYTan-LU-unsplash_85d5b2b3-fd91-40d8-86c9-5629871b9edc.jpg",
             "title": "Indoor Plants",
             "subtitle": "Shop Now",
             "link": ""
@@ -410,6 +413,7 @@
         "category_xFUqCB": {
           "type": "category",
           "settings": {
+            "image": "shopify://shop_images/traditional-macrame-arrangement-indoors.jpg",
             "title": "Indoor Plants",
             "subtitle": "Shop Now",
             "link": ""
@@ -418,6 +422,7 @@
         "category_m3WimR": {
           "type": "category",
           "settings": {
+            "image": "shopify://shop_images/top-view-plants.jpg",
             "title": "Indoor Plants",
             "subtitle": "Shop Now",
             "link": ""
@@ -443,8 +448,6 @@
       "name": "Daily Deals",
       "settings": {
         "heading": "Daily Deals",
-        "collection": "automated-collection",
-        "products_limit": 6,
         "view_all_text": "View all",
         "view_all_link": "shopify://collections/all"
       }
