@@ -19,37 +19,40 @@
       <div class="filter-group-modern">
         <h3 class="filter-main-title">Filter by</h3>
         
-        {%- comment -%} Categories Filter {%- endcomment -%}
-        <div class="filter-section-modern">
-          <div class="filter-section-header">
-            <h4>Categories</h4>
-            <button class="filter-reset-btn" onclick="window.location.href='{{ collection.url }}'">Reset</button>
-          </div>
-          
-          <div class="filter-options-modern">
-            {% for block in section.blocks %}
-              {% if block.type == 'filter_collection' %}
-                {% assign filter_coll = collections[block.settings.collection] %}
-                {% if filter_coll %}
-                  <label class="filter-checkbox-modern">
-                    <input type="checkbox" value="{{ filter_coll.handle }}">
-                    <span>{{ filter_coll.title }}</span>
-                    <span class="filter-count-modern">({{ filter_coll.products_count }})</span>
-                  </label>
+        {%- comment -%} Categories Filter - Only show on "all products" or main collections {%- endcomment -%}
+        {% if collection.handle == 'all' or collection.handle == blank %}
+          <div class="filter-section-modern">
+            <div class="filter-section-header">
+              <h4>Categories</h4>
+              <button class="filter-reset-btn" onclick="window.location.href='{{ collection.url }}'">Reset</button>
+            </div>
+            
+            <div class="filter-options-modern">
+              {% for block in section.blocks %}
+                {% if block.type == 'filter_collection' %}
+                  {% assign filter_coll = collections[block.settings.collection] %}
+                  {% if filter_coll %}
+                    <label class="filter-checkbox-modern">
+                      <input type="checkbox" value="{{ filter_coll.handle }}">
+                      <span>{{ filter_coll.title }}</span>
+                      <span class="filter-count-modern">({{ filter_coll.products_count }})</span>
+                    </label>
+                  {% endif %}
                 {% endif %}
-              {% endif %}
-            {% endfor %}
+              {% endfor %}
+            </div>
           </div>
-        </div>
+        {% endif %}
 
         {%- comment -%} Price Filter {%- endcomment -%}
         <div class="filter-section-modern">
           <div class="filter-section-header">
             <h4>Price</h4>
+            <button class="filter-reset-btn" onclick="resetPriceFilter()">Reset</button>
           </div>
           <div class="price-inputs-modern">
-            <input type="number" placeholder="$10" min="0" class="price-input-min">
-            <input type="number" placeholder="$600" min="0" class="price-input-max">
+            <input type="number" placeholder="Min" min="0" class="price-input-min" oninput="applyPriceFilter()">
+            <input type="number" placeholder="Max" min="0" class="price-input-max" oninput="applyPriceFilter()">
           </div>
         </div>
 
@@ -63,7 +66,6 @@
       {%- comment -%} Header {%- endcomment -%}
       <div class="modern-collection-header">
         <div>
-          <h1 class="modern-collection-title">{{ collection.title }}</h1>
           <p class="modern-product-count">1-{{ collection.products.size }} products</p>
         </div>
         
@@ -81,7 +83,7 @@
       {%- comment -%} Product Grid {%- endcomment -%}
       <div class="modern-product-grid">
         {% for product in collection.products %}
-          <div class="modern-product-card">
+          <div class="modern-product-card" data-price="{{ product.price }}" data-product-id="{{ product.id }}">
             
             <a href="{{ product.url }}" class="modern-product-image">
               {% if product.featured_image %}
@@ -581,6 +583,45 @@ function updateQty(btn, change) {
   let value = parseInt(input.value) || 1;
   value = Math.max(1, value + change);
   input.value = value;
+}
+
+// Price Filter Functionality
+function applyPriceFilter() {
+  const minInput = document.querySelector('.price-input-min');
+  const maxInput = document.querySelector('.price-input-max');
+  const cards = document.querySelectorAll('.modern-product-card');
+  
+  const minPrice = parseFloat(minInput.value) * 100 || 0; // Convert to cents
+  const maxPrice = parseFloat(maxInput.value) * 100 || Infinity;
+  
+  cards.forEach(card => {
+    const productPrice = parseFloat(card.dataset.price);
+    
+    if (productPrice >= minPrice && productPrice <= maxPrice) {
+      card.style.display = 'block';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+  
+  updateProductCount();
+}
+
+function resetPriceFilter() {
+  document.querySelector('.price-input-min').value = '';
+  document.querySelector('.price-input-max').value = '';
+  applyPriceFilter();
+}
+
+function updateProductCount() {
+  const visibleCards = document.querySelectorAll('.modern-product-card[style="display: block;"], .modern-product-card:not([style*="display: none"])');
+  const countElement = document.querySelector('.modern-product-count');
+  const total = document.querySelectorAll('.modern-product-card').length;
+  const visible = visibleCards.length;
+  
+  if (countElement) {
+    countElement.textContent = `1-${visible} products`;
+  }
 }
 </script>
 
