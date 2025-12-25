@@ -31,11 +31,10 @@
               {% if block.type == 'category_filter' %}
                 {% assign filter_collection = collections[block.settings.collection] %}
                 {% if filter_collection %}
-                  <label class="filter-checkbox">
-                    <input type="checkbox" name="category" value="{{ filter_collection.handle }}" data-filter="category">
+                  <a href="{{ filter_collection.url }}" class="filter-link {% if collection.handle == filter_collection.handle %}active{% endif %}">
                     <span>{{ filter_collection.title }}</span>
                     <span class="filter-count">({{ filter_collection.products_count }})</span>
-                  </label>
+                  </a>
                 {% endif %}
               {% endif %}
             {% endfor %}
@@ -52,8 +51,16 @@
           </div>
           
           <div class="price-inputs">
-            <input type="number" id="min-price" placeholder="$10" min="0">
-            <input type="number" id="max-price" placeholder="$600" min="0">
+            <div class="price-range-inputs">
+              <input type="number" id="min-price" placeholder="Min" min="0" value="10">
+              <input type="number" id="max-price" placeholder="Max" min="0" value="600">
+            </div>
+            
+            <div class="price-slider-container">
+              <div class="price-slider-track" id="price-track"></div>
+              <input type="range" id="range-min" min="0" max="600" value="10" step="10">
+              <input type="range" id="range-max" min="0" max="600" value="600" step="10">
+            </div>
           </div>
         </div>
       </div>
@@ -342,6 +349,33 @@
   gap: 8px;
 }
 
+.filter-link{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  color: #333;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  background: transparent;
+}
+
+.filter-link:hover{
+  background: #f6f7f2;
+  color: #1f3d2b;
+}
+
+.filter-link.active{
+  background: #1f3d2b;
+  color: #fff;
+}
+
+.filter-link.active .filter-count{
+  color: rgba(255,255,255,0.8);
+}
+
 .filter-checkbox{
   display: flex;
   align-items: center;
@@ -358,7 +392,6 @@
 }
 
 .filter-count{
-  margin-left: auto;
   color: #999;
   font-size: 13px;
 }
@@ -366,15 +399,70 @@
 /* Price Inputs */
 .price-inputs{
   display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.price-range-inputs{
+  display: flex;
   gap: 12px;
 }
 
-.price-inputs input{
+.price-inputs input[type="number"]{
   flex: 1;
   padding: 8px 12px;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 14px;
+}
+
+/* Price Range Slider */
+.price-slider-container{
+  position: relative;
+  height: 6px;
+  background: #e5e5e5;
+  border-radius: 3px;
+  margin: 20px 0;
+}
+
+.price-slider-track{
+  position: absolute;
+  height: 100%;
+  background: #1f3d2b;
+  border-radius: 3px;
+}
+
+input[type="range"]{
+  position: absolute;
+  width: 100%;
+  height: 6px;
+  background: transparent;
+  pointer-events: none;
+  -webkit-appearance: none;
+  top: -7px;
+}
+
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #1f3d2b;
+  cursor: pointer;
+  pointer-events: all;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+input[type="range"]::-moz-range-thumb{
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #1f3d2b;
+  cursor: pointer;
+  pointer-events: all;
+  border: none;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 
 /* Style Cards */
@@ -698,10 +786,36 @@ function updateQty(btn, change) {
   input.value = value;
 }
 
+// Price slider update function
+function updatePriceSlider() {
+  const rangeMin = document.getElementById('range-min');
+  const rangeMax = document.getElementById('range-max');
+  const minPrice = document.getElementById('min-price');
+  const maxPrice = document.getElementById('max-price');
+  const priceTrack = document.getElementById('price-track');
+  
+  if (!rangeMin || !rangeMax) return;
+  
+  const minVal = parseInt(rangeMin.value);
+  const maxVal = parseInt(rangeMax.value);
+  
+  // Update number inputs
+  minPrice.value = minVal;
+  maxPrice.value = maxVal;
+  
+  // Update track visual
+  const percentMin = (minVal / 600) * 100;
+  const percentMax = (maxVal / 600) * 100;
+  priceTrack.style.left = percentMin + '%';
+  priceTrack.style.width = (percentMax - percentMin) + '%';
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   const checkboxes = document.querySelectorAll('.filter-checkbox input[type="checkbox"]');
   const minPrice = document.getElementById('min-price');
   const maxPrice = document.getElementById('max-price');
+  const rangeMin = document.getElementById('range-min');
+  const rangeMax = document.getElementById('range-max');
   const productCards = document.querySelectorAll('.product-card');
   
   // Filter function
@@ -730,19 +844,75 @@ document.addEventListener('DOMContentLoaded', function() {
       
       card.style.display = showCard ? 'block' : 'none';
     });
+    
+    // Update count
+    const visibleCount = document.querySelectorAll('.product-card[style="display: block;"]').length;
+    const countDisplay = document.querySelector('.count-display');
+    if(countDisplay) {
+        countDisplay.textContent = `1-${visibleCount}`;
+    }
+  }
+
+  // Price Slider Logic
+  function handleRangeInput(e) {
+    let minVal = parseInt(rangeMin.value);
+    let maxVal = parseInt(rangeMax.value);
+    
+    // Prevent overlap
+    if (maxVal - minVal < 10) {
+        if (e.target.id === 'range-min') {
+            rangeMin.value = maxVal - 10;
+        } else {
+            rangeMax.value = minVal + 10;
+        }
+    }
+    
+    updatePriceSlider();
+    filterProducts();
   }
   
   // Event listeners
   checkboxes.forEach(cb => cb.addEventListener('change', filterProducts));
-  minPrice.addEventListener('input', filterProducts);
-  maxPrice.addEventListener('input', filterProducts);
+  
+  if(rangeMin && rangeMax) {
+      rangeMin.addEventListener('input', handleRangeInput);
+      rangeMax.addEventListener('input', handleRangeInput);
+      // Initialize handles
+      updatePriceSlider();
+  }
+  
+  if(minPrice && maxPrice) {
+      minPrice.addEventListener('input', function() {
+          let val = parseInt(this.value);
+          if(val < parseInt(rangeMax.value)) {
+             rangeMin.value = val;
+             updatePriceSlider();
+             filterProducts();
+          }
+      });
+      maxPrice.addEventListener('input', function() {
+          let val = parseInt(this.value);
+          if(val > parseInt(rangeMin.value)) {
+             rangeMax.value = val;
+             updatePriceSlider();
+             filterProducts();
+          }
+      });
+  }
   
   // Reset buttons
   document.querySelectorAll('.filter-reset').forEach(btn => {
     btn.addEventListener('click', function() {
       const section = this.closest('.filter-section');
       section.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
-      section.querySelectorAll('input[type="number"]').forEach(input => input.value = '');
+      
+      // Reset price
+      if (section.querySelector('#min-price')) {
+         rangeMin.value = 0;
+         rangeMax.value = 600;
+         updatePriceSlider();
+      }
+      
       filterProducts();
     });
   });
@@ -754,6 +924,9 @@ document.addEventListener('DOMContentLoaded', function() {
       window.location.href = window.location.pathname + '?sort_by=' + this.value;
     });
   }
+  
+  // Initial filter run
+  filterProducts();
 });
 </script>
 
