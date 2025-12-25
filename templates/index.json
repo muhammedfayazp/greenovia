@@ -457,6 +457,36 @@
         "view_all_text": "View all",
         "view_all_link": "shopify://collections/all"
       }
+    },
+    "category_product_rows_wwMeap": {
+      "type": "category-product-rows",
+      "blocks": {
+        "category_Y9XQg3": {
+          "type": "category",
+          "settings": {
+            "collection": "indoor-plants"
+          }
+        },
+        "category_gtijAi": {
+          "type": "category",
+          "settings": {
+            "collection": "outdoor-plants"
+          }
+        },
+        "category_ENeKqg": {
+          "type": "category",
+          "settings": {
+            "collection": "pots-planters"
+          }
+        }
+      },
+      "block_order": [
+        "category_Y9XQg3",
+        "category_gtijAi",
+        "category_ENeKqg"
+      ],
+      "name": "Category Product Rows",
+      "settings": {}
     }
   },
   "order": [
@@ -465,6 +495,7 @@
     "plant_landing_slider_w7ehJ7",
     "hero_p9CmMG",
     "shop_by_category_e8ipig",
-    "daily_deals_WpJVGc"
+    "daily_deals_WpJVGc",
+    "category_product_rows_wwMeap"
   ]
 }
