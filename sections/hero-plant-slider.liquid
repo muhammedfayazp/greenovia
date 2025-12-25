@@ -129,6 +129,10 @@
     
     <!-- Pagination -->
     <div class="swiper-pagination"></div>
+    
+    <!-- Navigation Buttons -->
+    <div class="swiper-button-prev"></div>
+    <div class="swiper-button-next"></div>
   </div>
 </div>
 
@@ -271,6 +275,44 @@
     transform: scale(1.2);
   }
 
+  /* Swiper Navigation Buttons */
+  .swiper-button-next,
+  .swiper-button-prev {
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    z-index: 25;
+  }
+
+  .swiper-button-next::after,
+  .swiper-button-prev::after {
+    font-size: 18px;
+    font-weight: bold;
+    color: #1a3c1a;
+  }
+
+  .swiper-button-next:hover,
+  .swiper-button-prev:hover {
+    background: #1a3c1a;
+    transform: scale(1.1);
+  }
+
+  .swiper-button-next:hover::after,
+  .swiper-button-prev:hover::after {
+    color: #fff;
+  }
+  
+  .swiper-button-prev {
+      left: 30px;
+  }
+
+  .swiper-button-next {
+      right: 30px;
+  }
+
   /* Responsive */
   @media (max-width: 1200px) {
     .hero-title { font-size: 3rem; }
@@ -383,6 +425,12 @@
       gap: 8px;
     }
     
+    /* Hide navigation on mobile */
+    .swiper-button-next,
+    .swiper-button-prev {
+      display: none;
+    }
+    
     .swiper-pagination-bullet {
       background: rgba(255,255,255,0.5);
     }
@@ -411,6 +459,10 @@
       pagination: {
         el: '.swiper-pagination',
         clickable: true,
+      },
+      navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
       }
     });
   });
