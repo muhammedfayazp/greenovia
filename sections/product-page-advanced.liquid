@@ -1,7 +1,599 @@
 {% comment %}
-  Advanced Product Page - Size & Planter Selection
-  Inspired by Acacia Garden Center
+  Advanced Product Page - Dynamic Variants & Image Switching
 {% endcomment %}
+
+<script type="application/ld+json">
+  {{ product | structured_data }}
+</script>
+
+{% liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign product_form_id = 'product-form-' | append: section.id
+%}
+
+<div class="product-page" data-section-id="{{ section.id }}">
+  <div class="container page-width">
+    <div class="product-layout">
+      
+      {%- comment -%} Product Images Gallery {%- endcomment -%}
+      <div class="product-media">
+        <div class="product-media__main">
+            <div class="product-media__featured">
+              <img
+                src="{{ current_variant.featured_media | default: product.featured_media | image_url: width: 800 }}"
+                alt="{{ product.title | escape }}"
+                width="800"
+                height="800"
+                loading="eager"
+                class="product-media__image"
+                id="MainProductImage"
+              >
+            </div>
+        </div>
+
+        {% if product.media.size > 1 %}
+          <div class="product-media__thumbnails">
+            {% for media in product.media %}
+              <button
+                type="button"
+                class="product-media__thumbnail {% if media.id == current_variant.featured_media.id or forloop.first %}active{% endif %}"
+                data-media-id="{{ media.id }}"
+                data-image-src="{{ media | image_url: width: 800 }}"
+                aria-label="Load image {{ forloop.index }}"
+              >
+                <img
+                  src="{{ media | image_url: width: 120 }}"
+                  alt="{{ media.alt | escape }}"
+                  width="120"
+                  height="120"
+                  loading="lazy"
+                >
+              </button>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      {%- comment -%} Product Information {%- endcomment -%}
+      <div class="product-info">
+        
+        <div class="product-info__header">
+          {% if product.vendor != blank %}
+            <p class="product-vendor">{{ product.vendor }}</p>
+          {% endif %}
+          <h1 class="product-title">{{ product.title }}</h1>
+        </div>
+
+        <div class="product-price" id="ProductPrice">
+          <span class="price-current">
+            {{ current_variant.price | money }}
+          </span>
+          {% if current_variant.compare_at_price > current_variant.price %}
+            <span class="price-compare">
+              {{ current_variant.compare_at_price | money }}
+            </span>
+            <span class="price-badge">
+              Save {{ current_variant.compare_at_price | minus: current_variant.price | times: 100 | divided_by: current_variant.compare_at_price }}%
+            </span>
+          {% endif %}
+        </div>
+
+        {%- comment -%} Product Form {%- endcomment -%}
+        {% form 'product', product, id: product_form_id, class: 'product-form' %}
+          <input type="hidden" name="id" value="{{ current_variant.id }}">
+          
+          {%- comment -%} Dynamic Variants Loop {%- endcomment -%}
+          {% unless product.has_only_default_variant %}
+            <div class="product-variants">
+              {% for option in product.options_with_values %}
+                <div class="product-option">
+                  <label class="product-option__label">
+                    {{ option.name }}
+                    <span class="product-option__selected" id="SelectedOption-{{ forloop.index0 }}">
+                      - {{ current_variant.options[forloop.index0] }}
+                    </span>
+                  </label>
+                  
+                  <div class="option-values">
+                    {% for value in option.values %}
+                      <label class="option-value-card {% if current_variant.options[forloop.parentloop.index0] == value %}checked{% endif %}">
+                        <input
+                          type="radio"
+                          name="option-{{ option.name | handleize }}"
+                          value="{{ value | escape }}"
+                          data-index="option{{ forloop.parentloop.index }}"
+                          {% if current_variant.options[forloop.parentloop.index0] == value %}checked{% endif %}
+                          class="option-input hidden"
+                        >
+                        <span class="option-text">{{ value }}</span>
+                      </label>
+                    {% endfor %}
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% endunless %}
+
+          {%- comment -%} Planter Selection (Preserved) {%- endcomment -%}
+          <div class="product-option planter-option-container">
+            <label class="product-option__label">
+              Select Planter
+              <span class="product-option__selected" id="SelectedPlanter">- None</span>
+            </label>
+            <div class="planter-selector">
+              <input type="radio" id="Planter-None" name="planter" value="none" checked class="hidden planter-input">
+              <label for="Planter-None" class="planter-card checked">
+                <div class="planter-card__image planter-card__image--none">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+                  </svg>
+                </div>
+                <div class="planter-card__info">
+                  <span class="planter-card__name">No Planter</span>
+                </div>
+              </label>
+
+              {% assign planter_options = section.settings.planter_products | split: ',' %}
+              {% for planter_handle in planter_options limit: 4 %}
+                {% assign planter = all_products[planter_handle] %}
+                {% if planter != blank %}
+                  <input
+                    type="radio"
+                    id="Planter-{{ forloop.index }}"
+                    name="planter"
+                    value="{{ planter.id }}"
+                    class="hidden planter-input"
+                    data-planter-price="{{ planter.price }}"
+                    data-planter-title="{{ planter.title | escape }}"
+                  >
+                  <label for="Planter-{{ forloop.index }}" class="planter-card">
+                    <div class="planter-card__image">
+                      {% if planter.featured_image %}
+                        <img src="{{ planter.featured_image | image_url: width: 100 }}" alt="{{ planter.title }}">
+                      {% endif %}
+                    </div>
+                    <div class="planter-card__info">
+                      <span class="planter-card__name">{{ planter.title }}</span>
+                      <span class="planter-card__price">+ {{ planter.price | money }}</span>
+                    </div>
+                  </label>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+
+          {%- comment -%} Quantity {%- endcomment -%}
+          <div class="product-option">
+            <label class="product-option__label">Quantity</label>
+            <div class="quantity-selector">
+              <button type="button" class="qty-btn" onclick="updateQty(-1)">−</button>
+              <input type="number" name="quantity" value="1" min="1" class="qty-input">
+              <button type="button" class="qty-btn" onclick="updateQty(1)">+</button>
+            </div>
+          </div>
+
+          {%- comment -%} Total & Actions {%- endcomment -%}
+          <div class="product-total-bar">
+            <div class="total-price-display">
+               Total: <span id="TotalPrice">{{ current_variant.price | money }}</span>
+            </div>
+            
+            <div class="action-buttons">
+              <button
+                type="submit"
+                name="add"
+                id="AddToCart"
+                class="btn btn-add-to-cart"
+                {% unless current_variant.available %}disabled{% endunless %}
+              >
+                {% if current_variant.available %}Add to Cart{% else %}Sold Out{% endif %}
+              </button>
+            </div>
+          </div>
+
+        {% endform %}
+        
+        {%- comment -%} Description & Trust {%- endcomment -%}
+        <div class="product-description-container">
+          <h3>About This Plant</h3>
+          <div class="rte">
+            {{ product.description }}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script id="product-variants-json" type="application/json">
+  {{ product.variants | json }}
+</script>
+
+<style>
+/* Modern Product Page Styles */
+.product-layout {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 4rem;
+  padding: 2rem 0;
+}
+
+/* Media */
+.product-media__main {
+  margin-bottom: 1rem;
+}
+.product-media__featured {
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f4f4f4;
+}
+.product-media__image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.product-media__thumbnails {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+}
+.product-media__thumbnail {
+  border: 2px solid transparent;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  background: none;
+  padding: 0;
+}
+.product-media__thumbnail.active {
+  border-color: #1f3d2b;
+}
+.product-media__thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Info */
+.product-title {
+  font-size: 2.5rem;
+  color: #1f3d2b;
+  margin: 0 0 1rem;
+  line-height: 1.2;
+}
+.product-vendor {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.8rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+.price-current {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1f3d2b;
+}
+
+/* Options */
+.product-option {
+  margin-bottom: 1.5rem;
+}
+.product-option__label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+  color: #333;
+}
+.product-option__selected {
+  color: #666;
+  font-weight: 400;
+  margin-left: 5px;
+}
+.option-values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.option-value-card {
+  border: 1px solid #ddd;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 4px;
+  background: #fff;
+  transition: all 0.2s;
+  min-width: 60px;
+  text-align: center;
+}
+.option-value-card:hover {
+  border-color: #1f3d2b;
+}
+.option-value-card.checked {
+  border-color: #1f3d2b;
+  background: #f6f7f2;
+  color: #1f3d2b;
+  font-weight: 500;
+  box-shadow: 0 0 0 1px #1f3d2b inset;
+}
+
+/* Planter */
+.planter-selector {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+}
+.planter-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+}
+.planter-card.checked {
+  border-color: #1f3d2b;
+  background: #f6f7f2;
+  box-shadow: 0 0 0 1px #1f3d2b inset;
+}
+.planter-card__image {
+  height: 60px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.planter-card__image img {
+  max-height: 100%;
+  max-width: 100%;
+}
+.planter-card__name {
+  font-size: 0.8rem;
+  display: block;
+}
+.planter-card__price {
+  font-size: 0.75rem;
+  color: #666;
+}
+
+/* Qty & Actions */
+.quantity-selector {
+  display: inline-flex;
+  border: 1px solid #ddd;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.qty-btn {
+  background: #fff;
+  border: none;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #1f3d2b;
+}
+.qty-input {
+  width: 50px;
+  border: none;
+  text-align: center;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #1f3d2b;
+}
+
+.product-total-bar {
+  background: #f9f9f9;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-top: 2rem;
+}
+.total-price-display {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+#TotalPrice {
+  font-weight: 700;
+  color: #1f3d2b;
+  font-size: 1.4rem;
+}
+.btn-add-to-cart {
+  width: 100%;
+  background-color: #1f3d2b;
+  color: white;
+  border: none;
+  padding: 16px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-add-to-cart:hover {
+  background-color: #2b503a;
+}
+.btn-add-to-cart:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Hidden Utils */
+.hidden {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+@media(max-width: 990px) {
+  .product-layout {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const variants = JSON.parse(document.getElementById('product-variants-json').textContent);
+  const options = document.querySelectorAll('.option-input');
+  const planterInputs = document.querySelectorAll('.planter-input');
+  const mainImage = document.getElementById('MainProductImage');
+  const thumbBtns = document.querySelectorAll('.product-media__thumbnail');
+
+  // Helper: Format Money
+  function formatMoney(cents) {
+    return 'AED ' + (cents / 100).toFixed(2);
+  }
+
+  // Handle Option Change
+  function handleOptionChange() {
+    // 1. Get selected values
+    const selectedValues = [];
+    document.querySelectorAll('.product-option').forEach(opt => {
+      const checked = opt.querySelector('.option-input:checked');
+      if(checked) selectedValues.push(checked.value);
+    });
+
+    // 2. Find variant
+    const matchedVariant = variants.find(v => {
+      return v.options.every((val, index) => val === selectedValues[index]);
+    });
+
+    // 3. Update UI
+    if (matchedVariant) {
+      // Update ID
+      document.querySelector('input[name="id"]').value = matchedVariant.id;
+      
+      // Update Price Display
+      document.querySelector('.price-current').textContent = formatMoney(matchedVariant.price);
+      
+      // Update Button
+      const btn = document.getElementById('AddToCart');
+      if (matchedVariant.available) {
+        btn.textContent = 'Add to Cart';
+        btn.disabled = false;
+      } else {
+        btn.textContent = 'Sold Out';
+        btn.disabled = true;
+      }
+
+      // Update URL (optional)
+      const newUrl = new URL(window.location);
+      newUrl.searchParams.set('variant', matchedVariant.id);
+      window.history.replaceState({}, '', newUrl);
+
+      // Update Image if variant has one
+      if (matchedVariant.featured_media) {
+        let src = matchedVariant.featured_media.preview_image.src;
+        if(src) updateMainImage(src);
+      }
+    }
+
+    // Refresh styling
+    options.forEach(opt => {
+      opt.parentElement.classList.toggle('checked', opt.checked);
+    });
+    
+    // Update labels
+    document.querySelectorAll('.product-option').forEach((block, i) => {
+        const checked = block.querySelector('.option-input:checked');
+        const labelSpan = block.querySelector('.product-option__selected');
+        if(checked && labelSpan) labelSpan.textContent = '- ' + checked.value;
+    });
+
+    updateTotal();
+  }
+
+  // Handle Planter Change
+  function handlePlanterChange() {
+    planterInputs.forEach(input => {
+      input.nextElementSibling.classList.toggle('checked', input.checked);
+    });
+    const checked = document.querySelector('.planter-input:checked');
+    const labelSpan = document.getElementById('SelectedPlanter');
+    if(checked && labelSpan) {
+       const title = checked.dataset.planterTitle || 'None';
+       labelSpan.textContent = '- ' + title;
+    }
+    updateTotal();
+  }
+
+  // Update Total
+  function updateTotal() {
+    const currentPriceText = document.querySelector('.price-current').textContent;
+    const basePrice = parseFloat(currentPriceText.replace(/[^0-9.]/g, ''));
+    
+    let planterPrice = 0;
+    const selectedPlanter = document.querySelector('.planter-input:checked');
+    if (selectedPlanter && selectedPlanter.dataset.planterPrice) {
+      planterPrice = parseFloat(selectedPlanter.dataset.planterPrice) / 100;
+    }
+
+    const qty = parseInt(document.querySelector('.qty-input').value) || 1;
+    const total = (basePrice + planterPrice) * qty;
+    
+    document.getElementById('TotalPrice').textContent = 'AED ' + total.toFixed(2);
+  }
+
+  // Update Main Image
+  function updateMainImage(src) {
+    if(!src) return;
+    let newSrc = src;
+    if(src.indexOf('?') === -1) newSrc += '?width=800';
+    
+    mainImage.src = newSrc;
+    
+    // Highlight thumbnail based on URL matching
+    thumbBtns.forEach(btn => {
+        const thumbSrc = btn.dataset.imageSrc;
+        // Check if the current main image src contains the media ID or base path
+        if(thumbSrc && newSrc.split('?')[0] === thumbSrc.split('?')[0]) {
+             btn.classList.add('active');
+        } else {
+             btn.classList.remove('active');
+        }
+    });
+  }
+
+  // Thumbnail Click
+  thumbBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      thumbBtns.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      const src = this.dataset.imageSrc;
+      if(src) mainImage.src = src;
+    });
+  });
+
+  // Quantity Global Hook
+  window.updateQty = function(change) {
+    const input = document.querySelector('.qty-input');
+    let val = parseInt(input.value) || 1;
+    val = Math.max(1, val + change);
+    input.value = val;
+    updateTotal();
+  };
+
+  // Listeners
+  options.forEach(opt => opt.addEventListener('change', handleOptionChange));
+  planterInputs.forEach(opt => opt.addEventListener('change', handlePlanterChange));
+});
+</script>
+
+{% schema %}
+{
+  "name": "Product Page Advanced",
+  "settings": [
+    {
+      "type": "text",
+      "id": "planter_products",
+      "label": "Planter Product Handles",
+      "default": "ceramic-planter-small,ceramic-planter-medium"
+    }
+  ]
+}
+{% endschema %}
 
 <script type="application/ld+json">
   {{ product | structured_data }}
