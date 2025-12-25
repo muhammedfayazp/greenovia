@@ -451,6 +451,7 @@
     },
     "daily_deals_WpJVGc": {
       "type": "daily-deals",
+      "disabled": true,
       "name": "Daily Deals",
       "settings": {
         "heading": "Daily Deals",
