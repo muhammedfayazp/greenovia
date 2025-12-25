@@ -11,6 +11,42 @@
   "type": "footer",
   "name": "Footer",
   "sections": {
+    "footer_benefits_qcxGcn": {
+      "type": "footer-benefits",
+      "blocks": {
+        "benefit_y6nr3E": {
+          "type": "benefit",
+          "settings": {
+            "icon": "shipping",
+            "title": "Free Shipping",
+            "description": "On all orders over $50"
+          }
+        },
+        "benefit_jM7dfh": {
+          "type": "benefit",
+          "settings": {
+            "icon": "discount",
+            "title": "25% Off First Order",
+            "description": "Use code GREENES at checkout"
+          }
+        },
+        "benefit_nRmLcK": {
+          "type": "benefit",
+          "settings": {
+            "icon": "support",
+            "title": "Customer Support",
+            "description": "We're here to help you 24/7"
+          }
+        }
+      },
+      "block_order": [
+        "benefit_y6nr3E",
+        "benefit_jM7dfh",
+        "benefit_nRmLcK"
+      ],
+      "name": "Footer Benefits",
+      "settings": {}
+    },
     "section_QGqdEc": {
       "type": "section",
       "blocks": {
@@ -248,6 +284,7 @@
         "group_Jmfad7",
         "group_U97DiE"
       ],
+      "disabled": true,
       "name": "t:names.custom_section",
       "settings": {
         "content_direction": "column",
@@ -333,6 +370,7 @@
     }
   },
   "order": [
+    "footer_benefits_qcxGcn",
     "section_QGqdEc",
     "footer_utilities"
   ]
