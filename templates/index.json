@@ -1,124 +1,35 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
   "sections": {
-    "hero_content_slider_new_1": {
-      "type": "hero-content-slider",
-      "blocks": {
-        "slide_1": {
-          "type": "slide",
-          "settings": {
-            "heading": "Shop Beautiful Plants for Every Home",
-            "text": "Premium plants, easy care, and fast delivery — everything you need to grow with confidence.",
-            "button_text": "View all items",
-            "button_link": "shopify://collections/all",
-            "image": "shopify://shop_images/peace-lily-plant-pot_257a9db8-bc19-4144-87e8-fe8e5c4e5d1e.jpg"
-          }
-        },
-        "slide_2": {
-          "type": "slide",
-          "settings": {
-            "heading": "Bring Nature Indoors",
-            "text": "Discover our collection of air-purifying plants that thrive in any light.",
-            "button_text": "Shop Indoor",
-            "button_link": "shopify://collections/indoor",
-            "image": "shopify://shop_images/monstera-deliciosa-plant-pot_1_7be21daf-1d57-4c14-ba45-9ad6b4fea5ef.jpg"
-          }
-        },
-        "feature_1": {
-          "type": "feature",
-          "settings": {
-            "title": "Fast Delivery",
-            "icon": "🚚",
-            "text": "Fresh plants at your doorstep"
-          }
-        },
-        "feature_2": {
-          "type": "feature",
-          "settings": {
-            "title": "Healthy Plants",
-            "icon": "🌱",
-            "text": "Grown with expert care"
-          }
-        },
-        "feature_3": {
-          "type": "feature",
-          "settings": {
-            "title": "Premium Quality",
-            "icon": "⭐",
-            "text": "Hand-picked for your home"
-          }
-        }
-      },
-      "block_order": [
-        "slide_1",
-        "slide_2",
-        "feature_1",
-        "feature_2",
-        "feature_3"
-      ],
-      "settings": {
-        "bg_color_right": "#E8F0E8",
-        "show_value_props": true
-      }
-    },
     "hero_plant_slider_D3Ke6b": {
       "type": "hero-plant-slider",
       "blocks": {
-        "feature_eLJMfX": {
-          "type": "feature",
-          "settings": {
-            "title": "🚚 Fast Delivery",
-            "text": "Fresh plants at your doorstep"
-          }
-        },
-        "feature_H7T8KJ": {
-          "type": "feature",
-          "settings": {
-            "title": "🌱 Healthy Plants",
-            "text": "Grown with expert care"
-          }
-        },
-        "feature_4QpzpE": {
-          "type": "feature",
-          "settings": {
-            "title": "⭐ Premium Quality",
-            "text": "Hand-picked for your home"
-          }
-        },
         "slide_Rfq76M": {
           "type": "slide",
           "settings": {
-            "image": "shopify://shop_images/peace-lily-plant-pot_257a9db8-bc19-4144-87e8-fe8e5c4e5d1e.jpg"
+            "image": "shopify://shop_images/peace-lily-plant-pot_257a9db8-bc19-4144-87e8-fe8e5c4e5d1e.jpg",
+            "heading": "Shop Beautiful Plants for Every Home",
+            "text": "Premium plants, easy care, and fast delivery — everything you need to grow with confidence.",
+            "button_text": "View all items",
+            "button_link": "shopify://collections/all"
           }
         },
         "slide_gYiHCh": {
           "type": "slide",
           "settings": {
-            "image": "shopify://shop_images/monstera-deliciosa-plant-pot_1_7be21daf-1d57-4c14-ba45-9ad6b4fea5ef.jpg"
+            "image": "shopify://shop_images/monstera-deliciosa-plant-pot_1_7be21daf-1d57-4c14-ba45-9ad6b4fea5ef.jpg",
+            "heading": "Bring Nature Indoors",
+            "text": "Discover our collection of air-purifying plants that thrive in any light.",
+            "button_text": "View all items",
+            "button_link": "shopify://collections/all"
           }
         }
       },
       "block_order": [
-        "feature_eLJMfX",
-        "feature_H7T8KJ",
-        "feature_4QpzpE",
         "slide_Rfq76M",
         "slide_gYiHCh"
       ],
-      "name": "Hero Plant Slider",
       "settings": {
-        "heading": "Shop Beautiful Plants for Every Home",
-        "subtext": "Premium plants, easy care, and fast delivery — everything you need to grow with confidence.",
-        "button_text": "View all items →",
-        "button_link": ""
+        "bg_color_right": "#E8F0E8"
       }
     },
     "hero_plant_WdReax": {
@@ -551,7 +462,6 @@
     }
   },
   "order": [
-    "hero_content_slider_new_1",
     "hero_plant_slider_D3Ke6b",
     "hero_plant_WdReax",
     "plant_landing_slider_w7ehJ7",
