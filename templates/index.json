@@ -15,15 +15,6 @@
         "slide_eKmJka": {
           "type": "slide",
           "settings": {
-            "heading": "Shop Beautiful Plants for Every Home",
-            "text": "Premium plants, easy care, and fast delivery - everything you need to grow with confidence.",
-            "button_text": "View all items",
-            "button_link": ""
-          }
-        },
-        "slide_Rfq76M": {
-          "type": "slide",
-          "settings": {
             "image": "shopify://shop_images/peace-lily-plant-pot_257a9db8-bc19-4144-87e8-fe8e5c4e5d1e.jpg",
             "heading": "Shop Beautiful Plants for Every Space",
             "text": "Premium plants, easy care, and fast delivery - everything you need to grow with confidence.",
@@ -44,7 +35,6 @@
       },
       "block_order": [
         "slide_eKmJka",
-        "slide_Rfq76M",
         "slide_gYiHCh"
       ],
       "settings": {
