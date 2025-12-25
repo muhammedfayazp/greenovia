@@ -12,7 +12,55 @@
       {% endif %}
     </div>
 
-    {% assign products = collections.all.products %}
+    {%- comment -%} Smart Algorithm for Daily Deals {%- endcomment -%}
+    {%- assign deal_products = "" | split: "" -%}
+    {%- assign featured_products = "" | split: "" -%}
+    {%- assign regular_products = "" | split: "" -%}
+
+    {%- comment -%} 1. Collect products on SALE (with compare_at_price) {%- endcomment -%}
+    {%- for product in collections.all.products limit: 50 -%}
+      {%- if product.compare_at_price > product.price -%}
+        {%- assign deal_products = deal_products | push: product -%}
+      {%- endif -%}
+    {%- endfor -%}
+
+    {%- comment -%} 2. Collect FEATURED or DEAL tagged products {%- endcomment -%}
+    {%- for product in collections.all.products limit: 50 -%}
+      {%- assign is_featured = false -%}
+      {%- for tag in product.tags -%}
+        {%- assign tag_lower = tag | downcase -%}
+        {%- if tag_lower contains 'featured' or tag_lower contains 'deal' or tag_lower contains 'special' -%}
+          {%- assign is_featured = true -%}
+          {%- break -%}
+        {%- endif -%}
+      {%- endfor -%}
+      {%- if is_featured -%}
+        {%- assign featured_products = featured_products | push: product -%}
+      {%- endif -%}
+    {%- endfor -%}
+
+    {%- comment -%} 3. Fallback to recent products {%- endcomment -%}
+    {%- for product in collections.all.products limit: 30 -%}
+      {%- assign regular_products = regular_products | push: product -%}
+    {%- endfor -%}
+
+    {%- comment -%} Combine: Sale products first, then featured, then recent {%- endcomment -%}
+    {%- assign products = deal_products | concat: featured_products | concat: regular_products -%}
+    
+    {%- comment -%} Remove duplicates and limit to 20 {%- endcomment -%}
+    {%- assign final_products = "" | split: "" -%}
+    {%- assign product_ids = "" | split: "" -%}
+    {%- for product in products -%}
+      {%- unless product_ids contains product.id -%}
+        {%- assign final_products = final_products | push: product -%}
+        {%- assign product_ids = product_ids | push: product.id -%}
+        {%- if final_products.size >= 20 -%}
+          {%- break -%}
+        {%- endif -%}
+      {%- endunless -%}
+    {%- endfor -%}
+
+    {%- assign products = final_products -%}
 
     <div class="dailydeals__swiper swiper">
       <div class="swiper-wrapper">
@@ -27,6 +75,13 @@
                   loading="lazy"
                 >
               {% endif %}
+
+              {%- comment -%} Sale badge {%- endcomment -%}
+              {% if product.compare_at_price > product.price %}
+                {% assign discount = product.compare_at_price | minus: product.price %}
+                {% assign discount_percentage = discount | times: 100.0 | divided_by: product.compare_at_price | round %}
+                <span class="dailydeals__badge">-{{ discount_percentage }}%</span>
+              {% endif %}
             </a>
 
             <div class="dailydeals__info">
@@ -35,7 +90,11 @@
               </a>
 
               <div class="dailydeals__price">
-                {{ product.price | money }}
+                {%- comment -%} Show compare price if on sale {%- endcomment -%}
+                {% if product.compare_at_price > product.price %}
+                  <span class="dailydeals__price--compare">{{ product.compare_at_price | money }}</span>
+                {% endif %}
+                <span class="dailydeals__price--current">{{ product.price | money }}</span>
               </div>
 
               <form method="post" action="/cart/add" class="dailydeals__form">
@@ -118,11 +177,27 @@
   display:block;
   aspect-ratio: 1/1;
   background:#eee;
+  position:relative;
 }
 .dailydeals__img img{
   width:100%;
   height:100%;
   object-fit:cover;
+}
+
+/* Sale Badge */
+.dailydeals__badge{
+  position:absolute;
+  top:12px;
+  right:12px;
+  background:#e63946;
+  color:#fff;
+  padding:6px 12px;
+  border-radius:999px;
+  font-size:13px;
+  font-weight:700;
+  box-shadow: 0 4px 12px rgba(230, 57, 70, 0.3);
+  z-index:2;
 }
 
 /* Info */
@@ -147,6 +222,22 @@
   margin-bottom: 10px;
   color:#1f3d2b;
   font-weight:500;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.dailydeals__price--compare{
+  font-size:13px;
+  color:#999;
+  text-decoration:line-through;
+  font-weight:400;
+}
+.dailydeals__price--current{
+  font-size:16px;
+  color:#e63946;
+  font-weight:700;
 }
 
 /* Actions */
@@ -233,8 +324,10 @@ document.addEventListener('DOMContentLoaded', function () {
     freeMode: true,
     breakpoints: {
       480: { slidesPerView: 1.5 },
-      640: { slidesPerView: 2.2 },
-      990: { slidesPerView: 4, freeMode: false }
+      640: { slidesPerView: 2.5 },
+      990: { slidesPerView: 4.5, freeMode: false },
+      1200: { slidesPerView: 5.5, freeMode: false },
+      1400: { slidesPerView: 6, freeMode: false }
     }
   });
 
