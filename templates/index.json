@@ -12,6 +12,15 @@
     "hero_plant_slider_D3Ke6b": {
       "type": "hero-plant-slider",
       "blocks": {
+        "slide_eKmJka": {
+          "type": "slide",
+          "settings": {
+            "heading": "Shop Beautiful Plants for Every Home",
+            "text": "Premium plants, easy care, and fast delivery - everything you need to grow with confidence.",
+            "button_text": "View all items",
+            "button_link": ""
+          }
+        },
         "slide_Rfq76M": {
           "type": "slide",
           "settings": {
@@ -34,6 +43,7 @@
         }
       },
       "block_order": [
+        "slide_eKmJka",
         "slide_Rfq76M",
         "slide_gYiHCh"
       ],
