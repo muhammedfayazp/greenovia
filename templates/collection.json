@@ -491,6 +491,7 @@
       "block_order": [
         "text_JaHVHx"
       ],
+      "disabled": true,
       "name": "t:names.product_recommendations",
       "settings": {
         "product": "{{ closest.product }}",
