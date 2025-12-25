@@ -387,7 +387,7 @@
           "type": "category",
           "settings": {
             "image": "shopify://shop_images/beautiful-shot-botanical-garden-with-exotic-tropical-plants-trees.jpg",
-            "title": "Indoor Plants",
+            "title": "Outdoor Plants",
             "subtitle": "Shop Now",
             "link": ""
           }
@@ -414,7 +414,7 @@
           "type": "category",
           "settings": {
             "image": "shopify://shop_images/traditional-macrame-arrangement-indoors.jpg",
-            "title": "Indoor Plants",
+            "title": "Other",
             "subtitle": "Shop Now",
             "link": ""
           }
@@ -423,7 +423,7 @@
           "type": "category",
           "settings": {
             "image": "shopify://shop_images/top-view-plants.jpg",
-            "title": "Indoor Plants",
+            "title": "Seeds",
             "subtitle": "Shop Now",
             "link": ""
           }
