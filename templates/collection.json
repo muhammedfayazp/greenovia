@@ -145,6 +145,47 @@
         "padding-block-end": 22
       }
     },
+    "collection_filter_page_kJegJj": {
+      "type": "collection-filter-page",
+      "blocks": {
+        "style_card_ecz6iJ": {
+          "type": "style_card",
+          "settings": {
+            "title": "Boho Style",
+            "image": "shopify://shop_images/Grcgrey01.webp",
+            "link": ""
+          }
+        },
+        "category_filter_bcN7bU": {
+          "type": "category_filter",
+          "settings": {
+            "collection": "indoor-plants"
+          }
+        },
+        "category_filter_CRgWRi": {
+          "type": "category_filter",
+          "settings": {
+            "collection": "outdoor-plants"
+          }
+        },
+        "category_filter_MzdVWE": {
+          "type": "category_filter",
+          "settings": {
+            "collection": "pots-planters"
+          }
+        }
+      },
+      "block_order": [
+        "style_card_ecz6iJ",
+        "category_filter_bcN7bU",
+        "category_filter_CRgWRi",
+        "category_filter_MzdVWE"
+      ],
+      "name": "Collection Filter Page",
+      "settings": {
+        "show_style_filter": true
+      }
+    },
     "main": {
       "type": "main-collection",
       "blocks": {
@@ -310,6 +351,7 @@
           ]
         }
       },
+      "disabled": true,
       "settings": {
         "layout_type": "grid",
         "product_card_size": "medium",
@@ -473,6 +515,7 @@
   "order": [
     "176616151613834162",
     "section",
+    "collection_filter_page_kJegJj",
     "main",
     "product_recommendations_JUdLyi"
   ]
