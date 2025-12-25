@@ -1,0 +1,409 @@
+{% schema %}
+{
+  "name": "Hero Content Slider",
+  "class": "section-hero-slider",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color_right",
+      "label": "Right Side Background Color",
+      "default": "#E8F0E8"
+    },
+    {
+      "type": "header",
+      "content": "Value Props Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_value_props",
+      "label": "Show Value Props",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Shop Beautiful Plants for Every Home"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Description",
+          "default": "Premium plants, easy care, and fast delivery - everything you need to grow with confidence."
+        },
+        {
+          "type": "text",
+          "id": "button_text",
+          "label": "Button Text",
+          "default": "View all items"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Button Link"
+        }
+      ]
+    },
+    {
+      "type": "feature",
+      "name": "Feature Card",
+      "limit": 3,
+      "settings": [
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Icon (Emoji or SVG)",
+          "default": "🚚"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Fast Delivery"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Description",
+          "default": "Fresh plants at your doorstep"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Modern Hero Slider",
+      "blocks": [
+        {
+          "type": "slide"
+        },
+        {
+          "type": "feature"
+        },
+        {
+          "type": "feature",
+          "settings": {
+              "title": "Healthy Plants",
+              "icon": "🌱",
+              "text": "Grown with expert care"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+              "title": "Premium Quality",
+              "icon": "⭐",
+              "text": "Hand-picked for your home"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
+
+<div class="hero-slider-wrapper" data-section-id="{{ section.id }}">
+  <!-- Setup Swiper -->
+  <div class="swiper hero-swiper">
+    <div class="swiper-wrapper">
+      {% for block in section.blocks %}
+        {% if block.type == 'slide' %}
+          <div class="swiper-slide" {{ block.shopify_attributes }}>
+            <div class="hero-slide-grid">
+              <!-- Left Content (Text) -->
+              <div class="hero-content">
+                <div class="hero-content-inner">
+                  <h2 class="hero-title">{{ block.settings.heading }}</h2>
+                  <p class="hero-description">{{ block.settings.text }}</p>
+                  {% if block.settings.button_text != blank %}
+                    <a href="{{ block.settings.button_link }}" class="hero-btn">
+                      {{ block.settings.button_text }} &rarr;
+                    </a>
+                  {% endif %}
+                </div>
+              </div>
+              
+              <!-- Right Content (Image) -->
+              <div class="hero-image-container" style="background-color: {{ section.settings.bg_color_right }};">
+                {% if block.settings.image %}
+                  <img src="{{ block.settings.image | image_url: width: 1000 }}" alt="{{ block.settings.heading }}" class="hero-plant-img" loading="lazy">
+                {% else %}
+                  {{ 'lifestyle-1' | placeholder_svg_tag: 'hero-plant-img placeholder' }}
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    <div class="swiper-pagination"></div>
+  </div>
+
+  <!-- Static Value Props (Overlay) -->
+  {% if section.settings.show_value_props %}
+    <div class="hero-features-container">
+      {% for block in section.blocks %}
+        {% if block.type == 'feature' %}
+          <div class="feature-card" {{ block.shopify_attributes }}>
+            <div class="feature-icon">{{ block.settings.icon }}</div>
+            <div class="feature-info">
+              <h4 class="feature-title">{{ block.settings.title }}</h4>
+              <p class="feature-text">{{ block.settings.text }}</p>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>
+
+<style>
+  /* Section Layout */
+  .hero-slider-wrapper {
+    position: relative;
+    width: 100%;
+    margin-bottom: 40px;
+    background: #fff;
+    overflow: hidden;
+  }
+
+  .hero-slide-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 600px;
+    align-items: center;
+  }
+
+  /* Left Content */
+  .hero-content {
+    padding: 60px 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+    background: #fff;
+  }
+
+  .hero-content-inner {
+    max-width: 500px;
+  }
+
+  .hero-title {
+    font-size: 3.5rem;
+    color: #1a3c1a; 
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    font-family: var(--font-heading-family); 
+  }
+
+  .hero-description {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
+    max-width: 400px;
+  }
+
+  .hero-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 14px 28px;
+    background: #2b4e2b;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: background 0.3s;
+    width: fit-content;
+  }
+
+  .hero-btn:hover {
+    background: #1a3c1a;
+  }
+
+  /* Right Image */
+  .hero-image-container {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .hero-plant-img {
+    max-width: 80%;
+    max-height: 80%;
+    object-fit: contain;
+    /* Clean shadow/effect if needed */
+    filter: drop-shadow(0 20px 30px rgba(0,0,0,0.1));
+  }
+  
+  .placeholder {
+    width: 100%;
+    height: 100%;
+    opacity: 0.5;
+  }
+
+  /* Static Features */
+  .hero-features-container {
+    position: absolute;
+    bottom: 50px;
+    left: 80px;
+    display: flex;
+    gap: 20px;
+    z-index: 10;
+    max-width: 50%;
+  }
+
+  .feature-card {
+    background: #fff;
+    border: 1px solid #eee;
+    padding: 20px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 180px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  }
+
+  .feature-icon {
+    font-size: 1.5rem;
+    color: #f79e1b; 
+  }
+
+  .feature-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin: 0;
+    color: #1a3c1a;
+  }
+
+  .feature-text {
+    font-size: 0.8rem;
+    color: #777;
+    margin: 0;
+    line-height: 1.4;
+  }
+  
+  /* Swiper Pagination */
+  .swiper-pagination {
+    position: absolute;
+    right: 20px !important;
+    top: 50% !important;
+    transform: translateY(-50%);
+    left: auto !important;
+    bottom: auto !important;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 20;
+  }
+  
+  .swiper-pagination-bullet {
+    width: 10px;
+    height: 10px;
+    background: rgba(0,0,0,0.2);
+    opacity: 1;
+    margin: 0 !important;
+  }
+  
+  .swiper-pagination-bullet-active {
+    background: #2b4e2b;
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .hero-title { font-size: 2.8rem; }
+    .hero-features-container {
+      max-width: 80%;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .hero-slide-grid {
+      grid-template-columns: 1fr;
+      min-height: auto;
+      grid-template-rows: 300px auto;
+    }
+    
+    .hero-image-container {
+      grid-row: 1; /* Image Top */
+      order: 1;
+    }
+    
+    .hero-content {
+      grid-row: 2; /* Content Bottom */
+      order: 2;
+      padding: 40px 20px 180px 20px; /* Padding bottom for features */
+      text-align: center;
+    }
+    
+    .hero-content-inner {
+      margin: 0 auto;
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hero-features-container {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      overflow-x: auto;
+      padding-bottom: 10px;
+      max-width: none;
+      justify-content: flex-start; /* Scrollable horizontal */
+    }
+    
+    .feature-card {
+      min-width: 240px; /* Wider card on mobile scroll */
+    }
+    
+    .swiper-pagination {
+      display: none; /* Hide vertical pagination on mobile usually */
+    }
+  }
+</style>
+
+<!-- Standard Swiper CSS/JS loading if not present -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    new Swiper('.hero-swiper', {
+      loop: true,
+      autoplay: {
+        delay: 5000,
+        disableOnInteraction: false,
+      },
+      pagination: {
+        el: '.swiper-pagination',
+        clickable: true,
+        direction: 'vertical', /* Desktop vertical */
+      },
+      breakpoints: {
+        768: {
+             direction: 'horizontal', /* Actually slider direction is horizontal (content slide), only pagination dots styling is vertical via CSS */
+        }
+      }
+    });
+  });
+</script>
