@@ -129,10 +129,6 @@
     
     <!-- Pagination -->
     <div class="swiper-pagination"></div>
-    
-    <!-- Navigation Buttons -->
-    <div class="swiper-button-prev"></div>
-    <div class="swiper-button-next"></div>
   </div>
 </div>
 
@@ -154,7 +150,7 @@
   .hero-swiper {
     height: 100%;
     width: 100%;
-    position: relative; /* Ensure absolute children are relative to this */
+    position: relative;
   }
 
   .swiper-slide {
@@ -252,79 +248,35 @@
   }
   
   /* Swiper Pagination - Vertical on the Right */
-  .swiper-pagination {
+  .hero-slider-wrapper .swiper-pagination {
     position: absolute !important;
-    right: 20px !important;
+    right: 30px !important;
     top: 50% !important;
     transform: translateY(-50%) !important;
     left: auto !important;
     bottom: auto !important;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+    width: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
     z-index: 20;
   }
   
-  .swiper-pagination-bullet {
-    width: 10px;
-    height: 10px;
-    background: #000;
-    opacity: 0.2;
+  .hero-slider-wrapper .swiper-pagination-bullet {
+    width: 12px !important;
+    height: 12px !important;
+    background: transparent !important;
+    border: 2px solid #1a3c1a !important;
+    opacity: 1 !important;
     margin: 0 !important;
     transition: all 0.3s ease;
     border-radius: 50%;
+    display: block !important;
   }
   
-  .swiper-pagination-bullet-active {
-    background: #1a3c1a;
-    opacity: 1;
+  .hero-slider-wrapper .swiper-pagination-bullet-active {
+    background: #1a3c1a !important;
     transform: scale(1.2);
-  }
-
-  /* Swiper Navigation Buttons - White Circles */
-  .swiper-button-next,
-  .swiper-button-prev {
-    position: absolute !important;
-    width: 60px !important; 
-    height: 60px !important;
-    background: #ffffff !important;
-    border-radius: 50%;
-    color: #1a3c1a !important; /* Dark green arrow color */
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15); /* Soft shadow */
-    transition: all 0.3s ease;
-    z-index: 25;
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    margin-top: -30px !important; /* Half of height to center vertically */
-    top: 50% !important;
-  }
-
-  /* Custom Arrow Icons (adjusting size/weight) */
-  .swiper-button-next::after,
-  .swiper-button-prev::after {
-    font-size: 24px !important;
-    font-weight: bold;
-  }
-
-  /* Hover Effects */
-  .swiper-button-next:hover,
-  .swiper-button-prev:hover {
-    background: #f8f8f8 !important;
-    transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.2);
-  }
-
-  /* Positioning */
-  .swiper-button-prev {
-    left: 40px !important;
-    right: auto !important;
-  }
-  
-  .swiper-button-next {
-    right: 60px !important;
-    left: auto !important;
   }
 
   /* Responsive */
@@ -426,31 +378,26 @@
       transform: translateY(-2px);
     }
 
-    .swiper-pagination {
-      display: flex;
+    .hero-slider-wrapper .swiper-pagination {
+      display: flex !important;
       bottom: 20px !important;
       top: auto !important;
       right: 0 !important;
       left: 0 !important;
-      width: 100%;
+      width: 100% !important;
       transform: none !important;
-      flex-direction: row;
+      flex-direction: row !important;
       justify-content: center;
       gap: 8px;
     }
     
-    /* Hide navigation on mobile */
-    .swiper-button-next,
-    .swiper-button-prev {
-      display: none !important;
+    .hero-slider-wrapper .swiper-pagination-bullet {
+      background: transparent !important;
+      border-color: #fff !important;
     }
     
-    .swiper-pagination-bullet {
-      background: rgba(255,255,255,0.5);
-    }
-    
-    .swiper-pagination-bullet-active {
-      background: #fff;
+    .hero-slider-wrapper .swiper-pagination-bullet-active {
+      background: #fff !important;
     }
   }
 </style>
@@ -462,8 +409,6 @@
     
     sliders.forEach(wrapper => {
       const swiperEl = wrapper.querySelector('.hero-swiper');
-      const nextBtn = wrapper.querySelector('.swiper-button-next');
-      const prevBtn = wrapper.querySelector('.swiper-button-prev');
       const paginationEl = wrapper.querySelector('.swiper-pagination');
       
       if (swiperEl) {
@@ -480,10 +425,6 @@
           pagination: {
             el: paginationEl,
             clickable: true,
-          },
-          navigation: {
-            nextEl: nextBtn,
-            prevEl: prevBtn,
           }
         });
       }
