@@ -19,6 +19,16 @@
             "text": "Premium plants, easy care, and fast delivery — everything you need to grow with confidence.",
             "button_text": "View all items",
             "button_link": "shopify://collections/all",
+            "image": "shopify://shop_images/peace-lily-plant-pot_257a9db8-bc19-4144-87e8-fe8e5c4e5d1e.jpg"
+          }
+        },
+        "slide_2": {
+          "type": "slide",
+          "settings": {
+            "heading": "Bring Nature Indoors",
+            "text": "Discover our collection of air-purifying plants that thrive in any light.",
+            "button_text": "Shop Indoor",
+            "button_link": "shopify://collections/indoor",
             "image": "shopify://shop_images/monstera-deliciosa-plant-pot_1_7be21daf-1d57-4c14-ba45-9ad6b4fea5ef.jpg"
           }
         },
@@ -49,6 +59,7 @@
       },
       "block_order": [
         "slide_1",
+        "slide_2",
         "feature_1",
         "feature_2",
         "feature_3"
