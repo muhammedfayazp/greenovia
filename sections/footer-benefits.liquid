@@ -1,0 +1,255 @@
+<section class="footer-benefits">
+  <div class="footer-benefits__container page-width">
+    <div class="footer-benefits__grid">
+      
+      {% for block in section.blocks %}
+        <div class="footer-benefits__item" {{ block.shopify_attributes }}>
+          <div class="footer-benefits__icon">
+            {% if block.settings.icon == 'shipping' %}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="1" y="3" width="15" height="13" rx="2"/>
+                <path d="M16 8h2.6c.5 0 1 .2 1.4.6l1.4 1.4c.4.4.6.9.6 1.4V16h-2"/>
+                <circle cx="5.5" cy="17.5" r="2.5"/>
+                <circle cx="18.5" cy="17.5" r="2.5"/>
+              </svg>
+            {% elsif block.settings.icon == 'discount' %}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/>
+              </svg>
+            {% elsif block.settings.icon == 'support' %}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 11a9 9 0 0 1 18 0"/>
+                <path d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                <path d="M6 17h.01M18 17h.01"/>
+                <path d="M6 19v-2a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3v2"/>
+              </svg>
+            {% elsif block.settings.icon == 'secure' %}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect width="18" height="11" x="3" y="11" rx="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            {% elsif block.settings.icon == 'returns' %}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                <path d="M21 3v5h-5"/>
+                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                <path d="M3 21v-5h5"/>
+              </svg>
+            {% elsif block.settings.icon == 'quality' %}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2 2 7l10 5 10-5z"/>
+                <path d="m2 17 10 5 10-5"/>
+                <path d="m2 12 10 5 10-5"/>
+              </svg>
+            {% endif %}
+          </div>
+          
+          <div class="footer-benefits__content">
+            <h3 class="footer-benefits__title">{{ block.settings.title }}</h3>
+            <p class="footer-benefits__text">{{ block.settings.description }}</p>
+          </div>
+        </div>
+      {% endfor %}
+
+    </div>
+  </div>
+</section>
+
+<style>
+.footer-benefits{
+  background: #f6f7f2;
+  padding: 24px 0;
+  border-bottom: 1px solid #e3e6de;
+}
+
+.footer-benefits__container{
+  padding-left: 24px !important;
+  padding-right: 24px !important;
+}
+
+.footer-benefits__grid{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+/* Benefit Item */
+.footer-benefits__item{
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Icon */
+.footer-benefits__icon{
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #d4a574;
+  border-radius: 50%;
+  color: #fff;
+}
+
+.footer-benefits__icon svg{
+  width: 24px;
+  height: 24px;
+}
+
+/* Content */
+.footer-benefits__content{
+  flex: 1;
+}
+
+.footer-benefits__title{
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f3d2b;
+}
+
+.footer-benefits__text{
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.4;
+}
+
+/* Tablet - 2 columns */
+@media (min-width: 640px){
+  .footer-benefits__grid{
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px 24px;
+  }
+}
+
+/* Desktop - 3 columns */
+@media (min-width: 990px){
+  .footer-benefits__grid{
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+  }
+  
+  .footer-benefits__item{
+    justify-content: center;
+    text-align: left;
+  }
+}
+
+/* Large Desktop - adjust for more space */
+@media (min-width: 1200px){
+  .footer-benefits{
+    padding: 32px 0;
+  }
+  
+  .footer-benefits__icon{
+    width: 52px;
+    height: 52px;
+  }
+  
+  .footer-benefits__icon svg{
+    width: 26px;
+    height: 26px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 639px){
+  .footer-benefits__container{
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  
+  .footer-benefits__grid{
+    gap: 20px;
+  }
+  
+  .footer-benefits__title{
+    font-size: 15px;
+  }
+  
+  .footer-benefits__text{
+    font-size: 13px;
+  }
+}
+</style>
+
+{% schema %}
+{
+  "name": "Footer Benefits",
+  "tag": "section",
+  "class": "section-footer-benefits",
+  "enabled_on": {
+    "groups": ["footer"]
+  },
+  "settings": [],
+  "blocks": [
+    {
+      "type": "benefit",
+      "name": "Benefit",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "shipping", "label": "Shipping / Delivery" },
+            { "value": "discount", "label": "Discount / Offer" },
+            { "value": "support", "label": "Customer Support" },
+            { "value": "secure", "label": "Secure Payment" },
+            { "value": "returns", "label": "Easy Returns" },
+            { "value": "quality", "label": "Quality Guarantee" }
+          ],
+          "default": "shipping"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Free Shipping"
+        },
+        {
+          "type": "text",
+          "id": "description",
+          "label": "Description",
+          "default": "On all orders over $50"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Footer Benefits",
+      "category": "Footer",
+      "blocks": [
+        {
+          "type": "benefit",
+          "settings": {
+            "icon": "shipping",
+            "title": "Free Shipping",
+            "description": "On all orders over $50"
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "icon": "discount",
+            "title": "25% Off First Order",
+            "description": "Use code GREENES at checkout"
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "icon": "support",
+            "title": "Customer Support",
+            "description": "We're here to help you 24/7"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
