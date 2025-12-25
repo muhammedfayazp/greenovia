@@ -42,18 +42,6 @@
                       {{ product.price | money }}
                     </div>
 
-                    {%- comment -%} Star Rating {%- endcomment -%}
-                    <div class="catprodrows__rating">
-                      <div class="catprodrows__stars">
-                        {% for i in (1..5) %}
-                          <svg class="catprodrows__star" viewBox="0 0 24 24">
-                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                          </svg>
-                        {% endfor %}
-                      </div>
-                      <span class="catprodrows__reviews">228</span>
-                    </div>
-
                     <form method="post" action="/cart/add" class="catprodrows__form">
                       <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
 
@@ -180,28 +168,6 @@
   margin-bottom: 10px;
   color:#1f3d2b;
   font-weight:500;
-}
-
-/* Star Rating */
-.catprodrows__rating{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:6px;
-  margin-bottom:10px;
-}
-.catprodrows__stars{
-  display:flex;
-  gap:2px;
-}
-.catprodrows__star{
-  width:14px;
-  height:14px;
-  fill:#ffc107;
-}
-.catprodrows__reviews{
-  font-size:13px;
-  color:#666;
 }
 
 /* Actions */

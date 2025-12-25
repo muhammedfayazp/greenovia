@@ -1,12 +1,3 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
   "sections": {
     "176616151613834162": {
@@ -145,6 +136,47 @@
         "padding-block-end": 22
       }
     },
+    "collection_filter_page_kJegJj": {
+      "type": "collection-filter-page",
+      "blocks": {
+        "style_card_ecz6iJ": {
+          "type": "style_card",
+          "settings": {
+            "title": "Boho Style",
+            "image": "shopify://shop_images/Grcgrey01.webp",
+            "link": ""
+          }
+        },
+        "category_filter_bcN7bU": {
+          "type": "category_filter",
+          "settings": {
+            "collection": "indoor-plants"
+          }
+        },
+        "category_filter_CRgWRi": {
+          "type": "category_filter",
+          "settings": {
+            "collection": "outdoor-plants"
+          }
+        },
+        "category_filter_MzdVWE": {
+          "type": "category_filter",
+          "settings": {
+            "collection": "pots-planters"
+          }
+        }
+      },
+      "block_order": [
+        "style_card_ecz6iJ",
+        "category_filter_bcN7bU",
+        "category_filter_CRgWRi",
+        "category_filter_MzdVWE"
+      ],
+      "name": "Collection Filter Page",
+      "settings": {
+        "show_style_filter": true
+      }
+    },
     "main": {
       "type": "modern-collection",
       "blocks": {
@@ -167,8 +199,23 @@
           }
         }
       },
-      "block_order": ["indoor_plants", "outdoor_plants", "pots_planters"],
-      "settings": {}
+      "disabled": true,
+      "settings": {
+        "layout_type": "grid",
+        "product_card_size": "medium",
+        "mobile_product_card_size": "small",
+        "enable_infinite_scroll": true,
+        "products_per_page": 24,
+        "product_grid_width": "centered",
+        "full_width_on_mobile": true,
+        "columns_gap_horizontal": 16,
+        "columns_gap_vertical": 24,
+        "padding-inline-start": 0,
+        "padding-inline-end": 0,
+        "color_scheme": "scheme-1",
+        "padding-block-start": 0,
+        "padding-block-end": 32
+      }
     },
     "product_recommendations_JUdLyi": {
       "type": "product-recommendations",
@@ -292,6 +339,7 @@
       "block_order": [
         "text_JaHVHx"
       ],
+      "disabled": true,
       "name": "t:names.product_recommendations",
       "settings": {
         "product": "{{ closest.product }}",
@@ -316,6 +364,7 @@
   "order": [
     "176616151613834162",
     "section",
+    "collection_filter_page_kJegJj",
     "main",
     "product_recommendations_JUdLyi"
   ]
