@@ -385,7 +385,7 @@
             "image": "shopify://shop_images/indoor-plants-studio.jpg",
             "title": "Indoor Plants",
             "subtitle": "Shop Now",
-            "link": "shopify://collections/all"
+            "link": "shopify://collections/indoor-plants"
           }
         },
         "category_itmBbV": {
@@ -394,7 +394,7 @@
             "image": "shopify://shop_images/freddie-marriage-UcfKYTan-LU-unsplash_85d5b2b3-fd91-40d8-86c9-5629871b9edc.jpg",
             "title": "Pots & Planters",
             "subtitle": "Shop Now",
-            "link": ""
+            "link": "shopify://collections/pots-planters"
           }
         },
         "category_xFUqCB": {
