@@ -13,6 +13,91 @@
             "button_link": "shopify://collections/all"
           }
         },
+        "slide_2": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/monstera-deliciosa-plant-pot_1_7be21daf-1d57-4c14-ba45-9ad6b4fea5ef.jpg",
+            "heading": "Bring Nature Indoors",
+            "text": "Discover our collection of air-purifying plants that thrive in any light.",
+            "button_text": "Shop Indoor",
+            "button_link": "shopify://collections/indoor"
+          }
+        },
+        "feature_1": {
+          "type": "feature",
+          "disabled": true,
+          "settings": {
+            "icon": "🚚",
+            "title": "Fast Delivery",
+            "text": "Fresh plants at your doorstep"
+          }
+        },
+        "feature_2": {
+          "type": "feature",
+          "disabled": true,
+          "settings": {
+            "icon": "🌱",
+            "title": "Healthy Plants",
+            "text": "Grown with expert care"
+          }
+        },
+        "feature_3": {
+          "type": "feature",
+          "disabled": true,
+          "settings": {
+            "icon": "⭐",
+            "title": "Premium Quality",
+            "text": "Hand-picked for your home"
+          }
+        }
+      },
+      "block_order": [
+        "slide_1",
+        "slide_2",
+        "feature_1",
+        "feature_2",
+        "feature_3"
+      ],
+      "disabled": true,
+      "settings": {
+        "bg_color_right": "#e8f0e8",
+        "heading_tag": "h1",
+        "show_value_props": true
+      }
+    },
+    "hero_plant_slider_D3Ke6b": {
+      "type": "hero-plant-slider",
+      "blocks": {
+        "feature_eLJMfX": {
+          "type": "feature",
+          "disabled": true,
+          "settings": {
+            "title": "🚚 Fast Delivery",
+            "text": "Fresh plants at your doorstep"
+          }
+        },
+        "feature_H7T8KJ": {
+          "type": "feature",
+          "disabled": true,
+          "settings": {
+            "title": "🌱 Healthy Plants",
+            "text": "Grown with expert care"
+          }
+        },
+        "feature_4QpzpE": {
+          "type": "feature",
+          "disabled": true,
+          "settings": {
+            "title": "⭐ Premium Quality",
+            "text": "Hand-picked for your home"
+          }
+        },
+        "slide_Rfq76M": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/peace-lily-plant-pot_257a9db8-bc19-4144-87e8-fe8e5c4e5d1e.jpg"
+          }
+        },
         "slide_gYiHCh": {
           "type": "slide",
           "settings": {
