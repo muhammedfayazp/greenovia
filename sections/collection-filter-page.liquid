@@ -11,8 +11,23 @@
 
   <div class="page-width collection-container">
     
+    {%- comment -%} Mobile Filter Toggle {%- endcomment -%}
+    <div class="mobile-filter-bar">
+      <button class="mobile-filter-btn" id="mobile-filter-toggle">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 21v-7m0-4V3m8 18v-9m0-4V3m8 18v-5m0-4V3M1 14h6m2-6h6m2 8h6"/>
+        </svg>
+        Filter & Sort
+      </button>
+      <span class="mobile-product-count">{{ collection.products_count }} products</span>
+    </div>
+
     {%- comment -%} Left Sidebar Filters {%- endcomment -%}
-    <aside class="filter-sidebar">
+    <aside class="filter-sidebar" id="filter-sidebar">
+      <div class="mobile-filter-header">
+        <h3>Filters</h3>
+        <button class="mobile-filter-close" id="mobile-filter-close">×</button>
+      </div>
       
       {%- comment -%} Categories Filter {%- endcomment -%}
       <div class="filter-group">
@@ -95,29 +110,34 @@
 
       {%- comment -%} Shop by Style {%- endcomment -%}
       {% if section.settings.show_style_filter %}
-        <div class="filter-group">
+        <div class="filter-group style-filter-group">
           <div class="filter-section">
             <h4>Shop by Style</h4>
             
-            <div class="style-cards">
-              {% for block in section.blocks %}
-                {% if block.type == 'style_card' %}
-                  <a href="{{ block.settings.link }}" class="style-card">
-                    {% if block.settings.image %}
-                      <img src="{{ block.settings.image | image_url: width: 400 }}" alt="{{ block.settings.title }}">
-                    {% endif %}
-                    <span>{{ block.settings.title }}</span>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                      <path d="M9 18l6-6-6-6"/>
-                    </svg>
-                  </a>
-                {% endif %}
-              {% endfor %}
+            <div class="style-cards swiper-container">
+              <div class="swiper-wrapper">
+                {% for block in section.blocks %}
+                  {% if block.type == 'style_card' %}
+                    <a href="{{ block.settings.link }}" class="style-card swiper-slide">
+                      {% if block.settings.image %}
+                        <img src="{{ block.settings.image | image_url: width: 400 }}" alt="{{ block.settings.title }}">
+                      {% endif %}
+                      <span>{{ block.settings.title }}</span>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M9 18l6-6-6-6"/>
+                      </svg>
+                    </a>
+                  {% endif %}
+                {% endfor %}
+              </div>
             </div>
           </div>
         </div>
       {% endif %}
 
+      <div class="mobile-filter-footer">
+        <button class="mobile-apply-btn" id="mobile-filter-apply">Apply Filters</button>
+      </div>
     </aside>
 
     {%- comment -%} Main Content Area {%- endcomment -%}
@@ -746,20 +766,150 @@ input[type="range"]::-moz-range-thumb{
   border-color: #1f3d2b;
 }
 
+/* Mobile Filters */
+.mobile-filter-bar {
+  display: none;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.mobile-filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: 1px solid #ddd;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  color: #333;
+}
+
+.mobile-filter-header,
+.mobile-filter-footer {
+  display: none;
+}
+
 /* Responsive */
 @media (max-width: 990px){
   .collection-container{
     grid-template-columns: 1fr;
   }
   
-  .filter-sidebar{
-    position: relative;
+  .mobile-filter-bar {
+    display: flex;
+  }
+
+  .filter-sidebar {
+    position: fixed;
     top: 0;
+    left: -100%; /* Hidden by default */
+    width: 300px;
+    height: 100vh;
+    background: #fff;
+    z-index: 1000;
+    padding: 20px;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    transition: left 0.3s ease;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .filter-sidebar.active {
+    left: 0;
+  }
+
+  .mobile-filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+  }
+
+  .mobile-filter-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .mobile-filter-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    color: #666;
+  }
+
+  .mobile-filter-footer {
+    display: block;
+    margin-top: auto;
+    padding-top: 20px;
+    background: #fff;
+    position: sticky;
+    bottom: 0;
+  }
+
+  .mobile-apply-btn {
+    width: 100%;
+    background: #1f3d2b;
+    color: #fff;
+    border: none;
+    padding: 12px;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  /* Style Cards as Swiper/Scroll on Mobile */
+  .style-cards.swiper-container {
+    overflow: hidden;
+    margin-right: -20px; /* Offset parent padding */
+  }
+
+  .style-cards .swiper-wrapper {
+    display: flex;
+    flex-wrap: nowrap; /* Force horizontal */
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    padding-right: 20px;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+
+  .style-card.swiper-slide {
+    flex: 0 0 140px; /* Fixed width for slides */
+    margin: 0;
+  }
+
+  .style-card img {
+    height: 80px; /* Smaller images */
   }
   
   .product-grid{
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 16px;
+  }
+  
+  /* Backdrop when filter is open */
+  body.filter-open::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
   }
 }
 
@@ -925,6 +1075,38 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
+  // Mobile Filter Logic
+  const mobileToggle = document.getElementById('mobile-filter-toggle');
+  const mobileClose = document.getElementById('mobile-filter-close');
+  const mobileApply = document.getElementById('mobile-filter-apply');
+  const sidebar = document.getElementById('filter-sidebar');
+  
+  if (mobileToggle) {
+    mobileToggle.addEventListener('click', function() {
+      sidebar.classList.add('active');
+      document.body.classList.add('filter-open');
+      document.body.style.overflow = 'hidden'; // Prevent scrolling
+    });
+  }
+  
+  function closeFilter() {
+    sidebar.classList.remove('active');
+    document.body.classList.remove('filter-open');
+    document.body.style.overflow = '';
+  }
+  
+  if (mobileClose) mobileClose.addEventListener('click', closeFilter);
+  if (mobileApply) mobileApply.addEventListener('click', closeFilter);
+  
+  // Close on click outside
+  document.addEventListener('click', function(e) {
+    if (document.body.classList.contains('filter-open') && 
+        !sidebar.contains(e.target) && 
+        !mobileToggle.contains(e.target)) {
+      closeFilter();
+    }
+  });
+
   // Initial filter run
   filterProducts();
 });
