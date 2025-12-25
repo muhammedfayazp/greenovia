@@ -35,11 +35,15 @@
         },
         "slide_Rfq76M": {
           "type": "slide",
-          "settings": {}
+          "settings": {
+            "image": "shopify://shop_images/peace-lily-plant-pot_257a9db8-bc19-4144-87e8-fe8e5c4e5d1e.jpg"
+          }
         },
         "slide_gYiHCh": {
           "type": "slide",
-          "settings": {}
+          "settings": {
+            "image": "shopify://shop_images/sq-lim-X7HWXvoUrDI-unsplash_cfb4a093-247b-41cb-8da0-e0b8ae4c2ccb.jpg"
+          }
         }
       },
       "block_order": [
@@ -73,7 +77,9 @@
       "blocks": {
         "slide_tpxDcE": {
           "type": "slide",
-          "settings": {}
+          "settings": {
+            "image": "shopify://shop_images/peace-lily-plant-pot_257a9db8-bc19-4144-87e8-fe8e5c4e5d1e.jpg"
+          }
         },
         "slide_dNbicj": {
           "type": "slide",
