@@ -1,0 +1,611 @@
+{% paginate collection.products by 24 %}
+
+<div class="modern-collection-page">
+  
+  {%- comment -%} Breadcrumb {%- endcomment -%}
+  <div class="page-width breadcrumb-wrap">
+    <nav class="breadcrumb-nav">
+      <a href="/">Home</a>
+      <span>/</span>
+      <span>{{ collection.title }}</span>
+    </nav>
+  </div>
+
+  <div class="page-width modern-collection-container">
+    
+    {%- comment -%} Left Sidebar Filters {%- endcomment -%}
+    <aside class="modern-filter-sidebar">
+      
+      <div class="filter-group-modern">
+        <h3 class="filter-main-title">Filter by</h3>
+        
+        {%- comment -%} Categories Filter {%- endcomment -%}
+        <div class="filter-section-modern">
+          <div class="filter-section-header">
+            <h4>Categories</h4>
+            <button class="filter-reset-btn" onclick="window.location.href='{{ collection.url }}'">Reset</button>
+          </div>
+          
+          <div class="filter-options-modern">
+            {% for block in section.blocks %}
+              {% if block.type == 'filter_collection' %}
+                {% assign filter_coll = collections[block.settings.collection] %}
+                {% if filter_coll %}
+                  <label class="filter-checkbox-modern">
+                    <input type="checkbox" value="{{ filter_coll.handle }}">
+                    <span>{{ filter_coll.title }}</span>
+                    <span class="filter-count-modern">({{ filter_coll.products_count }})</span>
+                  </label>
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+
+        {%- comment -%} Price Filter {%- endcomment -%}
+        <div class="filter-section-modern">
+          <div class="filter-section-header">
+            <h4>Price</h4>
+          </div>
+          <div class="price-inputs-modern">
+            <input type="number" placeholder="$10" min="0" class="price-input-min">
+            <input type="number" placeholder="$600" min="0" class="price-input-max">
+          </div>
+        </div>
+
+      </div>
+
+    </aside>
+
+    {%- comment -%} Main Content {%- endcomment -%}
+    <main class="modern-collection-main">
+      
+      {%- comment -%} Header {%- endcomment -%}
+      <div class="modern-collection-header">
+        <div>
+          <h1 class="modern-collection-title">{{ collection.title }}</h1>
+          <p class="modern-product-count">1-{{ collection.products.size }} products</p>
+        </div>
+        
+        <select class="modern-sort-select" onchange="window.location.href='{{ collection.url }}?sort_by=' + this.value">
+          <option value="manual">Featured</option>
+          <option value="best-selling">Best Selling</option>
+          <option value="title-ascending">A-Z</option>
+          <option value="title-descending">Z-A</option>
+          <option value="price-ascending">Price: Low to High</option>
+          <option value="price-descending">Price: High to Low</option>
+          <option value="created-descending">Newest</option>
+        </select>
+      </div>
+
+      {%- comment -%} Product Grid {%- endcomment -%}
+      <div class="modern-product-grid">
+        {% for product in collection.products %}
+          <div class="modern-product-card">
+            
+            <a href="{{ product.url }}" class="modern-product-image">
+              {% if product.featured_image %}
+                <img src="{{ product.featured_image | image_url: width: 600 }}" 
+                     alt="{{ product.title | escape }}"
+                     loading="lazy">
+              {% endif %}
+              
+              {%- comment -%} Sold Out or HOT Badge {%- endcomment -%}
+              {% if product.available == false %}
+                <span class="modern-badge sold-out-badge">Sold out</span>
+              {% elsif product.tags contains 'hot' or product.tags contains 'trending' %}
+                <span class="modern-badge hot-badge">HOT</span>
+              {% endif %}
+            </a>
+            
+            <div class="modern-product-info">
+              <a href="{{ product.url }}">
+                <h3 class="modern-product-title">{{ product.title }}</h3>
+              </a>
+              
+              <div class="modern-product-price">
+                {% if product.compare_at_price > product.price %}
+                  <span class="price-compare-modern">{{ product.compare_at_price | money }}</span>
+                {% endif %}
+                <span class="price-current-modern">{{ product.price | money }}</span>
+              </div>
+              
+              {%- comment -%} Star Rating {%- endcomment -%}
+              <div class="modern-rating">
+                <div class="modern-stars">
+                  {% for i in (1..5) %}
+                    <svg class="modern-star" viewBox="0 0 24 24">
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                  {% endfor %}
+                </div>
+                <span class="modern-reviews">228</span>
+              </div>
+              
+              {%- comment -%} Quantity and Add to Cart {%- endcomment -%}
+              <form method="post" action="/cart/add" class="modern-product-form">
+                <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+                
+                <div class="modern-product-actions">
+                  <div class="qty-modern">
+                    <button type="button" class="qty-btn-modern" onclick="updateQty(this, -1)">−</button>
+                    <input type="number" name="quantity" value="1" min="1" class="qty-input-modern">
+                    <button type="button" class="qty-btn-modern" onclick="updateQty(this, 1)">+</button>
+                  </div>
+                  
+                  <button type="submit" class="modern-cart-btn" {% unless product.available %}disabled{% endunless %}>
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M3 3h2l2.2 11.4a2 2 0 0 0 2 1.6h7.5a2 2 0 0 0 2-1.6L21 7H6"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <circle cx="10" cy="20" r="1.5" fill="currentColor"/>
+                      <circle cx="18" cy="20" r="1.5" fill="currentColor"/>
+                    </svg>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      {%- comment -%} Pagination {%- endcomment -%}
+      {% if paginate.pages > 1 %}
+        <div class="modern-pagination">
+          {% if paginate.previous %}
+            <a href="{{ paginate.previous.url }}" class="pagination-btn">← Previous</a>
+          {% endif %}
+          
+          {% for part in paginate.parts %}
+            {% if part.is_link %}
+              <a href="{{ part.url }}" class="pagination-num">{{ part.title }}</a>
+            {% else %}
+              <span class="pagination-num {% if part.title == paginate.current_page %}active{% endif %}">
+                {{ part.title }}
+              </span>
+            {% endif %}
+          {% endfor %}
+          
+          {% if paginate.next %}
+            <a href="{{ paginate.next.url }}" class="pagination-btn">Next →</a>
+          {% endif %}
+        </div>
+      {% endif %}
+
+    </main>
+
+  </div>
+</div>
+
+{% endpaginate %}
+
+<style>
+/* Modern Collection Page Styles */
+.modern-collection-page{
+  background:#fff;
+  min-height:100vh;
+}
+
+.page-width{
+  max-width:1400px;
+  margin:0 auto;
+  padding:0 24px;
+}
+
+/* Breadcrumb */
+.breadcrumb-wrap{
+  padding:16px 24px;
+  border-bottom:1px solid #e5e5e5;
+}
+.breadcrumb-nav{
+  font-size:14px;
+  color:#666;
+}
+.breadcrumb-nav a{
+  color:#666;
+  text-decoration:none;
+}
+.breadcrumb-nav a:hover{color:#1f3d2b;}
+.breadcrumb-nav span{margin:0 8px;}
+
+/* Container */
+.modern-collection-container{
+  display:grid;
+  grid-template-columns:250px 1fr;
+  gap:40px;
+  padding:32px 0;
+}
+
+/* Sidebar */
+.modern-filter-sidebar{
+  position:sticky;
+  top:20px;
+  height:fit-content;
+}
+
+.filter-group-modern{
+  margin-bottom:32px;
+}
+
+.filter-main-title{
+  font-size:20px;
+  font-weight:600;
+  color:#1f3d2b;
+  margin:0 0 16px;
+}
+
+.filter-section-modern{
+  margin-bottom:24px;
+}
+
+.filter-section-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:12px;
+}
+
+.filter-section-header h4{
+  font-size:16px;
+  font-weight:600;
+  color:#1f3d2b;
+  margin:0;
+}
+
+.filter-reset-btn{
+  background:none;
+  border:none;
+  color:#666;
+  font-size:13px;
+  cursor:pointer;
+}
+.filter-reset-btn:hover{
+  color:#1f3d2b;
+  text-decoration:underline;
+}
+
+/* Filter Options */
+.filter-options-modern{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.filter-checkbox-modern{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:14px;
+  color:#333;
+  cursor:pointer;
+}
+
+.filter-checkbox-modern input{
+  width:16px;
+  height:16px;
+}
+
+.filter-count-modern{
+  margin-left:auto;
+  color:#999;
+  font-size:13px;
+}
+
+/* Price Inputs */
+.price-inputs-modern{
+  display:flex;
+  gap:12px;
+}
+
+.price-inputs-modern input{
+  flex:1;
+  padding:8px 12px;
+  border:1px solid #ddd;
+  border-radius:4px;
+  font-size:14px;
+}
+
+/* Collection Header */
+.modern-collection-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:24px;
+  padding-bottom:16px;
+  border-bottom:1px solid #e5e5e5;
+}
+
+.modern-collection-title{
+  font-size:32px;
+  font-weight:600;
+  color:#1f3d2b;
+  margin:0 0 4px;
+}
+
+.modern-product-count{
+  font-size:14px;
+  color:#666;
+  margin:0;
+}
+
+.modern-sort-select{
+  padding:8px 32px 8px 12px;
+  border:1px solid #ddd;
+  border-radius:4px;
+  font-size:14px;
+  background:#fff url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12"><path fill="%23333" d="M6 9L1 4h10z"/></svg>') no-repeat right 10px center;
+  appearance:none;
+  cursor:pointer;
+}
+
+/* Product Grid */
+.modern-product-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(240px, 1fr));
+  gap:24px;
+}
+
+/* Product Card */
+.modern-product-card{
+  background:#fff;
+  border-radius:8px;
+  overflow:hidden;
+  box-shadow:0 2px 8px rgba(0,0,0,.05);
+  transition:all .3s ease;
+}
+
+.modern-product-card:hover{
+  box-shadow:0 4px 16px rgba(0,0,0,.1);
+  transform:translateY(-4px);
+}
+
+/* Product Image */
+.modern-product-image{
+  position:relative;
+  display:block;
+  aspect-ratio:1/1;
+  background:#f5f5f5;
+}
+
+.modern-product-image img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+/* Badges */
+.modern-badge{
+  position:absolute;
+  top:12px;
+  right:12px;
+  padding:4px 12px;
+  border-radius:4px;
+  font-size:12px;
+  font-weight:700;
+  text-transform:uppercase;
+  z-index:2;
+  color:#fff;
+}
+
+.hot-badge{background:#ff6b35;}
+.sold-out-badge{background:#666;}
+
+/* Product Info */
+.modern-product-info{
+  padding:12px;
+  text-align:center;
+}
+
+.modern-product-title{
+  font-size:15px;
+  font-weight:500;
+  color:#1f3d2b;
+  margin:0 0 8px;
+}
+
+.modern-product-info a{text-decoration:none;}
+
+/* Price */
+.modern-product-price{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  margin-bottom:8px;
+}
+
+.price-current-modern{
+  font-size:16px;
+  font-weight:600;
+  color:#1f3d2b;
+}
+
+.price-compare-modern{
+  font-size:14px;
+  color:#999;
+  text-decoration:line-through;
+}
+
+/* Rating */
+.modern-rating{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  margin-bottom:10px;
+}
+
+.modern-stars{
+  display:flex;
+  gap:2px;
+}
+
+.modern-star{
+  width:14px;
+  height:14px;
+  fill:#ffc107;
+}
+
+.modern-reviews{
+  font-size:13px;
+  color:#666;
+}
+
+/* Actions */
+.modern-product-actions{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+
+.qty-modern{
+  display:flex;
+  align-items:center;
+  background:#f6f7f2;
+  border-radius:999px;
+  padding:4px;
+  gap:4px;
+  box-shadow:inset 0 0 0 1px #e3e6de;
+}
+
+.qty-btn-modern{
+  width:28px;
+  height:28px;
+  border:none;
+  border-radius:50%;
+  background:#fff;
+  color:#1f3d2b;
+  font-size:18px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 2px 6px rgba(0,0,0,.08);
+}
+
+.qty-input-modern{
+  width:36px;
+  text-align:center;
+  border:none;
+  background:transparent;
+  font-size:14px;
+  font-weight:600;
+  color:#1f3d2b;
+  outline:none;
+}
+
+.modern-cart-btn{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  border:none;
+  background:#1f3d2b;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition:background .2s ease;
+}
+
+.modern-cart-btn:hover{background:#2d5940;}
+.modern-cart-btn:disabled{background:#ccc;cursor:not-allowed;}
+
+.modern-cart-btn svg{
+  width:20px;
+  height:20px;
+}
+
+/* Pagination */
+.modern-pagination{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:8px;
+  margin-top:48px;
+  padding-top:24px;
+  border-top:1px solid #e5e5e5;
+}
+
+.pagination-btn,
+.pagination-num{
+  padding:8px 12px;
+  border:1px solid #ddd;
+  border-radius:4px;
+  text-decoration:none;
+  color:#333;
+  font-size:14px;
+}
+
+.pagination-btn:hover,
+.pagination-num:hover{background:#f5f5f5;}
+
+.pagination-num.active{
+  background:#1f3d2b;
+  color:#fff;
+  border-color:#1f3d2b;
+}
+
+/* Responsive */
+@media (max-width:990px){
+  .modern-collection-container{
+    grid-template-columns:1fr;
+  }
+  .modern-filter-sidebar{
+    position:relative;
+    top:0;
+  }
+  .modern-product-grid{
+    grid-template-columns:repeat(auto-fill, minmax(180px, 1fr));
+    gap:16px;
+  }
+}
+
+@media (max-width:640px){
+  .modern-collection-header{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:16px;
+  }
+  .modern-product-grid{
+    grid-template-columns:repeat(2, 1fr);
+    gap:12px;
+  }
+  .modern-collection-title{font-size:24px;}
+}
+</style>
+
+<script>
+function updateQty(btn, change) {
+  const input = btn.parentElement.querySelector('.qty-input-modern');
+  let value = parseInt(input.value) || 1;
+  value = Math.max(1, value + change);
+  input.value = value;
+}
+</script>
+
+{% schema %}
+{
+  "name": "Modern Collection",
+  "class": "section-modern-collection",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "filter_collection",
+      "name": "Filter Collection",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Modern Collection"
+    }
+  ]
+}
+{% endschema %}
