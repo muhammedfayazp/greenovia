@@ -208,3 +208,115 @@ html {
   -webkit-appearance: none;
   margin:0;
 }
+/* ===============================
+   CUSTOM VARIANT PICKER (PILLS)
+================================ */
+
+/* Hide standard radio inputs visually but keep accessible */
+.product-form__input input[type=radio] {
+  position: absolute;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  width: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+}
+
+/* Style the label which acts as the button */
+.variant-option__button-label,
+.product-form__input input[type=radio] + label {
+  border-radius: 50px !important;
+  padding: 10px 24px !important;
+  font-family: var(--gv-font-ui) !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  letter-spacing: 0.5px !important;
+  text-transform: uppercase !important;
+  border: 1px solid #e0e0e0 !important;
+  color: var(--gv-text) !important;
+  background-color: transparent !important;
+  transition: all 0.2s ease !important;
+  min-width: 80px !important;
+  display: inline-flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Hide the inner pill element if it exists from default theme */
+.variant-option__button-label__pill {
+  display: none !important;
+}
+
+/* Ensure text is visible and centered */
+.variant-option__button-label__text {
+  z-index: 2;
+  text-align: center;
+  width: 100%;
+}
+
+/* Hover state */
+.variant-option__button-label:hover,
+.product-form__input input[type=radio] + label:hover {
+  border-color: var(--gv-secondary) !important;
+  color: var(--gv-primary) !important;
+  background-color: #f4f8f4 !important;
+}
+
+/* Selected / Checked state */
+.variant-option__button-label:has(:checked),
+.variant-option__button-label[data-current-checked="true"],
+.product-form__input input[type=radio]:checked + label {
+  background-color: var(--gv-primary) !important;
+  color: var(--gv-white) !important;
+  border-color: var(--gv-primary) !important;
+  box-shadow: 0 4px 10px rgba(45, 80, 22, 0.25) !important;
+  transform: translateY(-1px);
+}
+
+/* Flexgap for the container */
+.variant-option--buttons {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 12px !important;
+}
+
+/* Available/Unavailable logic visual cue */
+.variant-option__button-label:has([data-option-available='false']),
+.product-form__input input[type=radio]:disabled + label {
+  opacity: 0.6 !important;
+  background-color: #f9f9f9 !important;
+  color: #a0a0a0 !important;
+  text-decoration: line-through;
+  border-color: #eee !important;
+}
+
+/* Make sure the variant picker container has spacing */
+.variant-picker {
+  margin-bottom: 24px !important;
+}
+
+.variant-picker legend {
+  font-family: var(--gv-font-heading);
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--gv-text);
+  display: block;
+}
+
+/* Slideshow Thumbnails Customization */
+.slideshow-controls__thumbnail[aria-selected='true'] {
+  outline: 2px solid var(--gv-primary) !important;
+  outline-offset: 2px !important;
+  border-color: transparent !important;
+}
+
+.slideshow-controls__thumbnail:hover {
+  opacity: 0.8;
+}
