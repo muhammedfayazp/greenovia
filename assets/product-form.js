@@ -36,7 +36,7 @@ export class AddToCartComponent extends Component {
     super.disconnectedCallback();
 
     if (this.#resetTimeouts) {
-      this.#resetTimeouts.forEach(/** @param {number} timeoutId */ (timeoutId) => clearTimeout(timeoutId));
+      this.#resetTimeouts.forEach(/** @param {number} timeoutId */(timeoutId) => clearTimeout(timeoutId));
     }
     this.removeEventListener('pointerenter', this.#preloadImage);
   }
@@ -128,7 +128,7 @@ export class AddToCartComponent extends Component {
     }
 
     // Clear all existing timeouts
-    this.#resetTimeouts.forEach(/** @param {number} timeoutId */ (timeoutId) => clearTimeout(timeoutId));
+    this.#resetTimeouts.forEach(/** @param {number} timeoutId */(timeoutId) => clearTimeout(timeoutId));
     this.#resetTimeouts = [];
 
     if (addToCartButton.dataset.added !== 'true') {
@@ -267,7 +267,7 @@ class ProductFormComponent extends Component {
    *
    * @param {Event} event - The submit event.
    */
-  handleSubmit(event) {
+  handleSubmit = async (event) => {
     const { addToCartTextError } = this.refs;
     // Stop default behaviour from the browser
     event.preventDefault();
@@ -336,109 +336,100 @@ class ProductFormComponent extends Component {
     const formData = new FormData(form);
 
     const cartItemsComponents = document.querySelectorAll('cart-items-component');
+    /** @type {string[]} */
     let cartItemComponentsSectionIds = [];
     cartItemsComponents.forEach((item) => {
       if (item instanceof HTMLElement && item.dataset.sectionId) {
         cartItemComponentsSectionIds.push(item.dataset.sectionId);
       }
-      formData.append('sections', cartItemComponentsSectionIds.join(','));
     });
 
-    const fetchCfg = fetchConfig('javascript', { body: formData });
+    if (cartItemComponentsSectionIds.length > 0) {
+      formData.append('sections', cartItemComponentsSectionIds.join(','));
+    }
 
-    fetch(Theme.routes.cart_add_url, {
-      ...fetchCfg,
-      headers: {
-        ...fetchCfg.headers,
-        Accept: 'text/html',
-      },
-    })
-      .then((response) => response.json())
-      .then(async (response) => {
-        if (response.status) {
-          this.dispatchEvent(
-            new CartErrorEvent(form.getAttribute('id') || '', response.message, response.description, response.errors)
-          );
+    const config = fetchConfig('json', { body: formData });
+    if (config.headers) {
+      config.headers['X-Requested-With'] = 'XMLHttpRequest';
+      // @ts-ignore
+      delete config.headers['Content-Type'];
+    }
 
-          if (!addToCartTextError) return;
+    try {
+      const response = await fetch(Theme.routes.cart_add_url, config);
+      const data = await response.json();
+
+      if (data.status) {
+        this.dispatchEvent(
+          new CartErrorEvent(form.getAttribute('id') || '', data.message, data.description, data.errors)
+        );
+
+        if (addToCartTextError) {
           addToCartTextError.classList.remove('hidden');
 
-          // Reuse the text node if the user is spam-clicking
           const textNode = addToCartTextError.childNodes[2];
           if (textNode) {
-            textNode.textContent = response.message;
+            textNode.textContent = data.message;
           } else {
-            const newTextNode = document.createTextNode(response.message);
+            const newTextNode = document.createTextNode(data.message);
             addToCartTextError.appendChild(newTextNode);
           }
 
-          // Create or get existing error live region for screen readers
-          this.#setLiveRegionText(response.message);
+          this.#setLiveRegionText(data.message);
 
           this.#timeout = setTimeout(() => {
             if (!addToCartTextError) return;
             addToCartTextError.classList.add('hidden');
-
-            // Clear the announcement
             this.#clearLiveRegionText();
           }, ERROR_MESSAGE_DISPLAY_DURATION);
-
-          // When we add more than the maximum amount of items to the cart, we need to dispatch a cart update event
-          // because our back-end still adds the max allowed amount to the cart.
-          this.dispatchEvent(
-            new CartAddEvent({}, this.id, {
-              didError: true,
-              source: 'product-form-component',
-              itemCount: Number(formData.get('quantity')) || Number(this.dataset.quantityDefault),
-              productId: this.dataset.productId,
-            })
-          );
-
-          return;
-        } else {
-          const id = formData.get('id');
-
-          if (addToCartTextError) {
-            addToCartTextError.classList.add('hidden');
-            addToCartTextError.removeAttribute('aria-live');
-          }
-
-          if (!id) throw new Error('Form ID is required');
-
-          // Add aria-live region to inform screen readers that the item was added
-          // Get the added text from any add-to-cart button
-          const anyAddToCartButton = allAddToCartContainers[0]?.refs.addToCartButton;
-          if (anyAddToCartButton) {
-            const addedTextElement = anyAddToCartButton.querySelector('.add-to-cart-text--added');
-            const addedText = addedTextElement?.textContent?.trim() || Theme.translations.added;
-
-            this.#setLiveRegionText(addedText);
-
-            setTimeout(() => {
-              this.#clearLiveRegionText();
-            }, SUCCESS_MESSAGE_DISPLAY_DURATION);
-          }
-
-          // Fetch the updated cart to get the actual total quantity for this variant
-          await this.#fetchAndUpdateCartQuantity();
-
-          this.dispatchEvent(
-            new CartAddEvent({}, id.toString(), {
-              source: 'product-form-component',
-              itemCount: Number(formData.get('quantity')) || Number(this.dataset.quantityDefault),
-              productId: this.dataset.productId,
-              sections: response.sections,
-            })
-          );
         }
-      })
-      .catch((error) => {
-        console.error(error);
-      })
-      .finally(() => {
-        cartPerformance.measureFromEvent('add:user-action', event);
-      });
-  }
+
+        this.dispatchEvent(
+          new CartAddEvent({}, this.id, {
+            didError: true,
+            source: 'product-form-component',
+            itemCount: 0,
+            productId: this.dataset.productId,
+          })
+        );
+        return;
+      }
+
+      // Successful add
+      if (addToCartTextError) {
+        addToCartTextError.classList.add('hidden');
+      }
+
+      const items = data.items || [data];
+      const addedQty = items.reduce((acc, item) => acc + (item.quantity || 1), 0);
+      const variantId = items[0]?.variant_id?.toString();
+
+      // Update cart icon
+      const anyAddToCartButton = allAddToCartContainers[0]?.refs.addToCartButton;
+      if (anyAddToCartButton) {
+        const addedTextElement = anyAddToCartButton.querySelector('.add-to-cart-text--added');
+        const addedText = addedTextElement?.textContent?.trim() || Theme.translations.added;
+        this.#setLiveRegionText(addedText);
+        setTimeout(() => this.#clearLiveRegionText(), SUCCESS_MESSAGE_DISPLAY_DURATION);
+      }
+
+      await this.#fetchAndUpdateCartQuantity();
+
+      document.dispatchEvent(
+        new CartAddEvent(data, this.id, {
+          source: 'product-form-component',
+          itemCount: addedQty,
+          productId: this.dataset.productId,
+          variantId: variantId,
+          sections: data.sections,
+        })
+      );
+    } catch (error) {
+      console.error('Add to cart error:', error);
+    } finally {
+      cartPerformance.measureFromEvent('add:user-action', event);
+    }
+  };
 
   /**
    * Updates the quantity label with the current cart quantity
@@ -458,7 +449,7 @@ class ProductFormComponent extends Component {
   }
 
   /**
-   * @param {*} text
+   * @param {string} text
    */
   #setLiveRegionText(text) {
     const liveRegion = this.refs.liveRegion;
@@ -482,7 +473,7 @@ class ProductFormComponent extends Component {
     } else if (currentElement && !newElement) {
       currentElement.remove();
     } else if (!currentElement && newElement && insertReferenceElement) {
-      insertReferenceElement.insertAdjacentElement('beforebegin', /** @type {Element} */ (newElement.cloneNode(true)));
+      insertReferenceElement.insertAdjacentElement('beforebegin', /** @type {Element} */(newElement.cloneNode(true)));
     }
   }
 
