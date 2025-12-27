@@ -452,3 +452,14 @@ slideshow-component {
     display: none; /* Hide scrollbar Chrome/Safari */
 }
 
+
+/* Tweak Arrow Position Inwards */
+.slider-buttons {
+  padding: 0 20px !important;
+}
+
+/* Ensure main image doesn't force huge width with empty space */
+.product .media-gallery {
+  justify-content: center !important;
+}
+
