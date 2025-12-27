@@ -175,7 +175,7 @@ html {
 }
 
 /* 🌿 Global modern quantity counter */
-.qty--modern {
+.quantity-selector {
   display: flex;
   align-items: center;
   background: #f6f7f2;
@@ -183,9 +183,10 @@ html {
   padding: 4px;
   gap: 4px;
   box-shadow: inset 0 0 0 1px #e3e6de;
+  max-width: fit-content;
 }
 
-.qty--modern .qty__btn {
+.quantity-selector .button {
   width: 28px;
   height: 28px;
   border: none;
@@ -195,39 +196,72 @@ html {
   font-size: 18px;
   line-height: 1;
   cursor: pointer;
-  display: flex;
+  display: flex !important;
   align-items: center;
   justify-content: center;
   transition: background .2s ease, transform .15s ease, box-shadow .2s ease;
   box-shadow: 0 2px 6px rgba(0, 0, 0, .08);
+  padding: 0 !important;
 }
 
-.qty--modern .qty__btn:hover {
-  background: #1f3d2b;
-  color: #fff;
+.quantity-selector .button:hover {
+  background: #1f3d2b !important;
+  color: #fff !important;
   transform: scale(1.05);
 }
 
-.qty--modern .qty__btn:active {
-  transform: scale(.95);
-}
-
-.qty--modern .qty__input {
-  width: 36px;
+.quantity-selector input {
+  width: 40px !important;
   text-align: center;
-  border: none;
-  background: transparent;
-  font-size: 14px;
+  border: none !important;
+  background: transparent !important;
+  font-family: var(--gv-font-ui);
   font-weight: 600;
   color: #1f3d2b;
-  outline: none;
-  appearance: textfield;
+  padding: 0 !important;
+  margin: 0 !important;
+  appearance: none;
+  -moz-appearance: textfield;
 }
 
-.qty--modern .qty__input::-webkit-outer-spin-button,
-.qty--modern .qty__input::-webkit-inner-spin-button {
+.quantity-selector input::-webkit-outer-spin-button,
+.quantity-selector input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+
+/* Header cart bubble positioning */
+.header-actions__cart-icon {
+  position: relative;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-actions__cart-icon .cart-bubble {
+  position: absolute !important;
+  top: -2px !important;
+  right: -8px !important;
+  background: var(--gv-primary) !important;
+  color: white !important;
+  border-radius: 50% !important;
+  width: 18px !important;
+  height: 18px !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  z-index: 10 !important;
+}
+
+.header-actions__cart-icon .cart-bubble__background {
+  display: none !important;
+}
+
+.quantity-selector .button:active {
+  transform: scale(.95);
 }
 
 /* ===============================
