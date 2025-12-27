@@ -578,8 +578,12 @@ function updateCartQuantity(button, action) {
   });
 }
 
-// Update header cart count
+// Update header cart count - COMPREHENSIVE UPDATE
 function updateHeaderCartCount(itemCount) {
+  // Log for debugging
+  console.log('Updating header cart count to:', itemCount);
+  
+  // List of all possible cart count selectors
   const selectors = [
     '.cart-count',
     '[data-cart-count]',
@@ -594,31 +598,72 @@ function updateHeaderCartCount(itemCount) {
     'cart-count-bubble',
     '.cart-item-count',
     '#CartCount',
-    '.header-cart-count'
+    '.header-cart-count',
+    '.cart-link__count',
+    '.header__cart-count',
+    '#cart-item-count',
+    '.cartToggle__count',
+    '[aria-label*="cart"] span',
+    'a[href="/cart"] span',
+    'a[href*="cart"] span'
   ];
   
+  let foundElements = 0;
+  
   selectors.forEach(selector => {
-    const elements = document.querySelectorAll(selector);
-    elements.forEach(element => {
-      element.textContent = itemCount;
-      element.innerText = itemCount;
-      
-      if (element.hasAttribute('data-cart-count')) {
-        element.setAttribute('data-cart-count', itemCount);
-      }
-      
-      if (itemCount > 0) {
-        element.style.display = '';
-        element.style.opacity = '1';
-        element.classList.remove('hidden', 'hide');
-      }
-    });
+    try {
+      const elements = document.querySelectorAll(selector);
+      elements.forEach(element => {
+        // Skip if this is inside our product cards
+        if (element.closest('.catprodrows__card')) return;
+        
+        element.textContent = itemCount;
+        element.innerText = itemCount;
+        
+        // Update data attributes
+        if (element.hasAttribute('data-cart-count')) {
+          element.setAttribute('data-cart-count', itemCount);
+        }
+        
+        // Show/hide based on count
+        if (itemCount > 0) {
+          element.style.display = '';
+          element.style.opacity = '1';
+          element.style.visibility = 'visible';
+          element.classList.remove('hidden', 'hide');
+        } else {
+          // Some themes hide the badge when count is 0
+          const hideWhenEmpty = element.classList.contains('hide-when-empty') || 
+                                element.hasAttribute('data-hide-when-empty');
+          if (hideWhenEmpty) {
+            element.style.display = 'none';
+          }
+        }
+        
+        foundElements++;
+      });
+    } catch (e) {
+      // Silently fail for invalid selectors
+    }
   });
   
+  console.log('Updated', foundElements, 'cart count elements');
+  
+  // Trigger Shopify theme events
   document.documentElement.dispatchEvent(new CustomEvent('cart:refresh', {
     bubbles: true,
     detail: { itemCount: itemCount }
   }));
+  
+  // For themes that use custom events
+  window.dispatchEvent(new CustomEvent('cart:updated', {
+    detail: { itemCount: itemCount }
+  }));
+  
+  // Trigger jQuery events if jQuery is available
+  if (window.jQuery) {
+    jQuery(document).trigger('cart.updated', [itemCount]);
+  }
 }
 
 // Load cart state on page load
@@ -626,6 +671,8 @@ function loadCartState() {
   fetch('/cart.js')
     .then(res => res.json())
     .then(cart => {
+      console.log('Current cart:', cart);
+      
       // Update each product card based on cart
       document.querySelectorAll('.catprodrows__actions').forEach(actionsContainer => {
         const variantId = actionsContainer.dataset.variantId;
@@ -643,7 +690,11 @@ function loadCartState() {
         }
       });
       
+      // Update header cart count
       updateHeaderCartCount(cart.item_count);
+    })
+    .catch(err => {
+      console.error('Failed to load cart state:', err);
     });
 }
 
@@ -682,13 +733,12 @@ function addToCartAjax(button) {
     // Show notification
     showCartNotification(productTitle, 1);
     
-    // Update header cart count
-    fetch('/cart.js')
-      .then(res => res.json())
-      .then(cart => {
-        updateHeaderCartCount(cart.item_count);
-      });
-    
+    // Update header cart count immediately
+    return fetch('/cart.js');
+  })
+  .then(res => res.json())
+  .then(cart => {
+    updateHeaderCartCount(cart.item_count);
     button.disabled = false;
   })
   .catch(error => {
@@ -698,12 +748,55 @@ function addToCartAjax(button) {
   });
 }
 
+// Monitor cart changes from other sources (cart page, drawer, etc)
+function monitorCartChanges() {
+  // Check cart every 2 seconds when page is visible
+  let cartCheckInterval;
+  
+  function startMonitoring() {
+    cartCheckInterval = setInterval(() => {
+      loadCartState();
+    }, 2000);
+  }
+  
+  function stopMonitoring() {
+    clearInterval(cartCheckInterval);
+  }
+  
+  // Start/stop based on page visibility
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      stopMonitoring();
+    } else {
+      loadCartState();
+      startMonitoring();
+    }
+  });
+  
+  // Listen for theme cart events
+  document.addEventListener('cart:updated', () => {
+    console.log('Cart updated event detected');
+    loadCartState();
+  });
+  
+  // Listen for Shopify theme section rendering
+  document.addEventListener('shopify:section:load', () => {
+    loadCartState();
+  });
+  
+  // Start monitoring
+  startMonitoring();
+}
+
 document.addEventListener('DOMContentLoaded', function () {
   // Load wishlist state
   loadWishlist();
   
   // Load cart state
   loadCartState();
+  
+  // Start monitoring cart changes
+  monitorCartChanges();
   
   // Initialize sliders
   {% for block in section.blocks %}
@@ -723,6 +816,19 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     {% endif %}
   {% endfor %}
+});
+
+// Reload cart state when returning to page
+window.addEventListener('pageshow', function(event) {
+  if (event.persisted) {
+    // Page was loaded from cache
+    loadCartState();
+  }
+});
+
+// Listen for focus (when user returns to tab)
+window.addEventListener('focus', function() {
+  loadCartState();
 });
 </script>
 
