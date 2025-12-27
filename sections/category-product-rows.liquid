@@ -55,12 +55,18 @@
                               class="catprodrows__cartbtn" 
                               aria-label="Add to cart"
                               data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+                              data-product-title="{{ product.title | escape }}"
+                              data-product-image="{{ product.featured_image | image_url: width: 100 }}"
+                              data-product-price="{{ product.price | money }}"
                               onclick="addToCartAjax(this)">
-                        <svg viewBox="0 0 24 24" fill="none">
+                        <svg viewBox="0 0 24 24" fill="none" class="cart-icon">
                           <path d="M3 3h2l2.2 11.4a2 2 0 0 0 2 1.6h7.5a2 2 0 0 0 2-1.6L21 7H6"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                           <circle cx="10" cy="20" r="1.5" fill="currentColor"/>
                           <circle cx="18" cy="20" r="1.5" fill="currentColor"/>
+                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" class="check-icon" style="display:none;">
+                          <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                       </button>
                     </div>
@@ -77,6 +83,21 @@
 
   </div>
 </section>
+
+<!-- Toast Notification -->
+<div id="cart-notification" class="cart-notification">
+  <div class="cart-notification__content">
+    <div class="cart-notification__icon">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="cart-notification__text">
+      <strong>Added to cart!</strong>
+      <span class="cart-notification__details"></span>
+    </div>
+  </div>
+</div>
 
 <style>
 .catprodrows{
@@ -201,6 +222,10 @@
   align-items:center;
   justify-content:center;
   box-shadow: 0 2px 6px rgba(0,0,0,.08);
+  transition: all .2s ease;
+}
+.qty--modern .qty__btn:hover{
+  background:#f0f0f0;
 }
 .qty--modern .qty__input{
   width:36px;
@@ -226,12 +251,14 @@
   justify-content:center;
   cursor:pointer;
   transition: all .3s ease;
+  position: relative;
 }
 .catprodrows__cartbtn:hover{
   background:#2d5940;
+  transform: scale(1.05);
 }
 .catprodrows__cartbtn:disabled{
-  opacity: 0.6;
+  opacity: 0.7;
   cursor: not-allowed;
 }
 .catprodrows__cartbtn.added{
@@ -240,6 +267,62 @@
 .catprodrows__cartbtn svg{
   width:20px;
   height:20px;
+  position: absolute;
+  transition: opacity .3s ease;
+}
+
+/* Toast Notification */
+.cart-notification{
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #1f3d2b;
+  color: white;
+  padding: 16px 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.3);
+  z-index: 9999;
+  transform: translateX(400px);
+  opacity: 0;
+  transition: all .4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  max-width: 350px;
+}
+.cart-notification.show{
+  transform: translateX(0);
+  opacity: 1;
+}
+.cart-notification__content{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.cart-notification__icon{
+  width: 32px;
+  height: 32px;
+  background: #4CAF50;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.cart-notification__icon svg{
+  width: 18px;
+  height: 18px;
+  stroke: white;
+}
+.cart-notification__text{
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.cart-notification__text strong{
+  font-size: 15px;
+  font-weight: 600;
+}
+.cart-notification__details{
+  font-size: 13px;
+  opacity: 0.9;
 }
 
 /* Mobile */
@@ -255,19 +338,67 @@
   .catprodrows__section{
     margin-bottom: 40px;
   }
+  .cart-notification{
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    max-width: none;
+  }
 }
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
+// Show toast notification
+function showCartNotification(productTitle, quantity) {
+  const notification = document.getElementById('cart-notification');
+  const details = notification.querySelector('.cart-notification__details');
+  details.textContent = `${quantity} × ${productTitle}`;
+  
+  notification.classList.add('show');
+  
+  setTimeout(() => {
+    notification.classList.remove('show');
+  }, 3000);
+}
+
+// Update cart count in header
+function updateCartCount() {
+  fetch('/cart.js')
+    .then(res => res.json())
+    .then(cart => {
+      // Update cart count badge (adjust selector to match your theme)
+      const cartCountElements = document.querySelectorAll('.cart-count, [data-cart-count], .cart__count, #cart-count');
+      cartCountElements.forEach(element => {
+        element.textContent = cart.item_count;
+        
+        // Show badge if hidden
+        if(cart.item_count > 0) {
+          element.style.display = '';
+        }
+      });
+      
+      // Trigger cart drawer/refresh event for themes
+      document.documentElement.dispatchEvent(new CustomEvent('cart:refresh', {
+        bubbles: true
+      }));
+    })
+    .catch(err => console.error('Cart count update failed:', err));
+}
+
 // Ajax Add to Cart Function
 function addToCartAjax(button) {
   const variantId = button.dataset.variantId;
+  const productTitle = button.dataset.productTitle;
   const qtyInput = button.closest('.catprodrows__actions').querySelector('.qty__input');
   const quantity = parseInt(qtyInput.value) || 1;
   
   // Disable button to prevent double clicks
   button.disabled = true;
+  
+  // Toggle icons
+  const cartIcon = button.querySelector('.cart-icon');
+  const checkIcon = button.querySelector('.check-icon');
   
   // Shopify Ajax API call
   fetch('/cart/add.js', {
@@ -291,32 +422,22 @@ function addToCartAjax(button) {
   .then(data => {
     console.log('Added to cart:', data);
     
-    // Update cart count if you have a cart counter element
-    fetch('/cart.js')
-      .then(res => res.json())
-      .then(cart => {
-        const cartCount = document.querySelector('.cart-count');
-        if (cartCount) {
-          cartCount.textContent = cart.item_count;
-        }
-        
-        // Trigger Shopify theme cart drawer if it exists
-        if (typeof window.theme !== 'undefined' && window.theme.cartDrawer) {
-          window.theme.cartDrawer.open();
-        }
-        
-        // Trigger cart refresh event (for themes that listen to this)
-        document.documentElement.dispatchEvent(new CustomEvent('cart:refresh', {
-          bubbles: true
-        }));
-      });
-    
-    // Visual feedback - green checkmark
+    // Show success state on button
     button.classList.add('added');
+    cartIcon.style.display = 'none';
+    checkIcon.style.display = 'block';
+    
+    // Show notification
+    showCartNotification(productTitle, quantity);
+    
+    // Update cart count
+    updateCartCount();
     
     // Reset button after animation
     setTimeout(() => {
       button.classList.remove('added');
+      cartIcon.style.display = 'block';
+      checkIcon.style.display = 'none';
       button.disabled = false;
       qtyInput.value = 1; // Reset quantity to 1
     }, 1500);
@@ -324,7 +445,19 @@ function addToCartAjax(button) {
   })
   .catch(error => {
     console.error('Error:', error);
-    alert('Unable to add item to cart. Please try again.');
+    
+    // Show error notification
+    const notification = document.getElementById('cart-notification');
+    notification.querySelector('.cart-notification__text strong').textContent = 'Error adding to cart';
+    notification.querySelector('.cart-notification__details').textContent = 'Please try again';
+    notification.classList.add('show');
+    
+    setTimeout(() => {
+      notification.classList.remove('show');
+      // Reset text
+      notification.querySelector('.cart-notification__text strong').textContent = 'Added to cart!';
+    }, 3000);
+    
     button.disabled = false;
   });
 }
