@@ -54,15 +54,14 @@
                         </div>
 
                         {%- comment -%} Cart Button {%- endcomment -%}
- 
-<button type="button" class="catprodrows__cartbtn" aria-label="Add to cart" onclick="addToCartShopify(this)" data-variant-id="{{ product.selected_or_first_available_variant.id }}">
-  <svg viewBox="0 0 24 24" fill="none">
-    <path d="M3 3h2l2.2 11.4a2 2 0 0 0 2 1.6h7.5a2 2 0 0 0 2-1.6L21 7H6"
-      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <circle cx="10" cy="20" r="1.5" fill="currentColor"/>
-    <circle cx="18" cy="20" r="1.5" fill="currentColor"/>
-  </svg>
-</button>
+                        <button type="submit" class="catprodrows__cartbtn" aria-label="Add to cart">
+                          <svg viewBox="0 0 24 24" fill="none">
+                            <path d="M3 3h2l2.2 11.4a2 2 0 0 0 2 1.6h7.5a2 2 0 0 0 2-1.6L21 7H6"
+                              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="10" cy="20" r="1.5" fill="currentColor"/>
+                            <circle cx="18" cy="20" r="1.5" fill="currentColor"/>
+                          </svg>
+                        </button>
                       </div>
                     </form>
                   </div>
@@ -285,53 +284,6 @@ document.addEventListener('DOMContentLoaded', function () {
     input.value = value;
   });
 });
-
-function addToCartShopify(button) {
-  const variantId = button.dataset.variantId;
-  
-  // Disable button to prevent double clicks
-  button.disabled = true;
-  
-  // Shopify Ajax API call
-  fetch('/cart/add.js', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      items: [{
-        id: variantId,
-        quantity: 1
-      }]
-    })
-  })
-  .then(response => response.json())
-  .then(data => {
-    console.log('Added to cart:', data);
-    
-    // Update cart count (if you have a cart counter)
-    fetch('/cart.js')
-      .then(res => res.json())
-      .then(cart => {
-        document.querySelector('.cart-count')?.innerText = cart.item_count;
-      });
-    
-    // Visual feedback
-    button.classList.add('added');
-    setTimeout(() => {
-      button.classList.remove('added');
-      button.disabled = false;
-    }, 1000);
-    
-    // Optional: Show success message
-    alert('Product added to cart!');
-  })
-  .catch(error => {
-    console.error('Error:', error);
-    alert('Failed to add to cart');
-    button.disabled = false;
-  });
-}
 </script>
 
 {% schema %}
