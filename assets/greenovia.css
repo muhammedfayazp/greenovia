@@ -320,3 +320,68 @@ html {
 .slideshow-controls__thumbnail:hover {
   opacity: 0.8;
 }
+
+/* ===============================
+   CUSTOM COLOR SWATCHES
+================================ */
+
+/* Override pill styles for swatches */
+.variant-option__button-label--has-swatch {
+  border-radius: 50% !important;
+  padding: 0 !important;
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  border: 1px solid rgba(0,0,0,0.1) !important; /* Subtle border for white swatches */
+  position: relative;
+  overflow: visible !important; /* Allow outline to show */
+  background: none !important; /* Remove pill background */
+  box-shadow: none !important;
+}
+
+/* The actual swatch inside */
+.variant-option__button-label--has-swatch .swatch {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+}
+
+/* Selected State */
+.variant-option__button-label--has-swatch:has(:checked),
+.variant-option__button-label--has-swatch[data-current-checked="true"] {
+  border-color: transparent !important;
+  transform: scale(1.1);
+  box-shadow: 0 0 0 2px var(--gv-white), 0 0 0 4px var(--gv-primary) !important;
+}
+
+/* Hover State */
+.variant-option__button-label--has-swatch:hover {
+  transform: scale(1.1);
+  border-color: transparent !important;
+}
+
+/* Unavailable / Out of Stock Swatch */
+.variant-option__button-label--has-swatch:has([data-option-available='false']),
+.variant-option__button-label--has-swatch.unavailable {
+  opacity: 0.5 !important;
+  position: relative;
+  cursor: not-allowed;
+  transform: none !important; /* Prevent scale on hover */
+}
+
+/* Cross out line for unavailable */
+.variant-option__button-label--has-swatch:has([data-option-available='false'])::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 1px;
+  background-color: #555;
+  transform: translate(-50%, -50%) rotate(-45deg);
+  pointer-events: none;
+}
+
