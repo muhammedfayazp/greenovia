@@ -54,6 +54,17 @@
                         </div>
 
                         {%- comment -%} Cart Button {%- endcomment -%}
+
+                        
+{% capture children %}
+  {% unless closest.product == blank %}
+    {% render 'product-card-badges', product: closest.product, settings: settings %}
+    {%  if settings.quick_add or settings.mobile_quick_add %}
+      {% render 'quick-add', product: closest.product, section_id: section.id %}
+    {% endif %}
+  {% endunless %}
+{% endcapture %}
+
                         <button type="submit" class="catprodrows__cartbtn" aria-label="Add to cart">
                           <svg viewBox="0 0 24 24" fill="none">
                             <path d="M3 3h2l2.2 11.4a2 2 0 0 0 2 1.6h7.5a2 2 0 0 0 2-1.6L21 7H6"
