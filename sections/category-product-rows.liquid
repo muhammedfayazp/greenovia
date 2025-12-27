@@ -54,34 +54,38 @@
                       <h3>{{ product.title }}</h3>
                     </a>
 
-                    <div class="catprodrows__price">
-                      {{ product.price | money }}
-                    </div>
-
-                    <div class="catprodrows__actions" data-variant-id="{{ product.selected_or_first_available_variant.id }}">
-                      
-                      {%- comment -%} Counter - Hidden by default {%- endcomment -%}
-                      <div class="qty qty--modern" style="display:none;">
-                        <button type="button" class="qty__btn" data-action="minus" onclick="updateCartQuantity(this, 'minus')">−</button>
-                        <span class="qty__display">0</span>
-                        <button type="button" class="qty__btn" data-action="plus" onclick="updateCartQuantity(this, 'plus')">+</button>
+                    <div class="catprodrows__bottom">
+                      {%- comment -%} Price on Left {%- endcomment -%}
+                      <div class="catprodrows__price">
+                        {{ product.price | money }}
                       </div>
 
-                      {%- comment -%} Add to Cart Button {%- endcomment -%}
-                      <button type="button" 
-                              class="catprodrows__cartbtn" 
-                              aria-label="Add to cart"
-                              data-variant-id="{{ product.selected_or_first_available_variant.id }}"
-                              data-product-title="{{ product.title | escape }}"
-                              onclick="addToCartAjax(this)">
-                        <svg viewBox="0 0 24 24" fill="none">
-                          <path d="M3 3h2l2.2 11.4a2 2 0 0 0 2 1.6h7.5a2 2 0 0 0 2-1.6L21 7H6"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                          <circle cx="10" cy="20" r="1.5" fill="currentColor"/>
-                          <circle cx="18" cy="20" r="1.5" fill="currentColor"/>
-                        </svg>
-                        <span class="catprodrows__cartbtn-text">Add</span>
-                      </button>
+                      {%- comment -%} Actions on Right {%- endcomment -%}
+                      <div class="catprodrows__actions" data-variant-id="{{ product.selected_or_first_available_variant.id }}">
+                        
+                        {%- comment -%} Counter - Hidden by default {%- endcomment -%}
+                        <div class="qty qty--modern" style="display:none;">
+                          <button type="button" class="qty__btn" data-action="minus" onclick="updateCartQuantity(this, 'minus')">−</button>
+                          <span class="qty__display">0</span>
+                          <button type="button" class="qty__btn" data-action="plus" onclick="updateCartQuantity(this, 'plus')">+</button>
+                        </div>
+
+                        {%- comment -%} Add to Cart Button {%- endcomment -%}
+                        <button type="button" 
+                                class="catprodrows__cartbtn" 
+                                aria-label="Add to cart"
+                                data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+                                data-product-title="{{ product.title | escape }}"
+                                onclick="addToCartAjax(this)">
+                          <svg viewBox="0 0 24 24" fill="none">
+                            <path d="M3 3h2l2.2 11.4a2 2 0 0 0 2 1.6h7.5a2 2 0 0 0 2-1.6L21 7H6"
+                              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="10" cy="20" r="1.5" fill="currentColor"/>
+                            <circle cx="18" cy="20" r="1.5" fill="currentColor"/>
+                          </svg>
+                          <span class="catprodrows__cartbtn-text">Add</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
 
@@ -221,14 +225,13 @@
 /* Info */
 .catprodrows__info{
   padding: 12px;
-  text-align:center;
   flex:1;
   display:flex;
   flex-direction:column;
   justify-content:space-between;
 }
 .catprodrows__info h3{
-  margin:0 0 6px;
+  margin:0 0 8px;
   font-size:15px;
   font-weight:600;
   color:#1f3d2b;
@@ -238,23 +241,33 @@
   overflow: hidden;
   text-overflow: ellipsis;
   min-height: 40px;
+  text-align: left;
 }
 .catprodrows__info a{ text-decoration:none; }
 
+/* Bottom Row - Price Left, Actions Right */
+.catprodrows__bottom{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+}
+
 .catprodrows__price{
-  font-size:15px;
-  margin-bottom: 10px;
+  font-size:16px;
   color:#1f3d2b;
-  font-weight:500;
+  font-weight:700;
+  text-align: left;
+  flex-shrink: 0;
 }
 
 /* Actions Container */
 .catprodrows__actions{
   display:flex;
-  justify-content:center;
+  justify-content:flex-end;
   align-items:center;
   gap: 10px;
-  position: relative;
 }
 
 /* Counter - Initially Hidden */
@@ -425,9 +438,12 @@
     max-width: none;
   }
   .catprodrows__cartbtn{
-    padding: 0 20px;
+    padding: 0 18px;
     height: 44px;
     font-size: 14px;
+  }
+  .catprodrows__price{
+    font-size: 15px;
   }
   .qty--modern .qty__btn{
     width: 28px;
