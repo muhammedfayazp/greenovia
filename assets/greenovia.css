@@ -1,508 +1,394 @@
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap");
+/* ===============================
+   CART DRAWER FIXES
+ ================================ */
 
-:root {
-  --gv-primary: #2D5016;
-  --gv-secondary: #5A7C3E;
-  --gv-bg: #FAFAF8;
-  --gv-white: #FFFFFF;
-  --gv-text: #2C2C2C;
-  --gv-muted: #6B6B6B;
-
-  --gv-font-heading: "Playfair Display", serif;
-  --gv-font-body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  --gv-font-ui: "Montserrat", "Inter", system-ui, sans-serif;
-}
-
-/* Base typography */
-body {
+/* Fix cart drawer layout */
+cart-drawer,
+.drawer,
+.cart-drawer {
   font-family: var(--gv-font-body);
-  color: var(--gv-text);
-  background: var(--gv-bg);
-  line-height: 1.6;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+/* Cart drawer header */
+.drawer__header,
+.cart-drawer__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.drawer__heading,
+.cart-drawer__heading {
   font-family: var(--gv-font-heading);
+  font-size: 24px;
   font-weight: 600;
-  line-height: 1.15;
   color: var(--gv-primary);
+  margin: 0;
 }
 
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
-a:hover {
-  color: var(--gv-secondary);
-}
-
-/* Buttons */
-button,
-input[type="submit"],
-.button,
-.btn,
-.hero-btn {
-  font-family: var(--gv-font-ui);
-  font-weight: 600;
-  letter-spacing: .03em;
-}
-
-/* Header safety */
-.header,
-header-component {
-  position: relative;
-  z-index: 200;
-}
-
-.header img,
-header-component img {
-  width: auto !important;
-  height: auto !important;
-  max-width: none !important;
-  display: inline-block !important;
-}
-
-/* Header icons alignment */
-.header__icons,
-.header-actions {
-  display: flex !important;
-  align-items: center !important;
-  gap: 12px !important;
-}
-
-.header__icon,
-.header__icon--search,
-.header__icon--account,
-.header__icon--cart {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 36px !important;
-  height: 36px !important;
-  padding: 0 !important;
-}
-
-/* Icon graphics */
-.header__icon svg,
-.header__icon img {
-  width: 18px !important;
-  height: 18px !important;
+/* Cart items container */
+cart-drawer-items,
+.drawer__contents,
+.cart-drawer__contents,
+.cart-items {
   display: block !important;
+  padding: 0 24px;
+  max-height: calc(100vh - 300px);
+  overflow-y: auto;
 }
 
-/* Menu typography via variables */
-:root {
-  --menu-top-level-font-family: "Montserrat", "Inter", system-ui, sans-serif;
-  --menu-top-level-font-weight: 600;
-  --menu-top-level-font-case: uppercase;
-  --menu-top-level-font-size: 0.875rem;
-  --menu-top-level-font-size-desktop: 0.9375rem;
+/* Individual cart item */
+.cart-item,
+cart-item,
+.drawer__cart-item {
+  display: grid !important;
+  grid-template-columns: 80px 1fr;
+  gap: 16px;
+  align-items: start;
+  padding: 20px 0;
+  border-bottom: 1px solid #f0f0f0;
+  position: relative;
 }
 
-/* Content images only */
-main img,
-.product img,
-.collection img,
-.card img,
-.article img,
-.plant-hero img {
-  max-width: 100%;
-  height: auto;
+/* Cart item image */
+.cart-item__image,
+.cart-item__media {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  overflow: hidden;
+  grid-column: 1;
+}
+
+.cart-item__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Cart item details wrapper */
+.cart-item__details {
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Product title */
+.cart-item__name,
+.cart-item__title,
+a.cart-item__link {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--gv-text);
+  margin: 0;
+  line-height: 1.4;
+  text-decoration: none;
   display: block;
 }
 
-
-/* Header vertical padding */
-@media (min-width: 990px) {
-
-  .header,
-  header-component,
-  #header-group {
-    padding-bottom: 22px !important;
-  }
+.cart-item__name:hover,
+a.cart-item__link:hover {
+  color: var(--gv-primary);
 }
 
-@media (max-width: 989px) {
-
-  .header,
-  header-component,
-  #header-group {
-    padding-bottom: 14px !important;
-  }
+/* Variant info (size, color, etc) */
+.cart-item__variant,
+.product-option,
+dl.cart-item__option {
+  font-size: 13px;
+  color: var(--gv-muted);
+  margin: 0;
 }
 
-/* ===============================
-   REMOVE TOP GAP ON SCROLL
- ================================ */
-
-/* Reset default browser spacing */
-html,
-body {
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-/* Prevent background showing on overscroll */
-body {
-  background: #ffffff !important;
-  overflow-x: hidden;
-}
-
-/* Make sure main content starts right after header */
-#MainContent,
-main,
-.content-for-layout {
-  margin-top: 0 !important;
-  padding-top: 0 !important;
-}
-
-/* If hero adds space */
-.plant-hero,
-.hero-desktop,
-.hero-mobile {
-  margin-top: 0 !important;
-}
-
-/* Fix iOS/Chrome overscroll glow gap */
-html {
-  overscroll-behavior: none;
-}
-
-/* 🌿 Global modern quantity counter */
-.qty--modern {
+dl.cart-item__option {
   display: flex;
+  gap: 4px;
+  margin: 4px 0;
+}
+
+.cart-item__option dt {
+  font-weight: 500;
+}
+
+.cart-item__option dd {
+  margin: 0;
+}
+
+/* Price and quantity row */
+.cart-item__price-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+  gap: 12px;
+}
+
+/* Quantity selector in cart - using your global style */
+cart-item .quantity,
+.cart-item__quantity,
+.cart-item .qty--modern {
+  display: flex !important;
   align-items: center;
   background: #f6f7f2;
   border-radius: 999px;
-  padding: 4px;
-  gap: 4px;
+  padding: 4px 8px;
+  gap: 6px;
   box-shadow: inset 0 0 0 1px #e3e6de;
+  width: fit-content;
 }
 
-.qty--modern .qty__btn {
-  width: 28px;
-  height: 28px;
+.cart-item__quantity-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Quantity buttons */
+cart-item .quantity__button,
+.cart-item__quantity button,
+.cart-item button[name="minus"],
+.cart-item button[name="plus"] {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
   border: none;
   border-radius: 50%;
   background: #fff;
-  color: #1f3d2b;
+  color: var(--gv-primary);
   font-size: 18px;
-  line-height: 1;
+  font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background .2s ease, transform .15s ease, box-shadow .2s ease;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, .08);
+  transition: all 0.2s;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  padding: 0 !important;
 }
 
-.qty--modern .qty__btn:hover {
-  background: #1f3d2b;
+.cart-item__quantity button:hover,
+cart-item .quantity__button:hover {
+  background: var(--gv-primary);
   color: #fff;
   transform: scale(1.05);
 }
 
-.qty--modern .qty__btn:active {
-  transform: scale(.95);
-}
-
-.qty--modern .qty__input {
-  width: 36px;
+/* Quantity input */
+cart-item .quantity__input,
+.cart-item__quantity input,
+.cart-item input[type="number"] {
+  width: 36px !important;
+  min-width: 36px !important;
+  max-width: 36px !important;
   text-align: center;
   border: none;
   background: transparent;
-  font-size: 14px;
-  font-weight: 600;
-  color: #1f3d2b;
-  outline: none;
-  appearance: textfield;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--gv-text);
+  padding: 0 !important;
+  margin: 0 !important;
+  -moz-appearance: textfield;
 }
 
-.qty--modern .qty__input::-webkit-outer-spin-button,
-.qty--modern .qty__input::-webkit-inner-spin-button {
+.cart-item__quantity input::-webkit-outer-spin-button,
+.cart-item__quantity input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-/* ===============================
-   CUSTOM VARIANT PICKER (CIRCLES)
- ================================ */
+/* Price display */
+.cart-item__price,
+.cart-item__final-price,
+.price {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gv-primary);
+  white-space: nowrap;
+}
 
-/* Hide standard radio inputs visually but keep accessible */
-.product-form__input input[type=radio] {
+.cart-item__old-price {
+  font-size: 14px;
+  color: var(--gv-muted);
+  text-decoration: line-through;
+  margin-right: 8px;
+}
+
+/* Remove button */
+.cart-item__remove,
+cart-remove-button,
+.cart-item button[aria-label*="Remove"] {
   position: absolute;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  height: 1px;
-  width: 1px;
-  margin: -1px;
+  top: 20px;
+  right: 0;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--gv-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
   padding: 0;
+}
+
+.cart-item__remove:hover,
+cart-remove-button:hover {
+  color: #e74c3c;
+  transform: scale(1.1);
+}
+
+.cart-item__remove svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Cart footer/totals */
+.drawer__footer,
+.cart-drawer__footer {
+  padding: 20px 24px;
+  border-top: 2px solid #e5e5e5;
+  background: #fff;
+}
+
+/* Subtotal row */
+.totals,
+.cart-drawer__totals {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.totals__label {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--gv-text);
+}
+
+.totals__value,
+.cart-drawer__total-price {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--gv-primary);
+  font-family: var(--gv-font-heading);
+}
+
+/* Tax/shipping note */
+.tax-note,
+.cart-drawer__tax-note {
+  font-size: 12px;
+  color: var(--gv-muted);
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+/* Checkout button */
+.cart__ctas,
+.drawer__footer button,
+.cart-drawer__checkout {
+  width: 100%;
+  background: var(--gv-primary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 16px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: var(--gv-font-ui);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.drawer__footer button:hover,
+.cart-drawer__checkout:hover {
+  background: var(--gv-secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(45, 80, 22, 0.3);
+}
+
+/* Empty cart state */
+.drawer__empty,
+.cart-drawer__empty {
+  padding: 60px 24px;
+  text-align: center;
+}
+
+.drawer__empty-text {
+  font-size: 16px;
+  color: var(--gv-muted);
+  margin-bottom: 20px;
+}
+
+/* Hide duplicate numbers/text */
+.cart-item__quantity-label,
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
   border: 0;
 }
 
-/* Style the label which acts as the button */
-.variant-option__button-label,
-.product-form__input input[type=radio]+label {
-  border-radius: 50% !important;
-  width: 80px !important;
-  height: 80px !important;
-  padding: 8px !important;
-  font-family: var(--gv-font-ui) !important;
-  font-weight: 600 !important;
-  font-size: 0.85rem !important;
-  line-height: 1.2 !important;
-  letter-spacing: 0.5px !important;
-  text-transform: uppercase !important;
-  border: 1px solid #e0e0e0 !important;
-  color: var(--gv-text) !important;
-  background-color: transparent !important;
-  transition: all 0.2s ease !important;
-  display: inline-flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;
-  align-items: center !important;
-  text-align: center !important;
-  box-shadow: none !important;
-  cursor: pointer !important;
-  margin: 0 !important;
-  overflow: hidden !important;
-  white-space: normal !important;
-  word-break: break-word !important;
+/* Fix for multiple "3" numbers appearing */
+.cart-item__totals > *:not(.cart-item__price):not(.cart-item__old-price) {
+  display: none;
 }
 
-/* Hide the inner pill element if it exists from default theme */
-.variant-option__button-label__pill {
-  display: none !important;
+/* Ensure proper spacing */
+.cart-item + .cart-item {
+  border-top: none;
 }
 
-/* Ensure text is visible and centered */
-.variant-option__button-label__text {
-  z-index: 2;
-  text-align: center;
-  width: 100%;
-}
-
-/* Hover state */
-.variant-option__button-label:hover,
-.product-form__input input[type=radio]+label:hover {
-  border-color: var(--gv-secondary) !important;
-  color: var(--gv-primary) !important;
-  background-color: #f4f8f4 !important;
-}
-
-/* Selected / Checked state */
-.variant-option__button-label:has(:checked),
-.variant-option__button-label[data-current-checked="true"],
-.product-form__input input[type=radio]:checked+label {
-  background-color: var(--gv-primary) !important;
-  color: var(--gv-white) !important;
-  border-color: var(--gv-primary) !important;
-  box-shadow: 0 4px 10px rgba(45, 80, 22, 0.25) !important;
-  transform: translateY(-1px);
-}
-
-/* Flexgap for the container */
-.variant-option--buttons {
-  display: flex !important;
-  flex-wrap: wrap !important;
-  gap: 12px !important;
-}
-
-/* Available/Unavailable logic visual cue */
-.variant-option__button-label:has([data-option-available='false']),
-.product-form__input input[type=radio]:disabled+label {
-  opacity: 0.6 !important;
-  background-color: #f9f9f9 !important;
-  color: #a0a0a0 !important;
-  text-decoration: line-through;
-  border-color: #eee !important;
-}
-
-/* Make sure the variant picker container has spacing */
-.variant-picker {
-  margin-bottom: 24px !important;
-}
-
-.variant-picker legend {
-  font-family: var(--gv-font-heading);
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 12px;
-  color: var(--gv-text);
-  display: block;
-}
-
-/* Slideshow Thumbnails Customization */
-.slideshow-controls__thumbnail[aria-selected='true'] {
-  outline: 2px solid var(--gv-primary) !important;
-  outline-offset: 2px !important;
-  border-color: transparent !important;
-}
-
-.slideshow-controls__thumbnail:hover {
-  opacity: 0.8;
-}
-
-/* ===============================
-   CUSTOM COLOR SWATCHES
- ================================ */
-
-/* Override pill styles for swatches */
-.variant-option__button-label--has-swatch {
-  border-radius: 50% !important;
-  padding: 0 !important;
-  width: 40px !important;
-  height: 40px !important;
-  min-width: 40px !important;
-  border: 1px solid rgba(0, 0, 0, 0.1) !important;
-  /* Subtle border for white swatches */
-  position: relative;
-  overflow: visible !important;
-  /* Allow outline to show */
-  background: none !important;
-  /* Remove pill background */
-  box-shadow: none !important;
-}
-
-/* The actual swatch inside */
-.variant-option__button-label--has-swatch .swatch {
-  display: block;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background-size: cover;
-  background-position: center;
-}
-
-/* Selected State */
-.variant-option__button-label--has-swatch:has(:checked),
-.variant-option__button-label--has-swatch[data-current-checked="true"] {
-  border-color: transparent !important;
-  transform: scale(1.1);
-  box-shadow: 0 0 0 2px var(--gv-white), 0 0 0 4px var(--gv-primary) !important;
-}
-
-/* Hover State */
-.variant-option__button-label--has-swatch:hover {
-  transform: scale(1.1);
-  border-color: transparent !important;
-}
-
-/* Unavailable / Out of Stock Swatch */
-.variant-option__button-label--has-swatch:has([data-option-available='false']),
-.variant-option__button-label--has-swatch.unavailable {
-  opacity: 0.5 !important;
-  position: relative;
-  cursor: not-allowed;
-  transform: none !important;
-  /* Prevent scale on hover */
-}
-
-/* Cross out line for unavailable */
-.variant-option__button-label--has-swatch:has([data-option-available='false'])::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  height: 1px;
-  background-color: #555;
-  transform: translate(-50%, -50%) rotate(-45deg);
+/* Loading state */
+cart-drawer-items.is-loading {
+  opacity: 0.6;
   pointer-events: none;
 }
 
+/* Mobile adjustments */
+@media (max-width: 749px) {
+  .drawer__header,
+  .cart-drawer__header {
+    padding: 16px 20px;
+  }
 
-/* ===============================
-   CAROUSEL CONTROLS OVERLAY
- ================================ */
+  cart-drawer-items,
+  .drawer__contents {
+    padding: 0 20px;
+  }
 
-/* Ensure the gallery container allows absolute positioning of controls */
-.product .media-gallery,
-slideshow-component {
-  position: relative !important;
-}
+  .drawer__footer {
+    padding: 16px 20px;
+  }
 
-/* Hide default static arrow positioning if any */
-.slider-buttons {
-  position: absolute !important;
-  top: 50% !important;
-  left: 0 !important;
-  width: 100% !important;
-  transform: translateY(-50%) !important;
-  z-index: 2 !important;
-  display: flex !important;
-  justify-content: space-between !important;
-  pointer-events: none !important;
-  /* Let clicks pass through config area */
-  padding: 0 10px !important;
-  margin-top: -30px;
-  /* Adjust for thumbnail height if needed */
-}
+  .cart-item {
+    grid-template-columns: 70px 1fr;
+    gap: 12px;
+  }
 
-.slider-button {
-  position: relative !important;
-  pointer-events: auto !important;
-  /* Re-enable pointer events for buttons */
-  background: rgba(255, 255, 255, 0.8) !important;
-  border: 1px solid rgba(0, 0, 0, 0.1) !important;
-  border-radius: 50% !important;
-  width: 44px !important;
-  height: 44px !important;
-  color: var(--gv-primary) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
-  transition: all 0.2s ease !important;
-}
+  .cart-item__image,
+  .cart-item__media {
+    width: 70px;
+    height: 70px;
+  }
 
-.slider-button:hover {
-  background: var(--gv-primary) !important;
-  color: #fff !important;
-  transform: scale(1.1);
-}
+  .cart-item__name {
+    font-size: 14px;
+  }
 
-.slider-button .icon {
-  height: 18px !important;
-  width: 18px !important;
-}
-
-/* Ensure thumbnails are scrollable */
-.slider-mobile-gutter .slider-buttons {
-  display: flex !important;
-}
-
-.thumbnail-list {
-  display: flex !important;
-  flex-wrap: nowrap !important;
-  overflow-x: auto !important;
-  scroll-behavior: smooth;
-  scrollbar-width: none;
-  /* Hide scrollbar Firefox */
-  gap: 10px !important;
-}
-
-.thumbnail-list::-webkit-scrollbar {
-  display: none;
-  /* Hide scrollbar Chrome/Safari */
-}
-
-
-/* Tweak Arrow Position Inwards */
-.slider-buttons {
-  padding: 0 20px !important;
-}
-
-/* Ensure main image doesn't force huge width with empty space */
-.product .media-gallery {
-  justify-content: center !important;
-}
-
-
-/* Swatch Fallback for CSS Colors */
-.swatch {
-  background-color: var(--swatch-background);
+  .cart-item__price {
+    font-size: 15px;
+  }
 }
