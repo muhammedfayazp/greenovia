@@ -287,40 +287,51 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
-function addToCart(event) {
-  event.preventDefault(); // Prevent any default behavior
+function addToCartShopify(button) {
+  const variantId = button.dataset.variantId;
   
-  // Get product details from the button's parent or data attributes
-  const button = event.currentTarget;
-  const productId = button.dataset.productId; // Add data-product-id to button
-  const productName = button.dataset.productName;
-  const productPrice = button.dataset.productPrice;
+  // Disable button to prevent double clicks
+  button.disabled = true;
   
-  // Add to cart logic (customize based on your needs)
-  const cartItem = {
-    id: productId,
-    name: productName,
-    price: productPrice,
-    quantity: 1
-  };
-  
-  // Store in localStorage or send to your backend
-  let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-  const existingItem = cart.find(item => item.id === productId);
-  
-  if (existingItem) {
-    existingItem.quantity++;
-  } else {
-    cart.push(cartItem);
-  }
-  
-  localStorage.setItem('cart', JSON.stringify(cart));
-  
-  // Optional: Show success feedback
-  button.classList.add('added');
-  setTimeout(() => button.classList.remove('added'), 1000);
-  
-  console.log('Added to cart:', cartItem);
+  // Shopify Ajax API call
+  fetch('/cart/add.js', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      items: [{
+        id: variantId,
+        quantity: 1
+      }]
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('Added to cart:', data);
+    
+    // Update cart count (if you have a cart counter)
+    fetch('/cart.js')
+      .then(res => res.json())
+      .then(cart => {
+        document.querySelector('.cart-count')?.innerText = cart.item_count;
+      });
+    
+    // Visual feedback
+    button.classList.add('added');
+    setTimeout(() => {
+      button.classList.remove('added');
+      button.disabled = false;
+    }, 1000);
+    
+    // Optional: Show success message
+    alert('Product added to cart!');
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Failed to add to cart');
+    button.disabled = false;
+  });
 }
 </script>
 
