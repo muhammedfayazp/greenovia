@@ -310,13 +310,15 @@ html {
   width: 36px !important;
   height: 36px !important;
   padding: 0 !important;
+  overflow: visible !important;
+  /* Allow bubble to pop out */
 }
 
 /* Only target the bubble in the header trigger */
 .header-actions__cart-icon .cart-bubble {
   position: absolute !important;
-  top: -4px !important;
-  right: -6px !important;
+  top: -6px !important;
+  right: -8px !important;
   background: var(--gv-primary) !important;
   color: white !important;
   border-radius: 50% !important;
@@ -331,6 +333,10 @@ html {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
   z-index: 10 !important;
   text-align: center !important;
+  border: 1.5px solid white !important;
+  /* Help it pop against backgrounds */
+  overflow: visible !important;
+  clip-path: none !important;
 }
 
 .header-actions__cart-icon .cart-bubble__background {
@@ -628,4 +634,71 @@ slideshow-component {
 /* Swatch Fallback for CSS Colors */
 .swatch {
   background-color: var(--swatch-background);
+}
+
+/* ===============================
+   QUICK ADD PILL BUTTON
+ ================================ */
+
+.quick-add__button {
+  background: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(12px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(160%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  border-radius: 100px !important;
+  padding: 8px 16px !important;
+  color: #000 !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  height: auto !important;
+  width: auto !important;
+  min-width: 80px !important;
+  justify-content: center !important;
+  opacity: 1 !important;
+  bottom: 12px !important;
+  right: 12px !important;
+  position: absolute !important;
+  z-index: 600 !important;
+  cursor: pointer !important;
+  line-height: 1 !important;
+}
+
+.quick-add__button:hover {
+  background: rgba(255, 255, 255, 0.95) !important;
+  transform: translateY(-2px) scale(1.03) !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15) !important;
+}
+
+.quick-add__button:active {
+  transform: scale(0.97) !important;
+}
+
+.quick-add__button .icon-plus {
+  width: 12px !important;
+  height: 12px !important;
+  fill: currentColor !important;
+}
+
+.quick-add__button .quick-add__button-content {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+/* Hide Checkmark Burst & Added State Text */
+.checkmark-burst,
+.add-to-cart__added {
+  display: none !important;
+}
+
+.add-to-cart-button[data-added='true'] .add-to-cart-text {
+  clip-path: none !important;
+  opacity: 1 !important;
+  filter: none !important;
+  translate: 0 0 !important;
 }
