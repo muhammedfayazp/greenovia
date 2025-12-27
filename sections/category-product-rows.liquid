@@ -58,31 +58,29 @@
                       {{ product.price | money }}
                     </div>
 
-                    <div class="catprodrows__actions">
-                      {%- comment -%} Counter {%- endcomment -%}
-                      <div class="qty qty--modern">
-                        <button type="button" class="qty__btn" data-action="minus">−</button>
-                        <input type="number" name="quantity" value="1" min="1" class="qty__input">
-                        <button type="button" class="qty__btn" data-action="plus">+</button>
+                    <div class="catprodrows__actions" data-variant-id="{{ product.selected_or_first_available_variant.id }}">
+                      
+                      {%- comment -%} Counter - Hidden by default {%- endcomment -%}
+                      <div class="qty qty--modern" style="display:none;">
+                        <button type="button" class="qty__btn" data-action="minus" onclick="updateCartQuantity(this, 'minus')">−</button>
+                        <span class="qty__display">0</span>
+                        <button type="button" class="qty__btn" data-action="plus" onclick="updateCartQuantity(this, 'plus')">+</button>
                       </div>
 
-                      {%- comment -%} Cart Button with Badge {%- endcomment -%}
+                      {%- comment -%} Add to Cart Button {%- endcomment -%}
                       <button type="button" 
                               class="catprodrows__cartbtn" 
                               aria-label="Add to cart"
                               data-variant-id="{{ product.selected_or_first_available_variant.id }}"
                               data-product-title="{{ product.title | escape }}"
                               onclick="addToCartAjax(this)">
-                        <svg viewBox="0 0 24 24" fill="none" class="cart-icon">
+                        <svg viewBox="0 0 24 24" fill="none">
                           <path d="M3 3h2l2.2 11.4a2 2 0 0 0 2 1.6h7.5a2 2 0 0 0 2-1.6L21 7H6"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                           <circle cx="10" cy="20" r="1.5" fill="currentColor"/>
                           <circle cx="18" cy="20" r="1.5" fill="currentColor"/>
                         </svg>
-                        <svg viewBox="0 0 24 24" fill="none" class="check-icon" style="display:none;">
-                          <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        <span class="catprodrows__cartbtn-badge" style="display:none;">0</span>
+                        <span class="catprodrows__cartbtn-text">Add</span>
                       </button>
                     </div>
                   </div>
@@ -250,114 +248,107 @@
   font-weight:500;
 }
 
-/* Actions */
+/* Actions Container */
 .catprodrows__actions{
   display:flex;
-  justify-content:space-between;
+  justify-content:center;
   align-items:center;
   gap: 10px;
+  position: relative;
 }
 
-/* Counter */
+/* Counter - Initially Hidden */
 .qty--modern{
-  display:flex;
+  display:none;
   align-items:center;
   background:#f6f7f2;
   border-radius:999px;
-  padding:4px;
-  gap:4px;
+  padding:6px 8px;
+  gap:8px;
   box-shadow: inset 0 0 0 1px #e3e6de;
+  animation: slideIn .3s ease;
+}
+.qty--modern.show{
+  display: flex !important;
 }
 .qty--modern .qty__btn{
-  width:28px;
-  height:28px;
+  width:32px;
+  height:32px;
   border:none;
   border-radius:50%;
   background:#fff;
   color:#1f3d2b;
-  font-size:18px;
+  font-size:20px;
   cursor:pointer;
   display:flex;
   align-items:center;
   justify-content:center;
   box-shadow: 0 2px 6px rgba(0,0,0,.08);
   transition: all .2s ease;
+  font-weight: 600;
 }
 .qty--modern .qty__btn:hover{
-  background:#f0f0f0;
+  background:#1f3d2b;
+  color: #fff;
 }
-.qty--modern .qty__input{
-  width:36px;
+.qty--modern .qty__btn:active{
+  transform: scale(0.95);
+}
+.qty--modern .qty__display{
+  min-width:32px;
   text-align:center;
-  border:none;
-  background:transparent;
-  font-size:14px;
-  font-weight:600;
+  font-size:16px;
+  font-weight:700;
   color:#1f3d2b;
-  outline:none;
 }
 
-/* Cart Button */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Add to Cart Button */
 .catprodrows__cartbtn{
-  width:48px;
   height:48px;
-  border-radius:50%;
+  padding: 0 24px;
+  border-radius:999px;
   border:none;
-  background:#2196F3;
+  background:#1f3d2b;
   color:#fff;
   display:flex;
   align-items:center;
   justify-content:center;
   cursor:pointer;
   transition: all .3s ease;
-  position: relative;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
 }
 .catprodrows__cartbtn:hover{
-  background:#1976D2;
-  transform: scale(1.05);
+  background:#2d5940;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(31, 61, 43, 0.3);
 }
 .catprodrows__cartbtn:disabled{
   opacity: 0.7;
   cursor: not-allowed;
 }
-.catprodrows__cartbtn.added{
-  background:#4CAF50;
+.catprodrows__cartbtn.hide{
+  display: none;
 }
 .catprodrows__cartbtn svg{
-  width:22px;
-  height:22px;
-  position: absolute;
-  transition: opacity .3s ease;
+  width:20px;
+  height:20px;
 }
-
-/* Cart Button Badge */
-.catprodrows__cartbtn-badge{
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  background: #fff;
-  color: #2196F3;
-  font-size: 11px;
-  font-weight: 700;
-  min-width: 20px;
-  height: 20px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 5px;
-  box-shadow: 0 2px 4px rgba(0,0,0,.2);
-  animation: bounceIn .4s ease;
-}
-.catprodrows__cartbtn.added .catprodrows__cartbtn-badge{
-  background: #fff;
-  color: #4CAF50;
-}
-
-@keyframes bounceIn {
-  0% { transform: scale(0); }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); }
+.catprodrows__cartbtn-text{
+  font-weight: 600;
 }
 
 /* Toast Notification */
@@ -434,8 +425,18 @@
     max-width: none;
   }
   .catprodrows__cartbtn{
-    width: 44px;
+    padding: 0 20px;
     height: 44px;
+    font-size: 14px;
+  }
+  .qty--modern .qty__btn{
+    width: 28px;
+    height: 28px;
+    font-size: 18px;
+  }
+  .qty--modern .qty__display{
+    min-width: 28px;
+    font-size: 14px;
   }
 }
 </style>
@@ -447,18 +448,13 @@ function toggleWishlist(button) {
   const productId = button.dataset.productId;
   const productHandle = button.dataset.productHandle;
   
-  // Get wishlist from localStorage
   let wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
-  
-  // Check if product is already in wishlist
   const index = wishlist.findIndex(item => item.id === productId);
   
   if (index > -1) {
-    // Remove from wishlist
     wishlist.splice(index, 1);
     button.classList.remove('active');
   } else {
-    // Add to wishlist
     wishlist.push({
       id: productId,
       handle: productHandle,
@@ -467,10 +463,8 @@ function toggleWishlist(button) {
     button.classList.add('active');
   }
   
-  // Save to localStorage
   localStorage.setItem('wishlist', JSON.stringify(wishlist));
   
-  // Show notification
   const notification = document.getElementById('cart-notification');
   const wasActive = index > -1;
   notification.querySelector('.cart-notification__text strong').textContent = 
@@ -484,7 +478,6 @@ function toggleWishlist(button) {
   }, 2000);
 }
 
-// Load wishlist on page load
 function loadWishlist() {
   const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
   wishlist.forEach(item => {
@@ -508,51 +501,69 @@ function showCartNotification(productTitle, quantity) {
   }, 3000);
 }
 
-// Update individual product cart button badge
-function updateProductCartBadge(variantId, button) {
-  fetch('/cart.js')
-    .then(res => res.json())
+// Update cart quantity (+ and - buttons)
+function updateCartQuantity(button, action) {
+  const actionsContainer = button.closest('.catprodrows__actions');
+  const variantId = actionsContainer.dataset.variantId;
+  const qtyDisplay = actionsContainer.querySelector('.qty__display');
+  let currentQty = parseInt(qtyDisplay.textContent) || 0;
+  
+  button.disabled = true;
+  
+  if (action === 'plus') {
+    currentQty++;
+  } else if (action === 'minus') {
+    currentQty--;
+  }
+  
+  // If quantity is 0, remove from cart and show Add button again
+  if (currentQty <= 0) {
+    fetch('/cart/change.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: variantId,
+        quantity: 0
+      })
+    })
+    .then(response => response.json())
     .then(cart => {
-      // Find this variant in cart
-      const cartItem = cart.items.find(item => item.variant_id == variantId);
-      const badge = button.querySelector('.catprodrows__cartbtn-badge');
-      
-      if (cartItem && cartItem.quantity > 0) {
-        badge.textContent = cartItem.quantity;
-        badge.style.display = 'flex';
-      } else {
-        badge.style.display = 'none';
-      }
-    });
-}
-
-// Update all cart badges on page
-function updateAllCartBadges() {
-  fetch('/cart.js')
-    .then(res => res.json())
-    .then(cart => {
-      // Update each product card
-      document.querySelectorAll('.catprodrows__cartbtn').forEach(button => {
-        const variantId = button.dataset.variantId;
-        const cartItem = cart.items.find(item => item.variant_id == variantId);
-        const badge = button.querySelector('.catprodrows__cartbtn-badge');
-        
-        if (cartItem && cartItem.quantity > 0) {
-          badge.textContent = cartItem.quantity;
-          badge.style.display = 'flex';
-        } else {
-          badge.style.display = 'none';
-        }
-      });
-      
-      // Update header cart count
+      // Hide counter, show Add button
+      actionsContainer.querySelector('.qty--modern').classList.remove('show');
+      actionsContainer.querySelector('.catprodrows__cartbtn').classList.remove('hide');
       updateHeaderCartCount(cart.item_count);
+      button.disabled = false;
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      button.disabled = false;
     });
+    return;
+  }
+  
+  // Update cart quantity
+  fetch('/cart/change.js', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      id: variantId,
+      quantity: currentQty
+    })
+  })
+  .then(response => response.json())
+  .then(cart => {
+    qtyDisplay.textContent = currentQty;
+    updateHeaderCartCount(cart.item_count);
+    button.disabled = false;
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    button.disabled = false;
+  });
 }
 
 // Update header cart count
 function updateHeaderCartCount(itemCount) {
-  // Try multiple common selectors for cart count
   const selectors = [
     '.cart-count',
     '[data-cart-count]',
@@ -570,8 +581,6 @@ function updateHeaderCartCount(itemCount) {
     '.header-cart-count'
   ];
   
-  let updated = false;
-  
   selectors.forEach(selector => {
     const elements = document.querySelectorAll(selector);
     elements.forEach(element => {
@@ -582,88 +591,89 @@ function updateHeaderCartCount(itemCount) {
         element.setAttribute('data-cart-count', itemCount);
       }
       
-      // Show/hide based on count
       if (itemCount > 0) {
         element.style.display = '';
         element.style.opacity = '1';
         element.classList.remove('hidden', 'hide');
-      } else {
-        // Some themes hide when count is 0
-        if (element.classList.contains('hide-when-empty')) {
-          element.style.display = 'none';
-        }
       }
-      updated = true;
     });
   });
   
-  if (!updated) {
-    console.log('Cart count element not found. Item count:', itemCount);
-  }
-  
-  // Trigger theme cart events
   document.documentElement.dispatchEvent(new CustomEvent('cart:refresh', {
     bubbles: true,
     detail: { itemCount: itemCount }
   }));
 }
 
-// Ajax Add to Cart Function
+// Load cart state on page load
+function loadCartState() {
+  fetch('/cart.js')
+    .then(res => res.json())
+    .then(cart => {
+      // Update each product card based on cart
+      document.querySelectorAll('.catprodrows__actions').forEach(actionsContainer => {
+        const variantId = actionsContainer.dataset.variantId;
+        const cartItem = cart.items.find(item => item.variant_id == variantId);
+        
+        if (cartItem && cartItem.quantity > 0) {
+          // Show counter, hide Add button
+          const counter = actionsContainer.querySelector('.qty--modern');
+          const addBtn = actionsContainer.querySelector('.catprodrows__cartbtn');
+          const qtyDisplay = actionsContainer.querySelector('.qty__display');
+          
+          qtyDisplay.textContent = cartItem.quantity;
+          counter.classList.add('show');
+          addBtn.classList.add('hide');
+        }
+      });
+      
+      updateHeaderCartCount(cart.item_count);
+    });
+}
+
+// Add to Cart - First click
 function addToCartAjax(button) {
   const variantId = button.dataset.variantId;
   const productTitle = button.dataset.productTitle;
-  const qtyInput = button.closest('.catprodrows__actions').querySelector('.qty__input');
-  const quantity = parseInt(qtyInput.value) || 1;
+  const actionsContainer = button.closest('.catprodrows__actions');
   
-  // Disable button
   button.disabled = true;
   
-  // Toggle icons
-  const cartIcon = button.querySelector('.cart-icon');
-  const checkIcon = button.querySelector('.check-icon');
-  
-  // Shopify Ajax API
   fetch('/cart/add.js', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       items: [{
         id: variantId,
-        quantity: quantity
+        quantity: 1
       }]
     })
   })
   .then(response => {
-    if (!response.ok) {
-      throw new Error('Failed to add to cart');
-    }
+    if (!response.ok) throw new Error('Failed to add to cart');
     return response.json();
   })
   .then(data => {
     console.log('Added to cart:', data);
     
-    // Show success state
-    button.classList.add('added');
-    cartIcon.style.display = 'none';
-    checkIcon.style.display = 'block';
+    // Hide Add button, show counter
+    button.classList.add('hide');
+    const counter = actionsContainer.querySelector('.qty--modern');
+    const qtyDisplay = actionsContainer.querySelector('.qty__display');
+    qtyDisplay.textContent = '1';
+    counter.classList.add('show');
     
     // Show notification
-    showCartNotification(productTitle, quantity);
+    showCartNotification(productTitle, 1);
     
-    // Update cart badges
-    updateAllCartBadges();
+    // Update header cart count
+    fetch('/cart.js')
+      .then(res => res.json())
+      .then(cart => {
+        updateHeaderCartCount(cart.item_count);
+      });
     
-    // Reset button
-    setTimeout(() => {
-      button.classList.remove('added');
-      cartIcon.style.display = 'block';
-      checkIcon.style.display = 'none';
-      button.disabled = false;
-      qtyInput.value = 1;
-    }, 1500);
-    
+    button.disabled = false;
   })
   .catch(error => {
     console.error('Error:', error);
@@ -676,10 +686,10 @@ document.addEventListener('DOMContentLoaded', function () {
   // Load wishlist state
   loadWishlist();
   
-  // Load initial cart badges
-  updateAllCartBadges();
+  // Load cart state
+  loadCartState();
   
-  // Initialize each category slider
+  // Initialize sliders
   {% for block in section.blocks %}
     {% assign col = collections[block.settings.collection] %}
     {% if col != blank and col.products.size > 0 %}
@@ -697,17 +707,6 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     {% endif %}
   {% endfor %}
-
-  // Counter logic
-  document.addEventListener('click', function(e){
-    const btn = e.target.closest('.qty__btn');
-    if(!btn) return;
-    const input = btn.parentElement.querySelector('.qty__input');
-    let value = parseInt(input.value) || 1;
-    if(btn.dataset.action === 'plus') value++;
-    if(btn.dataset.action === 'minus' && value > 1) value--;
-    input.value = value;
-  });
 });
 </script>
 
