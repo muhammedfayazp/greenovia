@@ -131,7 +131,6 @@ export class AddToCartComponent extends Component {
     this.#resetTimeouts.forEach(/** @param {number} timeoutId */(timeoutId) => clearTimeout(timeoutId));
     this.#resetTimeouts = [];
 
-    /* 
     if (addToCartButton.dataset.added !== 'true') {
       addToCartButton.dataset.added = 'true';
     }
@@ -148,7 +147,6 @@ export class AddToCartComponent extends Component {
         this.#resetTimeouts.splice(index, 1);
       }
     }, 800);
-    */
 
     this.#resetTimeouts.push(timeoutId);
   };
