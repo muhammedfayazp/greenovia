@@ -22,6 +22,8 @@
     assign swatch_value = 'url(' | append: swatch_image_url | append: ')'
   elsif swatch.color
     assign swatch_value = 'rgb(' | append: swatch.color.rgb | append: ')'
+  elsif value
+    assign swatch_value = value | split: ' ' | last | handle
   endif
 
   case mode

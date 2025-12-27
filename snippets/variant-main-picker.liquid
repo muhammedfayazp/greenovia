@@ -38,7 +38,13 @@
           assign swatch_count = product_option.values | map: 'swatch' | compact | size
           assign variant_style = block_settings.variant_style
 
-          if swatch_count > 0 and block_settings.show_swatches
+          assign option_name_downcase = product_option.name | downcase
+          assign is_color_option = false
+          if option_name_downcase contains 'color' or option_name_downcase contains 'colour' or option_name_downcase contains 'flower'
+            assign is_color_option = true
+          endif
+
+          if block_settings.show_swatches and is_color_option
             if block_settings.variant_style == 'dropdown'
               assign variant_style = 'swatch_dropdown'
             else
@@ -113,6 +119,7 @@
                   {% render 'swatch',
                     swatch: product_option_value.swatch,
                     variant_image: featured_media,
+                    value: product_option_value,
                     mode: 'unscaled'
                   %}
                 {% else %}
