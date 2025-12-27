@@ -459,6 +459,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
+// Global debounce timer
+let cartUpdateDebounce = null;
+
 // Wishlist functionality
 function toggleWishlist(button) {
   const productId = button.dataset.productId;
@@ -532,7 +535,7 @@ function updateCartQuantity(button, action) {
     currentQty--;
   }
   
-  // If quantity is 0, remove from cart and show Add button again
+  // If quantity is 0, remove from cart
   if (currentQty <= 0) {
     fetch('/cart/change.js', {
       method: 'POST',
@@ -544,9 +547,9 @@ function updateCartQuantity(button, action) {
     })
     .then(response => response.json())
     .then(cart => {
-      // Hide counter, show Add button
       resetProductUI(variantId);
       updateHeaderCartCount(cart.item_count);
+      triggerCartUpdate();
       button.disabled = false;
     })
     .catch(error => {
@@ -569,6 +572,7 @@ function updateCartQuantity(button, action) {
   .then(cart => {
     qtyDisplay.textContent = currentQty;
     updateHeaderCartCount(cart.item_count);
+    triggerCartUpdate();
     button.disabled = false;
   })
   .catch(error => {
@@ -577,115 +581,163 @@ function updateCartQuantity(button, action) {
   });
 }
 
-// Reset product UI to initial state (show Add button, hide counter)
+// Reset product UI to initial state
 function resetProductUI(variantId) {
-  const actionsContainer = document.querySelector(`[data-variant-id="${variantId}"]`);
+  const actionsContainer = document.querySelector(`.catprodrows__actions[data-variant-id="${variantId}"]`);
   if (!actionsContainer) return;
   
   const counter = actionsContainer.querySelector('.qty--modern');
   const addBtn = actionsContainer.querySelector('.catprodrows__cartbtn');
   const qtyDisplay = actionsContainer.querySelector('.qty__display');
   
-  counter.classList.remove('show');
-  counter.style.display = 'none';
-  addBtn.classList.remove('hide');
-  qtyDisplay.textContent = '0';
+  if (counter) {
+    counter.classList.remove('show');
+    counter.style.display = 'none';
+  }
+  if (addBtn) {
+    addBtn.classList.remove('hide');
+  }
+  if (qtyDisplay) {
+    qtyDisplay.textContent = '0';
+  }
 }
 
-// Update header cart count
+// Update header cart count - ENHANCED
 function updateHeaderCartCount(itemCount) {
-  console.log('Updating header cart count to:', itemCount);
+  console.log('🛒 Updating cart count to:', itemCount);
   
+  // Comprehensive list of selectors
   const selectors = [
+    // Top-right cart icon badge
+    'a[href="/cart"] span',
+    'a[href*="/cart"] span',
+    '.header__icon--cart span',
+    '.header-cart-count',
     '.cart-count',
-    '[data-cart-count]',
     '.cart__count',
     '#cart-count',
+    '#CartCount',
     '.cart-link__bubble',
-    '.header__icon--cart span',
     '.site-header__cart-count',
     '.cart-count-bubble',
+    '[data-cart-count]',
     '[data-header-cart-count]',
     '.js-cart-count',
     'cart-count-bubble',
     '.cart-item-count',
-    '#CartCount',
-    '.header-cart-count',
     '.cart-link__count',
     '.header__cart-count',
     '#cart-item-count',
     '.cartToggle__count',
+    '[aria-label*="Cart"] span',
     '[aria-label*="cart"] span',
-    'a[href="/cart"] span',
-    'a[href*="cart"] span'
+    // Add more theme-specific selectors
+    '.icon--cart + span',
+    'svg[class*="cart"] + span',
+    '.cart-icon + span'
   ];
+  
+  let updatedCount = 0;
   
   selectors.forEach(selector => {
     try {
       const elements = document.querySelectorAll(selector);
       elements.forEach(element => {
+        // Skip elements inside our product cards
         if (element.closest('.catprodrows__card')) return;
         
+        // Skip if element is a link or svg
+        if (element.tagName === 'A' || element.tagName === 'SVG') return;
+        
+        // Update the count
         element.textContent = itemCount;
         element.innerText = itemCount;
         
+        // Update data attribute if it exists
         if (element.hasAttribute('data-cart-count')) {
           element.setAttribute('data-cart-count', itemCount);
         }
         
+        // Show/hide based on count
         if (itemCount > 0) {
           element.style.display = '';
           element.style.opacity = '1';
           element.style.visibility = 'visible';
-          element.classList.remove('hidden', 'hide');
+          element.classList.remove('hidden', 'hide', 'display-none');
+        } else {
+          // Some themes hide when 0
+          if (element.classList.contains('hide-when-empty')) {
+            element.style.display = 'none';
+          }
         }
+        
+        updatedCount++;
+        console.log('✅ Updated:', selector, '→', itemCount);
       });
-    } catch (e) {}
+    } catch (e) {
+      // Silently skip invalid selectors
+    }
   });
   
-  // Trigger events
-  document.documentElement.dispatchEvent(new CustomEvent('cart:refresh', {
-    bubbles: true,
-    detail: { itemCount: itemCount }
-  }));
-  
-  window.dispatchEvent(new CustomEvent('cart:updated', {
-    detail: { itemCount: itemCount }
-  }));
-  
-  if (window.jQuery) {
-    jQuery(document).trigger('cart.updated', [itemCount]);
+  if (updatedCount === 0) {
+    console.warn('⚠️ No cart count elements found!');
+  } else {
+    console.log(`✅ Updated ${updatedCount} cart count elements`);
   }
 }
 
-// Load cart state and sync UI
+// Trigger cart update events
+function triggerCartUpdate() {
+  // Custom event for Shopify themes
+  document.documentElement.dispatchEvent(new CustomEvent('cart:refresh', { bubbles: true }));
+  window.dispatchEvent(new CustomEvent('cart:updated', { bubbles: true }));
+  
+  // jQuery events if available
+  if (window.jQuery) {
+    jQuery(document).trigger('cart:updated');
+    jQuery(document).trigger('cart.requestComplete');
+  }
+  
+  // Theme-specific events
+  document.body.dispatchEvent(new CustomEvent('cart:change', { bubbles: true }));
+}
+
+// Load cart state and sync ALL products
 function loadCartState() {
+  console.log('🔄 Loading cart state...');
+  
   fetch('/cart.js')
     .then(res => res.json())
     .then(cart => {
-      console.log('Loading cart state. Total items:', cart.item_count);
-      console.log('Cart items:', cart.items);
+      console.log('📦 Cart data:', cart);
+      console.log('📊 Total items:', cart.item_count);
+      console.log('🛍️ Cart items:', cart.items);
       
-      // Get all variant IDs currently in cart
-      const cartVariantIds = cart.items.map(item => item.variant_id.toString());
+      // Create a map of variant IDs in cart
+      const cartVariantsMap = {};
+      cart.items.forEach(item => {
+        cartVariantsMap[item.variant_id] = item.quantity;
+      });
       
-      // Update each product card
+      // Update ALL product cards on the page
       document.querySelectorAll('.catprodrows__actions').forEach(actionsContainer => {
         const variantId = actionsContainer.dataset.variantId;
-        const cartItem = cart.items.find(item => item.variant_id == variantId);
+        const quantityInCart = cartVariantsMap[variantId] || 0;
         
         const counter = actionsContainer.querySelector('.qty--modern');
         const addBtn = actionsContainer.querySelector('.catprodrows__cartbtn');
         const qtyDisplay = actionsContainer.querySelector('.qty__display');
         
-        if (cartItem && cartItem.quantity > 0) {
-          // Product is in cart - show counter
-          qtyDisplay.textContent = cartItem.quantity;
+        if (quantityInCart > 0) {
+          // Product IS in cart - show counter
+          console.log(`✅ Variant ${variantId}: ${quantityInCart} in cart - showing counter`);
+          qtyDisplay.textContent = quantityInCart;
           counter.classList.add('show');
           counter.style.display = 'flex';
           addBtn.classList.add('hide');
         } else {
-          // Product not in cart - show Add button
+          // Product NOT in cart - show Add button
+          console.log(`➕ Variant ${variantId}: not in cart - showing Add button`);
           qtyDisplay.textContent = '0';
           counter.classList.remove('show');
           counter.style.display = 'none';
@@ -693,10 +745,11 @@ function loadCartState() {
         }
       });
       
+      // Update header cart count
       updateHeaderCartCount(cart.item_count);
     })
     .catch(err => {
-      console.error('Failed to load cart state:', err);
+      console.error('❌ Failed to load cart:', err);
     });
 }
 
@@ -707,6 +760,7 @@ function addToCartAjax(button) {
   const actionsContainer = button.closest('.catprodrows__actions');
   
   button.disabled = true;
+  console.log('➕ Adding to cart:', variantId, productTitle);
   
   fetch('/cart/add.js', {
     method: 'POST',
@@ -723,9 +777,9 @@ function addToCartAjax(button) {
     return response.json();
   })
   .then(data => {
-    console.log('Added to cart:', data);
+    console.log('✅ Added to cart:', data);
     
-    // Hide Add button, show counter
+    // Update UI immediately
     button.classList.add('hide');
     const counter = actionsContainer.querySelector('.qty--modern');
     const qtyDisplay = actionsContainer.querySelector('.qty__display');
@@ -736,124 +790,114 @@ function addToCartAjax(button) {
     // Show notification
     showCartNotification(productTitle, 1);
     
-    // Update header cart count
+    // Fetch updated cart and update count
     return fetch('/cart.js');
   })
   .then(res => res.json())
   .then(cart => {
     updateHeaderCartCount(cart.item_count);
+    triggerCartUpdate();
     button.disabled = false;
   })
   .catch(error => {
-    console.error('Error:', error);
+    console.error('❌ Error:', error);
     alert('Unable to add item to cart. Please try again.');
     button.disabled = false;
   });
 }
 
-// Monitor cart drawer/page for changes using MutationObserver
-function monitorCartDrawer() {
-  // Look for cart drawer or cart elements
-  const cartSelectors = [
-    'cart-drawer',
-    '[data-cart-drawer]',
-    '.cart-drawer',
-    '#cart-drawer',
-    '.drawer--cart',
-    'aside[aria-label*="cart"]',
-    '[role="dialog"][aria-label*="cart"]'
-  ];
+// Watch for cart DOM changes
+function observeCartChanges() {
+  // Watch for any element that might be the cart
+  const observer = new MutationObserver((mutations) => {
+    clearTimeout(cartUpdateDebounce);
+    cartUpdateDebounce = setTimeout(() => {
+      console.log('🔍 Cart DOM changed - reloading state');
+      loadCartState();
+    }, 500);
+  });
   
-  cartSelectors.forEach(selector => {
-    const cartElement = document.querySelector(selector);
-    if (cartElement) {
-      console.log('Found cart element:', selector);
-      
-      // Create observer for cart changes
-      const observer = new MutationObserver((mutations) => {
-        console.log('Cart DOM changed, syncing state...');
-        // Debounce the update
-        clearTimeout(window.cartSyncTimeout);
-        window.cartSyncTimeout = setTimeout(() => {
-          loadCartState();
-        }, 300);
-      });
-      
-      // Observe cart changes
-      observer.observe(cartElement, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['data-cart-count', 'data-item-count']
-      });
-    }
+  // Observe the body for cart-related changes
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+    attributes: true,
+    attributeFilter: ['data-cart-count', 'class']
   });
+  
+  console.log('👀 Started observing cart changes');
 }
 
-// Listen for clicks on remove buttons in cart
-function monitorCartRemoveButtons() {
+// Monitor clicks on cart-related buttons
+function monitorCartButtons() {
   document.addEventListener('click', function(e) {
-    // Check if clicked element is a remove/delete button in cart
-    const removeButton = e.target.closest('[data-cart-remove], .cart-remove, [aria-label*="Remove"], button[name="update"]');
+    const target = e.target;
     
-    if (removeButton) {
-      console.log('Remove button clicked in cart');
-      // Wait for cart to update, then sync
-      setTimeout(() => {
-        loadCartState();
-      }, 500);
+    // Check if it's a cart remove/update button
+    if (
+      target.closest('[data-cart-remove]') ||
+      target.closest('.cart-remove') ||
+      target.closest('[aria-label*="Remove"]') ||
+      target.closest('button[name="update"]') ||
+      target.closest('.cart__remove') ||
+      target.closest('[data-index]') // Cart item remove button
+    ) {
+      console.log('🗑️ Remove/update button clicked');
+      setTimeout(() => loadCartState(), 800);
     }
-  });
+  }, true);
 }
 
-// Periodic cart sync (every 3 seconds)
-let cartSyncInterval;
-function startPeriodicCartSync() {
-  cartSyncInterval = setInterval(() => {
+// Check cart every 2 seconds when page is active
+let cartCheckInterval;
+function startCartMonitoring() {
+  cartCheckInterval = setInterval(() => {
     if (!document.hidden) {
       loadCartState();
     }
-  }, 3000);
+  }, 2000);
+  console.log('⏱️ Started periodic cart checking');
 }
 
-function stopPeriodicCartSync() {
-  clearInterval(cartSyncInterval);
+function stopCartMonitoring() {
+  clearInterval(cartCheckInterval);
+  console.log('⏸️ Stopped cart monitoring');
 }
 
+// Initialize everything
 document.addEventListener('DOMContentLoaded', function () {
+  console.log('🚀 Initializing cart system...');
+  
   // Load wishlist state
   loadWishlist();
   
   // Initial cart state load
   loadCartState();
   
-  // Monitor cart drawer for changes
-  monitorCartDrawer();
+  // Start monitoring
+  observeCartChanges();
+  monitorCartButtons();
+  startCartMonitoring();
   
-  // Monitor cart remove buttons
-  monitorCartRemoveButtons();
-  
-  // Start periodic sync
-  startPeriodicCartSync();
-  
-  // Listen for visibility changes
+  // Visibility change handling
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden) {
+      console.log('👁️ Page visible - reloading cart');
       loadCartState();
-      startPeriodicCartSync();
+      startCartMonitoring();
     } else {
-      stopPeriodicCartSync();
+      stopCartMonitoring();
     }
   });
   
-  // Listen for theme cart events
+  // Listen for custom cart events
   document.addEventListener('cart:updated', () => {
-    console.log('Cart updated event detected');
+    console.log('📢 cart:updated event');
     loadCartState();
   });
   
   document.addEventListener('cart:refresh', () => {
-    console.log('Cart refresh event detected');
+    console.log('📢 cart:refresh event');
     loadCartState();
   });
   
@@ -875,17 +919,20 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     {% endif %}
   {% endfor %}
+  
+  console.log('✅ Cart system initialized');
 });
 
-// Reload when returning to page
+// Page navigation handling
 window.addEventListener('pageshow', function(event) {
   if (event.persisted) {
+    console.log('📄 Page loaded from cache');
     loadCartState();
   }
 });
 
-// Listen for window focus
 window.addEventListener('focus', function() {
+  console.log('🎯 Window focused');
   loadCartState();
 });
 </script>
