@@ -42,28 +42,28 @@
                       {{ product.price | money }}
                     </div>
 
-                    <form method="post" action="/cart/add" class="catprodrows__form">
-                      <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
-
-                      <div class="catprodrows__actions">
-                        {%- comment -%} Counter {%- endcomment -%}
-                        <div class="qty qty--modern">
-                          <button type="button" class="qty__btn" data-action="minus">−</button>
-                          <input type="number" name="quantity" value="1" min="1" class="qty__input">
-                          <button type="button" class="qty__btn" data-action="plus">+</button>
-                        </div>
-
-                        {%- comment -%} Cart Button {%- endcomment -%}
-                        <button type="submit" class="catprodrows__cartbtn" aria-label="Add to cart">
-                          <svg viewBox="0 0 24 24" fill="none">
-                            <path d="M3 3h2l2.2 11.4a2 2 0 0 0 2 1.6h7.5a2 2 0 0 0 2-1.6L21 7H6"
-                              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <circle cx="10" cy="20" r="1.5" fill="currentColor"/>
-                            <circle cx="18" cy="20" r="1.5" fill="currentColor"/>
-                          </svg>
-                        </button>
+                    <div class="catprodrows__actions">
+                      {%- comment -%} Counter {%- endcomment -%}
+                      <div class="qty qty--modern">
+                        <button type="button" class="qty__btn" data-action="minus">−</button>
+                        <input type="number" name="quantity" value="1" min="1" class="qty__input">
+                        <button type="button" class="qty__btn" data-action="plus">+</button>
                       </div>
-                    </form>
+
+                      {%- comment -%} Cart Button {%- endcomment -%}
+                      <button type="button" 
+                              class="catprodrows__cartbtn" 
+                              aria-label="Add to cart"
+                              data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+                              onclick="addToCartAjax(this)">
+                        <svg viewBox="0 0 24 24" fill="none">
+                          <path d="M3 3h2l2.2 11.4a2 2 0 0 0 2 1.6h7.5a2 2 0 0 0 2-1.6L21 7H6"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          <circle cx="10" cy="20" r="1.5" fill="currentColor"/>
+                          <circle cx="18" cy="20" r="1.5" fill="currentColor"/>
+                        </svg>
+                      </button>
+                    </div>
                   </div>
 
                 </div>
@@ -225,10 +225,17 @@
   align-items:center;
   justify-content:center;
   cursor:pointer;
-  transition: background .2s ease;
+  transition: all .3s ease;
 }
 .catprodrows__cartbtn:hover{
   background:#2d5940;
+}
+.catprodrows__cartbtn:disabled{
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.catprodrows__cartbtn.added{
+  background:#4CAF50;
 }
 .catprodrows__cartbtn svg{
   width:20px;
@@ -253,6 +260,75 @@
 
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
+// Ajax Add to Cart Function
+function addToCartAjax(button) {
+  const variantId = button.dataset.variantId;
+  const qtyInput = button.closest('.catprodrows__actions').querySelector('.qty__input');
+  const quantity = parseInt(qtyInput.value) || 1;
+  
+  // Disable button to prevent double clicks
+  button.disabled = true;
+  
+  // Shopify Ajax API call
+  fetch('/cart/add.js', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      items: [{
+        id: variantId,
+        quantity: quantity
+      }]
+    })
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Failed to add to cart');
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log('Added to cart:', data);
+    
+    // Update cart count if you have a cart counter element
+    fetch('/cart.js')
+      .then(res => res.json())
+      .then(cart => {
+        const cartCount = document.querySelector('.cart-count');
+        if (cartCount) {
+          cartCount.textContent = cart.item_count;
+        }
+        
+        // Trigger Shopify theme cart drawer if it exists
+        if (typeof window.theme !== 'undefined' && window.theme.cartDrawer) {
+          window.theme.cartDrawer.open();
+        }
+        
+        // Trigger cart refresh event (for themes that listen to this)
+        document.documentElement.dispatchEvent(new CustomEvent('cart:refresh', {
+          bubbles: true
+        }));
+      });
+    
+    // Visual feedback - green checkmark
+    button.classList.add('added');
+    
+    // Reset button after animation
+    setTimeout(() => {
+      button.classList.remove('added');
+      button.disabled = false;
+      qtyInput.value = 1; // Reset quantity to 1
+    }, 1500);
+    
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Unable to add item to cart. Please try again.');
+    button.disabled = false;
+  });
+}
+
 document.addEventListener('DOMContentLoaded', function () {
   // Initialize each category slider
   {% for block in section.blocks %}
