@@ -385,3 +385,70 @@ html {
   pointer-events: none;
 }
 
+
+/* ===============================
+   CAROUSEL CONTROLS OVERLAY
+================================ */
+
+/* Ensure the gallery container allows absolute positioning of controls */
+.product .media-gallery,
+slideshow-component {
+  position: relative !important;
+}
+
+/* Hide default static arrow positioning if any */
+.slider-buttons {
+  position: absolute !important;
+  top: 50% !important;
+  left: 0 !important;
+  width: 100% !important;
+  transform: translateY(-50%) !important;
+  z-index: 2 !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  pointer-events: none !important; /* Let clicks pass through config area */
+  padding: 0 10px !important;
+  margin-top: -30px; /* Adjust for thumbnail height if needed */
+}
+
+.slider-button {
+  position: relative !important;
+  pointer-events: auto !important; /* Re-enable pointer events for buttons */
+  background: rgba(255, 255, 255, 0.8) !important;
+  border: 1px solid rgba(0,0,0,0.1) !important;
+  border-radius: 50% !important;
+  width: 44px !important;
+  height: 44px !important;
+  color: var(--gv-primary) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+  transition: all 0.2s ease !important;
+}
+
+.slider-button:hover {
+  background: var(--gv-primary) !important;
+  color: #fff !important;
+  transform: scale(1.1);
+}
+
+.slider-button .icon {
+  height: 18px !important;
+  width: 18px !important;
+}
+
+/* Ensure thumbnails are scrollable */
+.slider-mobile-gutter .slider-buttons {
+  display: flex !important;
+}
+
+.thumbnail-list {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  scroll-behavior: smooth;
+  scrollbar-width: none; /* Hide scrollbar Firefox */
+  gap: 10px !important;
+}
+.thumbnail-list::-webkit-scrollbar {
+    display: none; /* Hide scrollbar Chrome/Safari */
+}
+
