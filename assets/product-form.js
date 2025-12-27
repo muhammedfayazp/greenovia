@@ -516,7 +516,7 @@ class ProductFormComponent extends Component {
   }
 
   /**
-   * @param {string} text
+   * @param {*} text
    */
   #setLiveRegionText(text) {
     const liveRegion = this.refs.liveRegion;
@@ -540,7 +540,7 @@ class ProductFormComponent extends Component {
     } else if (currentElement && !newElement) {
       currentElement.remove();
     } else if (!currentElement && newElement && insertReferenceElement) {
-      insertReferenceElement.insertAdjacentElement('beforebegin', /** @type {Element} */(newElement.cloneNode(true)));
+      insertReferenceElement.insertAdjacentElement('beforebegin', /** @type {Element} */ (newElement.cloneNode(true)));
     }
   }
 
