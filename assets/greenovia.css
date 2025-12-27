@@ -1,16 +1,16 @@
 @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap");
 
-:root {
-  --gv-primary: #2D5016;
-  --gv-secondary: #5A7C3E;
-  --gv-bg: #FAFAF8;
-  --gv-white: #FFFFFF;
-  --gv-text: #2C2C2C;
-  --gv-muted: #6B6B6B;
+:root{
+  --gv-primary:#2D5016;
+  --gv-secondary:#5A7C3E;
+  --gv-bg:#FAFAF8;
+  --gv-white:#FFFFFF;
+  --gv-text:#2C2C2C;
+  --gv-muted:#6B6B6B;
 
-  --gv-font-heading: "Playfair Display", serif;
-  --gv-font-body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  --gv-font-ui: "Montserrat", "Inter", system-ui, sans-serif;
+  --gv-font-heading:"Playfair Display", serif;
+  --gv-font-body:"Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --gv-font-ui:"Montserrat", "Inter", system-ui, sans-serif;
 }
 
 /* Base Utility Classes - Extremely robust to block leakage */
@@ -52,66 +52,55 @@
 }
 
 /* Base typography */
-body {
+body{
   font-family: var(--gv-font-body);
   color: var(--gv-text);
   background: var(--gv-bg);
   line-height: 1.6;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h1,h2,h3,h4,h5,h6{
   font-family: var(--gv-font-heading);
   font-weight: 600;
   line-height: 1.15;
   color: var(--gv-primary);
 }
 
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
-a:hover {
-  color: var(--gv-secondary);
-}
+a{ text-decoration:none; color:inherit; }
+a:hover{ color: var(--gv-secondary); }
 
 /* Buttons */
 button,
 input[type="submit"],
 .button,
 .btn,
-.hero-btn {
+.hero-btn{
   font-family: var(--gv-font-ui);
   font-weight: 600;
-  letter-spacing: .03em;
+  letter-spacing:.03em;
 }
 
 /* Header safety */
 .header,
-header-component {
+header-component{
   position: relative;
   z-index: 200;
 }
 
 .header img,
-header-component img {
-  width: auto !important;
-  height: auto !important;
-  max-width: none !important;
-  display: inline-block !important;
+header-component img{
+  width:auto !important;
+  height:auto !important;
+  max-width:none !important;
+  display:inline-block !important;
 }
 
 /* Header icons alignment */
 .header__icons,
-.header-actions {
-  display: flex !important;
-  align-items: center !important;
-  gap: 12px !important;
+.header-actions{
+  display:flex !important;
+  align-items:center !important;
+  gap:12px !important;
 }
 
 /* Fix boxed cart icon and generic button boxes */
@@ -130,23 +119,22 @@ header-component img {
 
 .header__icon,
 .header__icon--search,
-.header__icon--account {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 36px !important;
-  height: 36px !important;
-  padding: 0 !important;
-  border: none !important;
-  background: transparent !important;
+.header__icon--account,
+.header__icon--cart{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:36px !important;
+  height:36px !important;
+  padding:0 !important;
 }
 
 /* Icon graphics */
 .header__icon svg,
-.header__icon img {
-  width: 18px !important;
-  height: 18px !important;
-  display: block !important;
+.header__icon img{
+  width:18px !important;
+  height:18px !important;
+  display:block !important;
 }
 
 /* Menu typography via variables */
@@ -164,39 +152,30 @@ main img,
 .collection img,
 .card img,
 .article img,
-.plant-hero img {
-  max-width: 100%;
-  height: auto;
-  display: block;
+.plant-hero img{
+  max-width:100%;
+  height:auto;
+  display:block;
 }
 
 
 /* Header vertical padding */
 @media (min-width: 990px) {
-
-  .header,
-  header-component,
-  #header-group {
+  .header, header-component, #header-group {
     padding-bottom: 22px !important;
   }
 }
-
 @media (max-width: 989px) {
-
-  .header,
-  header-component,
-  #header-group {
+  .header, header-component, #header-group {
     padding-bottom: 14px !important;
   }
 }
-
 /* ===============================
    REMOVE TOP GAP ON SCROLL
- ================================ */
+================================ */
 
 /* Reset default browser spacing */
-html,
-body {
+html, body {
   margin: 0 !important;
   padding: 0 !important;
 }
@@ -226,142 +205,65 @@ main,
 html {
   overscroll-behavior: none;
 }
-
 /* 🌿 Global modern quantity counter */
-.quantity-selector {
-  display: flex;
-  align-items: center;
-  background: #f6f7f2;
-  border-radius: 999px;
-  padding: 4px;
-  gap: 4px;
+.qty--modern{
+  display:flex;
+  align-items:center;
+  background:#f6f7f2;
+  border-radius:999px;
+  padding:4px;
+  gap:4px;
   box-shadow: inset 0 0 0 1px #e3e6de;
   max-width: fit-content;
 }
 
-.quantity-selector .button {
-  width: 28px;
-  height: 28px;
-  border: none;
-  border-radius: 50%;
-  background: #fff;
-  color: #1f3d2b;
-  font-size: 18px;
-  line-height: 1;
-  cursor: pointer;
-  display: flex !important;
-  align-items: center;
-  justify-content: center;
+.qty--modern .qty__btn{
+  width:28px;
+  height:28px;
+  border:none;
+  border-radius:50%;
+  background:#fff;
+  color:#1f3d2b;
+  font-size:18px;
+  line-height:1;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   transition: background .2s ease, transform .15s ease, box-shadow .2s ease;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, .08);
-  padding: 0 !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,.08);
 }
 
-.quantity-selector .button:hover {
-  background: #1f3d2b !important;
-  color: #fff !important;
+.qty--modern .qty__btn:hover{
+  background:#1f3d2b;
+  color:#fff;
   transform: scale(1.05);
 }
 
-/* Ensure icons are centered and visible */
-.quantity-selector .button .svg-wrapper,
-.quantity-selector .button-unstyled .svg-wrapper {
-  color: inherit !important;
-  width: 14px !important;
-  height: 14px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-.quantity-selector .button svg,
-.quantity-selector .button-unstyled svg {
-  width: 100% !important;
-  height: 100% !important;
-  display: block !important;
-}
-
-.quantity-selector input {
-  width: 40px !important;
-  text-align: center;
-  border: none !important;
-  background: transparent !important;
-  font-family: var(--gv-font-ui);
-  font-weight: 600;
-  color: #1f3d2b;
-  padding: 0 !important;
-  margin: 0 !important;
-  appearance: none;
-  -moz-appearance: textfield;
-}
-
-.quantity-selector input::-webkit-outer-spin-button,
-.quantity-selector input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-/* Header cart bubble positioning */
-.header-actions__cart-icon {
-  position: relative !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 36px !important;
-  height: 36px !important;
-  padding: 0 !important;
-  overflow: visible !important;
-  /* Allow bubble to pop out */
-}
-
-/* Only target the bubble in the header trigger */
-.header-actions__cart-icon .cart-bubble {
-  position: absolute !important;
-  top: -6px !important;
-  right: -8px !important;
-  background: var(--gv-primary) !important;
-  color: white !important;
-  border-radius: 50% !important;
-  min-width: 18px !important;
-  height: 18px !important;
-  padding: 0 4px !important;
-  font-size: 10px !important;
-  font-weight: 700 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-  z-index: 10 !important;
-  text-align: center !important;
-  border: 1.5px solid white !important;
-  /* Help it pop against backgrounds */
-  overflow: visible !important;
-  clip-path: none !important;
-}
-
-.header-actions__cart-icon .cart-bubble__background {
-  display: none !important;
-}
-
-/* Fix for drawer heading bubble which should NOT be absolute */
-.cart-drawer__heading .cart-bubble {
-  display: inline-flex !important;
-  background: #eee !important;
-  color: #333 !important;
-  border-radius: 999px !important;
-  padding: 2px 8px !important;
-  margin-left: 8px !important;
-  font-size: 0.8rem !important;
-  vertical-align: middle !important;
-}
-
-.quantity-selector .button:active {
+.qty--modern .qty__btn:active{
   transform: scale(.95);
 }
 
+.qty--modern .qty__input{
+  width:36px;
+  text-align:center;
+  border:none;
+  background:transparent;
+  font-size:14px;
+  font-weight:600;
+  color:#1f3d2b;
+  outline:none;
+  appearance: textfield;
+}
+
+.qty--modern .qty__input::-webkit-outer-spin-button,
+.qty--modern .qty__input::-webkit-inner-spin-button{
+  -webkit-appearance: none;
+  margin:0;
+}
 /* ===============================
-   CUSTOM VARIANT PICKER (CIRCLES)
- ================================ */
+   CUSTOM VARIANT PICKER (PILLS)
+================================ */
 
 /* Hide standard radio inputs visually but keep accessible */
 .product-form__input input[type=radio] {
@@ -377,32 +279,26 @@ html {
 
 /* Style the label which acts as the button */
 .variant-option__button-label,
-.product-form__input input[type=radio]+label {
-  border-radius: 50% !important;
-  width: 80px !important;
-  height: 80px !important;
-  padding: 8px !important;
+.product-form__input input[type=radio] + label {
+  border-radius: 50px !important;
+  padding: 10px 24px !important;
   font-family: var(--gv-font-ui) !important;
   font-weight: 600 !important;
-  font-size: 0.85rem !important;
-  line-height: 1.2 !important;
+  font-size: 0.9rem !important;
   letter-spacing: 0.5px !important;
   text-transform: uppercase !important;
   border: 1px solid #e0e0e0 !important;
   color: var(--gv-text) !important;
   background-color: transparent !important;
   transition: all 0.2s ease !important;
+  min-width: 80px !important;
   display: inline-flex !important;
-  flex-direction: column !important;
   justify-content: center !important;
   align-items: center !important;
-  text-align: center !important;
   box-shadow: none !important;
   cursor: pointer !important;
   margin: 0 !important;
   overflow: hidden !important;
-  white-space: normal !important;
-  word-break: break-word !important;
 }
 
 /* Hide the inner pill element if it exists from default theme */
@@ -419,7 +315,7 @@ html {
 
 /* Hover state */
 .variant-option__button-label:hover,
-.product-form__input input[type=radio]+label:hover {
+.product-form__input input[type=radio] + label:hover {
   border-color: var(--gv-secondary) !important;
   color: var(--gv-primary) !important;
   background-color: #f4f8f4 !important;
@@ -428,7 +324,7 @@ html {
 /* Selected / Checked state */
 .variant-option__button-label:has(:checked),
 .variant-option__button-label[data-current-checked="true"],
-.product-form__input input[type=radio]:checked+label {
+.product-form__input input[type=radio]:checked + label {
   background-color: var(--gv-primary) !important;
   color: var(--gv-white) !important;
   border-color: var(--gv-primary) !important;
@@ -445,7 +341,7 @@ html {
 
 /* Available/Unavailable logic visual cue */
 .variant-option__button-label:has([data-option-available='false']),
-.product-form__input input[type=radio]:disabled+label {
+.product-form__input input[type=radio]:disabled + label {
   opacity: 0.6 !important;
   background-color: #f9f9f9 !important;
   color: #a0a0a0 !important;
@@ -480,7 +376,7 @@ html {
 
 /* ===============================
    CUSTOM COLOR SWATCHES
- ================================ */
+================================ */
 
 /* Override pill styles for swatches */
 .variant-option__button-label--has-swatch {
@@ -489,13 +385,10 @@ html {
   width: 40px !important;
   height: 40px !important;
   min-width: 40px !important;
-  border: 1px solid rgba(0, 0, 0, 0.1) !important;
-  /* Subtle border for white swatches */
+  border: 1px solid rgba(0,0,0,0.1) !important; /* Subtle border for white swatches */
   position: relative;
-  overflow: visible !important;
-  /* Allow outline to show */
-  background: none !important;
-  /* Remove pill background */
+  overflow: visible !important; /* Allow outline to show */
+  background: none !important; /* Remove pill background */
   box-shadow: none !important;
 }
 
@@ -529,8 +422,7 @@ html {
   opacity: 0.5 !important;
   position: relative;
   cursor: not-allowed;
-  transform: none !important;
-  /* Prevent scale on hover */
+  transform: none !important; /* Prevent scale on hover */
 }
 
 /* Cross out line for unavailable */
@@ -549,7 +441,7 @@ html {
 
 /* ===============================
    CAROUSEL CONTROLS OVERLAY
- ================================ */
+================================ */
 
 /* Ensure the gallery container allows absolute positioning of controls */
 .product .media-gallery,
@@ -567,24 +459,21 @@ slideshow-component {
   z-index: 2 !important;
   display: flex !important;
   justify-content: space-between !important;
-  pointer-events: none !important;
-  /* Let clicks pass through config area */
+  pointer-events: none !important; /* Let clicks pass through config area */
   padding: 0 10px !important;
-  margin-top: -30px;
-  /* Adjust for thumbnail height if needed */
+  margin-top: -30px; /* Adjust for thumbnail height if needed */
 }
 
 .slider-button {
   position: relative !important;
-  pointer-events: auto !important;
-  /* Re-enable pointer events for buttons */
+  pointer-events: auto !important; /* Re-enable pointer events for buttons */
   background: rgba(255, 255, 255, 0.8) !important;
-  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid rgba(0,0,0,0.1) !important;
   border-radius: 50% !important;
   width: 44px !important;
   height: 44px !important;
   color: var(--gv-primary) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
   transition: all 0.2s ease !important;
 }
 
@@ -609,14 +498,11 @@ slideshow-component {
   flex-wrap: nowrap !important;
   overflow-x: auto !important;
   scroll-behavior: smooth;
-  scrollbar-width: none;
-  /* Hide scrollbar Firefox */
+  scrollbar-width: none; /* Hide scrollbar Firefox */
   gap: 10px !important;
 }
-
 .thumbnail-list::-webkit-scrollbar {
-  display: none;
-  /* Hide scrollbar Chrome/Safari */
+    display: none; /* Hide scrollbar Chrome/Safari */
 }
 
 
@@ -636,69 +522,3 @@ slideshow-component {
   background-color: var(--swatch-background);
 }
 
-/* ===============================
-   QUICK ADD PILL BUTTON
- ================================ */
-
-.quick-add__button {
-  background: rgba(255, 255, 255, 0.75) !important;
-  backdrop-filter: blur(12px) saturate(160%) !important;
-  -webkit-backdrop-filter: blur(12px) saturate(160%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.4) !important;
-  border-radius: 100px !important;
-  padding: 8px 16px !important;
-  color: #000 !important;
-  font-weight: 600 !important;
-  font-size: 13px !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 6px !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  height: auto !important;
-  width: auto !important;
-  min-width: 80px !important;
-  justify-content: center !important;
-  opacity: 1 !important;
-  bottom: 12px !important;
-  right: 12px !important;
-  position: absolute !important;
-  z-index: 600 !important;
-  cursor: pointer !important;
-  line-height: 1 !important;
-}
-
-.quick-add__button:hover {
-  background: rgba(255, 255, 255, 0.95) !important;
-  transform: translateY(-2px) scale(1.03) !important;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15) !important;
-}
-
-.quick-add__button:active {
-  transform: scale(0.97) !important;
-}
-
-.quick-add__button .icon-plus {
-  width: 12px !important;
-  height: 12px !important;
-  fill: currentColor !important;
-}
-
-.quick-add__button .quick-add__button-content {
-  display: flex !important;
-  align-items: center !important;
-  gap: 6px !important;
-}
-
-/* Hide Checkmark Burst & Added State Text */
-.checkmark-burst,
-.add-to-cart__added {
-  display: none !important;
-}
-
-.add-to-cart-button[data-added='true'] .add-to-cart-text {
-  clip-path: none !important;
-  opacity: 1 !important;
-  filter: none !important;
-  translate: 0 0 !important;
-}
