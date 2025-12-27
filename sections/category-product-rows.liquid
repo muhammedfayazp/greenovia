@@ -286,6 +286,42 @@ document.addEventListener('DOMContentLoaded', function () {
     input.value = value;
   });
 });
+
+function addToCart(event) {
+  event.preventDefault(); // Prevent any default behavior
+  
+  // Get product details from the button's parent or data attributes
+  const button = event.currentTarget;
+  const productId = button.dataset.productId; // Add data-product-id to button
+  const productName = button.dataset.productName;
+  const productPrice = button.dataset.productPrice;
+  
+  // Add to cart logic (customize based on your needs)
+  const cartItem = {
+    id: productId,
+    name: productName,
+    price: productPrice,
+    quantity: 1
+  };
+  
+  // Store in localStorage or send to your backend
+  let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  const existingItem = cart.find(item => item.id === productId);
+  
+  if (existingItem) {
+    existingItem.quantity++;
+  } else {
+    cart.push(cartItem);
+  }
+  
+  localStorage.setItem('cart', JSON.stringify(cart));
+  
+  // Optional: Show success feedback
+  button.classList.add('added');
+  setTimeout(() => button.classList.remove('added'), 1000);
+  
+  console.log('Added to cart:', cartItem);
+}
 </script>
 
 {% schema %}
