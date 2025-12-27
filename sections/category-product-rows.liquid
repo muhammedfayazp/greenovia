@@ -545,8 +545,7 @@ function updateCartQuantity(button, action) {
     .then(response => response.json())
     .then(cart => {
       // Hide counter, show Add button
-      actionsContainer.querySelector('.qty--modern').classList.remove('show');
-      actionsContainer.querySelector('.catprodrows__cartbtn').classList.remove('hide');
+      resetProductUI(variantId);
       updateHeaderCartCount(cart.item_count);
       button.disabled = false;
     })
@@ -578,12 +577,25 @@ function updateCartQuantity(button, action) {
   });
 }
 
-// Update header cart count - COMPREHENSIVE UPDATE
+// Reset product UI to initial state (show Add button, hide counter)
+function resetProductUI(variantId) {
+  const actionsContainer = document.querySelector(`[data-variant-id="${variantId}"]`);
+  if (!actionsContainer) return;
+  
+  const counter = actionsContainer.querySelector('.qty--modern');
+  const addBtn = actionsContainer.querySelector('.catprodrows__cartbtn');
+  const qtyDisplay = actionsContainer.querySelector('.qty__display');
+  
+  counter.classList.remove('show');
+  counter.style.display = 'none';
+  addBtn.classList.remove('hide');
+  qtyDisplay.textContent = '0';
+}
+
+// Update header cart count
 function updateHeaderCartCount(itemCount) {
-  // Log for debugging
   console.log('Updating header cart count to:', itemCount);
   
-  // List of all possible cart count selectors
   const selectors = [
     '.cart-count',
     '[data-cart-count]',
@@ -608,89 +620,79 @@ function updateHeaderCartCount(itemCount) {
     'a[href*="cart"] span'
   ];
   
-  let foundElements = 0;
-  
   selectors.forEach(selector => {
     try {
       const elements = document.querySelectorAll(selector);
       elements.forEach(element => {
-        // Skip if this is inside our product cards
         if (element.closest('.catprodrows__card')) return;
         
         element.textContent = itemCount;
         element.innerText = itemCount;
         
-        // Update data attributes
         if (element.hasAttribute('data-cart-count')) {
           element.setAttribute('data-cart-count', itemCount);
         }
         
-        // Show/hide based on count
         if (itemCount > 0) {
           element.style.display = '';
           element.style.opacity = '1';
           element.style.visibility = 'visible';
           element.classList.remove('hidden', 'hide');
-        } else {
-          // Some themes hide the badge when count is 0
-          const hideWhenEmpty = element.classList.contains('hide-when-empty') || 
-                                element.hasAttribute('data-hide-when-empty');
-          if (hideWhenEmpty) {
-            element.style.display = 'none';
-          }
         }
-        
-        foundElements++;
       });
-    } catch (e) {
-      // Silently fail for invalid selectors
-    }
+    } catch (e) {}
   });
   
-  console.log('Updated', foundElements, 'cart count elements');
-  
-  // Trigger Shopify theme events
+  // Trigger events
   document.documentElement.dispatchEvent(new CustomEvent('cart:refresh', {
     bubbles: true,
     detail: { itemCount: itemCount }
   }));
   
-  // For themes that use custom events
   window.dispatchEvent(new CustomEvent('cart:updated', {
     detail: { itemCount: itemCount }
   }));
   
-  // Trigger jQuery events if jQuery is available
   if (window.jQuery) {
     jQuery(document).trigger('cart.updated', [itemCount]);
   }
 }
 
-// Load cart state on page load
+// Load cart state and sync UI
 function loadCartState() {
   fetch('/cart.js')
     .then(res => res.json())
     .then(cart => {
-      console.log('Current cart:', cart);
+      console.log('Loading cart state. Total items:', cart.item_count);
+      console.log('Cart items:', cart.items);
       
-      // Update each product card based on cart
+      // Get all variant IDs currently in cart
+      const cartVariantIds = cart.items.map(item => item.variant_id.toString());
+      
+      // Update each product card
       document.querySelectorAll('.catprodrows__actions').forEach(actionsContainer => {
         const variantId = actionsContainer.dataset.variantId;
         const cartItem = cart.items.find(item => item.variant_id == variantId);
         
+        const counter = actionsContainer.querySelector('.qty--modern');
+        const addBtn = actionsContainer.querySelector('.catprodrows__cartbtn');
+        const qtyDisplay = actionsContainer.querySelector('.qty__display');
+        
         if (cartItem && cartItem.quantity > 0) {
-          // Show counter, hide Add button
-          const counter = actionsContainer.querySelector('.qty--modern');
-          const addBtn = actionsContainer.querySelector('.catprodrows__cartbtn');
-          const qtyDisplay = actionsContainer.querySelector('.qty__display');
-          
+          // Product is in cart - show counter
           qtyDisplay.textContent = cartItem.quantity;
           counter.classList.add('show');
+          counter.style.display = 'flex';
           addBtn.classList.add('hide');
+        } else {
+          // Product not in cart - show Add button
+          qtyDisplay.textContent = '0';
+          counter.classList.remove('show');
+          counter.style.display = 'none';
+          addBtn.classList.remove('hide');
         }
       });
       
-      // Update header cart count
       updateHeaderCartCount(cart.item_count);
     })
     .catch(err => {
@@ -729,11 +731,12 @@ function addToCartAjax(button) {
     const qtyDisplay = actionsContainer.querySelector('.qty__display');
     qtyDisplay.textContent = '1';
     counter.classList.add('show');
+    counter.style.display = 'flex';
     
     // Show notification
     showCartNotification(productTitle, 1);
     
-    // Update header cart count immediately
+    // Update header cart count
     return fetch('/cart.js');
   })
   .then(res => res.json())
@@ -748,28 +751,98 @@ function addToCartAjax(button) {
   });
 }
 
-// Monitor cart changes from other sources (cart page, drawer, etc)
-function monitorCartChanges() {
-  // Check cart every 2 seconds when page is visible
-  let cartCheckInterval;
+// Monitor cart drawer/page for changes using MutationObserver
+function monitorCartDrawer() {
+  // Look for cart drawer or cart elements
+  const cartSelectors = [
+    'cart-drawer',
+    '[data-cart-drawer]',
+    '.cart-drawer',
+    '#cart-drawer',
+    '.drawer--cart',
+    'aside[aria-label*="cart"]',
+    '[role="dialog"][aria-label*="cart"]'
+  ];
   
-  function startMonitoring() {
-    cartCheckInterval = setInterval(() => {
+  cartSelectors.forEach(selector => {
+    const cartElement = document.querySelector(selector);
+    if (cartElement) {
+      console.log('Found cart element:', selector);
+      
+      // Create observer for cart changes
+      const observer = new MutationObserver((mutations) => {
+        console.log('Cart DOM changed, syncing state...');
+        // Debounce the update
+        clearTimeout(window.cartSyncTimeout);
+        window.cartSyncTimeout = setTimeout(() => {
+          loadCartState();
+        }, 300);
+      });
+      
+      // Observe cart changes
+      observer.observe(cartElement, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['data-cart-count', 'data-item-count']
+      });
+    }
+  });
+}
+
+// Listen for clicks on remove buttons in cart
+function monitorCartRemoveButtons() {
+  document.addEventListener('click', function(e) {
+    // Check if clicked element is a remove/delete button in cart
+    const removeButton = e.target.closest('[data-cart-remove], .cart-remove, [aria-label*="Remove"], button[name="update"]');
+    
+    if (removeButton) {
+      console.log('Remove button clicked in cart');
+      // Wait for cart to update, then sync
+      setTimeout(() => {
+        loadCartState();
+      }, 500);
+    }
+  });
+}
+
+// Periodic cart sync (every 3 seconds)
+let cartSyncInterval;
+function startPeriodicCartSync() {
+  cartSyncInterval = setInterval(() => {
+    if (!document.hidden) {
       loadCartState();
-    }, 2000);
-  }
+    }
+  }, 3000);
+}
+
+function stopPeriodicCartSync() {
+  clearInterval(cartSyncInterval);
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  // Load wishlist state
+  loadWishlist();
   
-  function stopMonitoring() {
-    clearInterval(cartCheckInterval);
-  }
+  // Initial cart state load
+  loadCartState();
   
-  // Start/stop based on page visibility
+  // Monitor cart drawer for changes
+  monitorCartDrawer();
+  
+  // Monitor cart remove buttons
+  monitorCartRemoveButtons();
+  
+  // Start periodic sync
+  startPeriodicCartSync();
+  
+  // Listen for visibility changes
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-      stopMonitoring();
-    } else {
+    if (!document.hidden) {
       loadCartState();
-      startMonitoring();
+      startPeriodicCartSync();
+    } else {
+      stopPeriodicCartSync();
     }
   });
   
@@ -779,24 +852,10 @@ function monitorCartChanges() {
     loadCartState();
   });
   
-  // Listen for Shopify theme section rendering
-  document.addEventListener('shopify:section:load', () => {
+  document.addEventListener('cart:refresh', () => {
+    console.log('Cart refresh event detected');
     loadCartState();
   });
-  
-  // Start monitoring
-  startMonitoring();
-}
-
-document.addEventListener('DOMContentLoaded', function () {
-  // Load wishlist state
-  loadWishlist();
-  
-  // Load cart state
-  loadCartState();
-  
-  // Start monitoring cart changes
-  monitorCartChanges();
   
   // Initialize sliders
   {% for block in section.blocks %}
@@ -818,15 +877,14 @@ document.addEventListener('DOMContentLoaded', function () {
   {% endfor %}
 });
 
-// Reload cart state when returning to page
+// Reload when returning to page
 window.addEventListener('pageshow', function(event) {
   if (event.persisted) {
-    // Page was loaded from cache
     loadCartState();
   }
 });
 
-// Listen for focus (when user returns to tab)
+// Listen for window focus
 window.addEventListener('focus', function() {
   loadCartState();
 });
