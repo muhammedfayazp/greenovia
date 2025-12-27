@@ -36,7 +36,7 @@ export class AddToCartComponent extends Component {
     super.disconnectedCallback();
 
     if (this.#resetTimeouts) {
-      this.#resetTimeouts.forEach(/** @param {number} timeoutId */(timeoutId) => clearTimeout(timeoutId));
+      this.#resetTimeouts.forEach(/** @param {number} timeoutId */ (timeoutId) => clearTimeout(timeoutId));
     }
     this.removeEventListener('pointerenter', this.#preloadImage);
   }
@@ -128,7 +128,7 @@ export class AddToCartComponent extends Component {
     }
 
     // Clear all existing timeouts
-    this.#resetTimeouts.forEach(/** @param {number} timeoutId */(timeoutId) => clearTimeout(timeoutId));
+    this.#resetTimeouts.forEach(/** @param {number} timeoutId */ (timeoutId) => clearTimeout(timeoutId));
     this.#resetTimeouts = [];
 
     if (addToCartButton.dataset.added !== 'true') {
@@ -267,7 +267,7 @@ class ProductFormComponent extends Component {
    *
    * @param {Event} event - The submit event.
    */
-  handleSubmit = async (event) => {
+  handleSubmit(event) {
     const { addToCartTextError } = this.refs;
     // Stop default behaviour from the browser
     event.preventDefault();
@@ -336,53 +336,111 @@ class ProductFormComponent extends Component {
     const formData = new FormData(form);
 
     const cartItemsComponents = document.querySelectorAll('cart-items-component');
-    /** @type {string[]} */
     let cartItemComponentsSectionIds = [];
     cartItemsComponents.forEach((item) => {
       if (item instanceof HTMLElement && item.dataset.sectionId) {
         cartItemComponentsSectionIds.push(item.dataset.sectionId);
       }
+      formData.append('sections', cartItemComponentsSectionIds.join(','));
     });
 
-    if (cartItemComponentsSectionIds.length > 0) {
-      formData.append('sections', cartItemComponentsSectionIds.join(','));
-    }
+    const fetchCfg = fetchConfig('javascript', { body: formData });
 
+<<<<<<< HEAD
     const config = fetchConfig('json', { body: formData });
     if (config.headers) {
       Object.assign(config.headers, { 'X-Requested-With': 'XMLHttpRequest' });
       // @ts-ignore
       delete config.headers['Content-Type'];
     }
+=======
+    fetch(Theme.routes.cart_add_url, {
+      ...fetchCfg,
+      headers: {
+        ...fetchCfg.headers,
+        Accept: 'text/html',
+      },
+    })
+      .then((response) => response.json())
+      .then(async (response) => {
+        if (response.status) {
+          this.dispatchEvent(
+            new CartErrorEvent(form.getAttribute('id') || '', response.message, response.description, response.errors)
+          );
+>>>>>>> parent of 6466010 (add to cart)
 
-    try {
-      const response = await fetch(Theme.routes.cart_add_url, config);
-      const data = await response.json();
-
-      if (data.status) {
-        this.dispatchEvent(
-          new CartErrorEvent(form.getAttribute('id') || '', data.message, data.description, data.errors)
-        );
-
-        if (addToCartTextError) {
+          if (!addToCartTextError) return;
           addToCartTextError.classList.remove('hidden');
 
+          // Reuse the text node if the user is spam-clicking
           const textNode = addToCartTextError.childNodes[2];
           if (textNode) {
-            textNode.textContent = data.message;
+            textNode.textContent = response.message;
           } else {
-            const newTextNode = document.createTextNode(data.message);
+            const newTextNode = document.createTextNode(response.message);
             addToCartTextError.appendChild(newTextNode);
           }
 
-          this.#setLiveRegionText(data.message);
+          // Create or get existing error live region for screen readers
+          this.#setLiveRegionText(response.message);
 
           this.#timeout = setTimeout(() => {
             if (!addToCartTextError) return;
             addToCartTextError.classList.add('hidden');
+
+            // Clear the announcement
             this.#clearLiveRegionText();
           }, ERROR_MESSAGE_DISPLAY_DURATION);
+
+          // When we add more than the maximum amount of items to the cart, we need to dispatch a cart update event
+          // because our back-end still adds the max allowed amount to the cart.
+          this.dispatchEvent(
+            new CartAddEvent({}, this.id, {
+              didError: true,
+              source: 'product-form-component',
+              itemCount: Number(formData.get('quantity')) || Number(this.dataset.quantityDefault),
+              productId: this.dataset.productId,
+            })
+          );
+
+          return;
+        } else {
+          const id = formData.get('id');
+
+          if (addToCartTextError) {
+            addToCartTextError.classList.add('hidden');
+            addToCartTextError.removeAttribute('aria-live');
+          }
+
+          if (!id) throw new Error('Form ID is required');
+
+          // Add aria-live region to inform screen readers that the item was added
+          // Get the added text from any add-to-cart button
+          const anyAddToCartButton = allAddToCartContainers[0]?.refs.addToCartButton;
+          if (anyAddToCartButton) {
+            const addedTextElement = anyAddToCartButton.querySelector('.add-to-cart-text--added');
+            const addedText = addedTextElement?.textContent?.trim() || Theme.translations.added;
+
+            this.#setLiveRegionText(addedText);
+
+            setTimeout(() => {
+              this.#clearLiveRegionText();
+            }, SUCCESS_MESSAGE_DISPLAY_DURATION);
+          }
+
+          // Fetch the updated cart to get the actual total quantity for this variant
+          await this.#fetchAndUpdateCartQuantity();
+
+          this.dispatchEvent(
+            new CartAddEvent({}, id.toString(), {
+              source: 'product-form-component',
+              itemCount: Number(formData.get('quantity')) || Number(this.dataset.quantityDefault),
+              productId: this.dataset.productId,
+              sections: response.sections,
+            })
+          );
         }
+<<<<<<< HEAD
 
         this.dispatchEvent(
           new CartAddEvent({}, this.id, {
@@ -429,6 +487,16 @@ class ProductFormComponent extends Component {
       cartPerformance.measureFromEvent('add:user-action', event);
     }
   };
+=======
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {
+        cartPerformance.measureFromEvent('add:user-action', event);
+      });
+  }
+>>>>>>> parent of 6466010 (add to cart)
 
   /**
    * Updates the quantity label with the current cart quantity
