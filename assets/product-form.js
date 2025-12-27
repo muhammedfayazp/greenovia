@@ -350,7 +350,7 @@ class ProductFormComponent extends Component {
 
     const config = fetchConfig('json', { body: formData });
     if (config.headers) {
-      config.headers['X-Requested-With'] = 'XMLHttpRequest';
+      Object.assign(config.headers, { 'X-Requested-With': 'XMLHttpRequest' });
       // @ts-ignore
       delete config.headers['Content-Type'];
     }
@@ -388,8 +388,7 @@ class ProductFormComponent extends Component {
           new CartAddEvent({}, this.id, {
             didError: true,
             source: 'product-form-component',
-            itemCount: 0,
-            productId: this.dataset.productId,
+            productId: this.dataset.productId ?? '',
           })
         );
         return;
@@ -401,14 +400,14 @@ class ProductFormComponent extends Component {
       }
 
       const items = data.items || [data];
-      const addedQty = items.reduce((acc, item) => acc + (item.quantity || 1), 0);
+      const addedQty = items.reduce((/** @type {number} */ acc, /** @type {any} */ item) => acc + (item.quantity || 1), 0);
       const variantId = items[0]?.variant_id?.toString();
 
       // Update cart icon
       const anyAddToCartButton = allAddToCartContainers[0]?.refs.addToCartButton;
       if (anyAddToCartButton) {
         const addedTextElement = anyAddToCartButton.querySelector('.add-to-cart-text--added');
-        const addedText = addedTextElement?.textContent?.trim() || Theme.translations.added;
+        const addedText = addedTextElement?.textContent?.trim() || Theme.translations.added || 'Added';
         this.#setLiveRegionText(addedText);
         setTimeout(() => this.#clearLiveRegionText(), SUCCESS_MESSAGE_DISPLAY_DURATION);
       }
@@ -419,7 +418,7 @@ class ProductFormComponent extends Component {
         new CartAddEvent(data, this.id, {
           source: 'product-form-component',
           itemCount: addedQty,
-          productId: this.dataset.productId,
+          productId: this.dataset.productId ?? '',
           variantId: variantId,
           sections: data.sections,
         })
