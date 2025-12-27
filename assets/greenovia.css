@@ -463,3 +463,9 @@ slideshow-component {
   justify-content: center !important;
 }
 
+
+/* Swatch Fallback for CSS Colors */
+.swatch {
+  background-color: var(--swatch-background);
+}
+
