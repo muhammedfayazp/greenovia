@@ -7,6 +7,12 @@
       {% assign col = collections[block.settings.collection] %}
       {% if col != blank and col.products.size > 0 %}
         
+        <script
+          src="{{ 'component-cart-quantity-selector.js' | asset_url }}"
+          type="module"
+          fetchpriority="low"
+        ></script>
+
         <div class="catprodrows__section" {{ block.shopify_attributes }}>
           
           {%- comment -%} Category Header {%- endcomment -%}
@@ -356,9 +362,13 @@
 .catprodrows__cartbtn.hide{
   display: none;
 }
-.catprodrows__cartbtn svg{
-  width:20px;
-  height:20px;
+
+.catprodrows__qty-selector .qty__btn svg { width: 14px; height: 14px; }
+
+.catprodrows__qty-selector .qty__current {
+  color: #fff;
+  font-weight: 600;
+  font-size: 16px;
 }
 .catprodrows__cartbtn-text{
   font-weight: 600;
