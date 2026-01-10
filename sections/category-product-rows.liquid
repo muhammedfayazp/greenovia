@@ -23,70 +23,51 @@
               {% for product in col.products limit: 12 %}
                 <div class="catprodrows__card swiper-slide">
                   
-                  {%- comment -%} Wishlist Button {%- endcomment -%}
-                  <button type="button" 
-                          class="catprodrows__wishlist" 
-                          aria-label="Add to wishlist"
-                          data-product-id="{{ product.id }}"
-                          data-product-handle="{{ product.handle }}"
-                          onclick="toggleWishlist(this)">
-                    <svg viewBox="0 0 24 24" fill="none" class="heart-outline">
-                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" 
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    <svg viewBox="0 0 24 24" fill="currentColor" class="heart-filled" style="display:none;">
-                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                    </svg>
-                  </button>
-                  
-                  <a href="{{ product.url }}" class="catprodrows__img">
-                    {% if product.featured_image %}
-                      <img
-                        src="{{ product.featured_image | image_url: width: 600 }}"
-                        alt="{{ product.title | escape }}"
-                        loading="lazy"
-                      >
-                    {% endif %}
-                  </a>
+                  <div class="catprodrows__img-container">
+                    <a href="{{ product.url }}" class="catprodrows__img">
+                      {% if product.featured_image %}
+                        <img
+                          src="{{ product.featured_image | image_url: width: 600 }}"
+                          alt="{{ product.title | escape }}"
+                          loading="lazy"
+                        >
+                      {% endif %}
+                    </a>
+                    <button type="button" class="catprodrows__heart" aria-label="Add to wishlist" data-product-id="{{ product.id }}">
+                      {% render 'icon', icon: 'heart' %}
+                    </button>
+                  </div>
 
                   <div class="catprodrows__info">
                     <a href="{{ product.url }}">
                       <h3>{{ product.title }}</h3>
                     </a>
 
-                    <div class="catprodrows__bottom">
-                      {%- comment -%} Price on Left {%- endcomment -%}
-                      <div class="catprodrows__price">
-                        {{ product.price | money }}
-                      </div>
+                    <div class="catprodrows__price">
+                      {{ product.price | money }}
+                    </div>
 
-                      {%- comment -%} Actions on Right {%- endcomment -%}
-                      <div class="catprodrows__actions" data-variant-id="{{ product.selected_or_first_available_variant.id }}">
-                        
-                        {%- comment -%} Counter - Hidden by default {%- endcomment -%}
-                        <div class="qty qty--modern" style="display:none;">
-                          <button type="button" class="qty__btn" data-action="minus" onclick="updateCartQuantity(this, 'minus')">−</button>
-                          <span class="qty__display">0</span>
-                          <button type="button" class="qty__btn" data-action="plus" onclick="updateCartQuantity(this, 'plus')">+</button>
+                    {%- assign cart_qty = 0 -%}
+                    {%- for item in cart.items -%}
+                      {%- if item.variant_id == product.selected_or_first_available_variant.id -%}
+                        {%- assign cart_qty = item.quantity -%}
+                        {%- break -%}
+                      {%- endif -%}
+                    {%- endfor -%}
+
+                    <product-form class="catprodrows__form-wrapper" data-variant-id="{{ product.selected_or_first_available_variant.id }}">
+                      <div class="catprodrows__actions {% if cart_qty > 0 %}is-active{% endif %}">
+                        <div class="catprodrows__qty-selector">
+                          <button type="button" class="qty__btn" data-action="minus">{% if cart_qty == 1 %}{% render 'icon', icon: 'delete' %}{% else %}−{% endif %}</button>
+                          <span class="qty__current">{{ cart_qty }}</span>
+                          <button type="button" class="qty__btn" data-action="plus">+</button>
                         </div>
-
-                        {%- comment -%} Add to Cart Button {%- endcomment -%}
-                        <button type="button" 
-                                class="catprodrows__cartbtn" 
-                                aria-label="Add to cart"
-                                data-variant-id="{{ product.selected_or_first_available_variant.id }}"
-                                data-product-title="{{ product.title | escape }}"
-                                onclick="addToCartAjax(this)">
-                          <svg viewBox="0 0 24 24" fill="none">
-                            <path d="M3 3h2l2.2 11.4a2 2 0 0 0 2 1.6h7.5a2 2 0 0 0 2-1.6L21 7H6"
-                              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <circle cx="10" cy="20" r="1.5" fill="currentColor"/>
-                            <circle cx="18" cy="20" r="1.5" fill="currentColor"/>
-                          </svg>
-                          <span class="catprodrows__cartbtn-text">Add</span>
+                        
+                        <button type="button" class="catprodrows__atc-trigger" aria-label="Add to cart">
+                          <span>+</span>
                         </button>
                       </div>
-                    </div>
+                    </product-form>
                   </div>
 
                 </div>
@@ -100,21 +81,6 @@
 
   </div>
 </section>
-
-<!-- Toast Notification -->
-<div id="cart-notification" class="cart-notification">
-  <div class="cart-notification__content">
-    <div class="cart-notification__icon">
-      <svg viewBox="0 0 24 24" fill="none">
-        <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </div>
-    <div class="cart-notification__text">
-      <strong>Added to cart!</strong>
-      <span class="cart-notification__details"></span>
-    </div>
-  </div>
-</div>
 
 <style>
 .catprodrows{
@@ -167,47 +133,9 @@
   overflow:hidden;
   box-shadow: 0 6px 18px rgba(0,0,0,.08);
   transition: transform .25s ease;
-  position: relative;
 }
 .catprodrows__card:hover{
   transform: translateY(-4px);
-}
-
-/* Wishlist Button */
-.catprodrows__wishlist{
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: none;
-  background: rgba(255,255,255,0.95);
-  color: #666;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 10;
-  box-shadow: 0 2px 8px rgba(0,0,0,.1);
-  transition: all .3s ease;
-}
-.catprodrows__wishlist:hover{
-  transform: scale(1.1);
-  background: #fff;
-}
-.catprodrows__wishlist.active{
-  color: #e74c3c;
-}
-.catprodrows__wishlist.active .heart-outline{
-  display: none;
-}
-.catprodrows__wishlist.active .heart-filled{
-  display: block !important;
-}
-.catprodrows__wishlist svg{
-  width: 20px;
-  height: 20px;
 }
 
 /* Image */
@@ -225,197 +153,132 @@
 /* Info */
 .catprodrows__info{
   padding: 12px;
+  text-align:center;
   flex:1;
   display:flex;
   flex-direction:column;
   justify-content:space-between;
 }
 .catprodrows__info h3{
-  margin:0 0 8px;
+  margin:0 0 6px;
   font-size:15px;
   font-weight:600;
   color:#1f3d2b;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  min-height: 40px;
-  text-align: left;
 }
 .catprodrows__info a{ text-decoration:none; }
 
-/* Bottom Row - Price Left, Actions Right */
-.catprodrows__bottom{
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  margin-top: auto;
-}
-
 .catprodrows__price{
-  font-size:16px;
+  font-size:15px;
+  margin-bottom: 10px;
   color:#1f3d2b;
-  font-weight:700;
-  text-align: left;
-  flex-shrink: 0;
+  font-weight:500;
 }
 
-/* Actions Container */
-.catprodrows__actions{
-  display:flex;
-  justify-content:flex-end;
-  align-items:center;
-  gap: 10px;
+/* Image Container */
+.catprodrows__img-container {
+  position: relative;
+  overflow: hidden;
 }
 
-/* Counter - Initially Hidden */
-.qty--modern{
-  display:none;
-  align-items:center;
-  background:#f6f7f2;
-  border-radius:999px;
-  padding:6px 8px;
-  gap:8px;
-  box-shadow: inset 0 0 0 1px #e3e6de;
-  animation: slideIn .3s ease;
-}
-.qty--modern.show{
-  display: flex !important;
-}
-.qty--modern .qty__btn{
-  width:32px;
-  height:32px;
-  border:none;
-  border-radius:50%;
-  background:#fff;
-  color:#1f3d2b;
-  font-size:20px;
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  box-shadow: 0 2px 6px rgba(0,0,0,.08);
-  transition: all .2s ease;
-  font-weight: 600;
-}
-.qty--modern .qty__btn:hover{
-  background:#1f3d2b;
-  color: #fff;
-}
-.qty--modern .qty__btn:active{
-  transform: scale(0.95);
-}
-.qty--modern .qty__display{
-  min-width:32px;
-  text-align:center;
-  font-size:16px;
-  font-weight:700;
-  color:#1f3d2b;
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* Add to Cart Button */
-.catprodrows__cartbtn{
-  height:48px;
-  padding: 0 24px;
-  border-radius:999px;
-  border:none;
-  background:#1f3d2b;
-  color:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  transition: all .3s ease;
-  gap: 8px;
-  font-size: 15px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-.catprodrows__cartbtn:hover{
-  background:#2d5940;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(31, 61, 43, 0.3);
-}
-.catprodrows__cartbtn:disabled{
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-.catprodrows__cartbtn.hide{
-  display: none;
-}
-.catprodrows__cartbtn svg{
-  width:20px;
-  height:20px;
-}
-.catprodrows__cartbtn-text{
-  font-weight: 600;
-}
-
-/* Toast Notification */
-.cart-notification{
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: #1f3d2b;
-  color: white;
-  padding: 16px 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0,0,0,.3);
-  z-index: 9999;
-  transform: translateX(400px);
-  opacity: 0;
-  transition: all .4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  max-width: 350px;
-}
-.cart-notification.show{
-  transform: translateX(0);
-  opacity: 1;
-}
-.cart-notification__content{
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.cart-notification__icon{
+/* Heart Icon */
+.catprodrows__heart {
+  position: absolute;
+  top: 12px;
+  right: 12px;
   width: 32px;
   height: 32px;
-  background: #4CAF50;
+  background: #fff;
   border-radius: 50%;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  cursor: pointer;
+  z-index: 2;
+  transition: transform 0.2s ease;
+  padding: 0;
+  color: #1f3d2b;
 }
-.cart-notification__icon svg{
-  width: 18px;
-  height: 18px;
-  stroke: white;
-}
-.cart-notification__text{
+.catprodrows__heart:hover { transform: scale(1.1); }
+.catprodrows__heart svg { width: 18px; height: 18px; stroke-width: 1.5; }
+.catprodrows__heart.is-active { color: #ff3b30; }
+
+/* Actions & Buttons */
+.catprodrows__actions {
+  position: relative;
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  justify-content: flex-end;
+  height: 40px;
 }
-.cart-notification__text strong{
-  font-size: 15px;
+
+.catprodrows__atc-trigger {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #1f3d2b;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
+}
+
+.catprodrows__qty-selector {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 40px;
+  width: 40px;
+  background: #1f3d2b;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box;
+}
+
+.catprodrows__actions.is-active .catprodrows__atc-trigger {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.8);
+}
+
+.catprodrows__actions.is-active .catprodrows__qty-selector {
+  width: 100%;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.catprodrows__qty-selector .qty__btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.catprodrows__qty-selector .qty__btn svg { width: 14px; height: 14px; }
+
+.catprodrows__qty-selector .qty__current {
+  color: #fff;
   font-weight: 600;
-}
-.cart-notification__details{
-  font-size: 13px;
-  opacity: 0.9;
+  font-size: 16px;
 }
 
 /* Mobile */
@@ -431,477 +294,13 @@
   .catprodrows__section{
     margin-bottom: 40px;
   }
-  .cart-notification{
-    top: 10px;
-    right: 10px;
-    left: 10px;
-    max-width: none;
-  }
-  .catprodrows__cartbtn{
-    padding: 0 18px;
-    height: 44px;
-    font-size: 14px;
-  }
-  .catprodrows__price{
-    font-size: 15px;
-  }
-  .qty--modern .qty__btn{
-    width: 28px;
-    height: 28px;
-    font-size: 18px;
-  }
-  .qty--modern .qty__display{
-    min-width: 28px;
-    font-size: 14px;
-  }
 }
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
-// Global debounce timer
-let cartUpdateDebounce = null;
-
-// Wishlist functionality
-function toggleWishlist(button) {
-  const productId = button.dataset.productId;
-  const productHandle = button.dataset.productHandle;
-  
-  let wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
-  const index = wishlist.findIndex(item => item.id === productId);
-  
-  if (index > -1) {
-    wishlist.splice(index, 1);
-    button.classList.remove('active');
-  } else {
-    wishlist.push({
-      id: productId,
-      handle: productHandle,
-      addedAt: new Date().toISOString()
-    });
-    button.classList.add('active');
-  }
-  
-  localStorage.setItem('wishlist', JSON.stringify(wishlist));
-  
-  const notification = document.getElementById('cart-notification');
-  const wasActive = index > -1;
-  notification.querySelector('.cart-notification__text strong').textContent = 
-    wasActive ? 'Removed from wishlist' : 'Added to wishlist!';
-  notification.querySelector('.cart-notification__details').textContent = '';
-  notification.classList.add('show');
-  
-  setTimeout(() => {
-    notification.classList.remove('show');
-    notification.querySelector('.cart-notification__text strong').textContent = 'Added to cart!';
-  }, 2000);
-}
-
-function loadWishlist() {
-  const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
-  wishlist.forEach(item => {
-    const button = document.querySelector(`[data-product-id="${item.id}"]`);
-    if (button) {
-      button.classList.add('active');
-    }
-  });
-}
-
-// Show toast notification
-function showCartNotification(productTitle, quantity) {
-  const notification = document.getElementById('cart-notification');
-  const details = notification.querySelector('.cart-notification__details');
-  details.textContent = `${quantity} × ${productTitle}`;
-  
-  notification.classList.add('show');
-  
-  setTimeout(() => {
-    notification.classList.remove('show');
-  }, 3000);
-}
-
-// Update cart quantity (+ and - buttons)
-function updateCartQuantity(button, action) {
-  const actionsContainer = button.closest('.catprodrows__actions');
-  const variantId = actionsContainer.dataset.variantId;
-  const qtyDisplay = actionsContainer.querySelector('.qty__display');
-  let currentQty = parseInt(qtyDisplay.textContent) || 0;
-  
-  button.disabled = true;
-  
-  if (action === 'plus') {
-    currentQty++;
-  } else if (action === 'minus') {
-    currentQty--;
-  }
-  
-  // If quantity is 0, remove from cart
-  if (currentQty <= 0) {
-    fetch('/cart/change.js', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        id: variantId,
-        quantity: 0
-      })
-    })
-    .then(response => response.json())
-    .then(cart => {
-      resetProductUI(variantId);
-      updateHeaderCartCount(cart.item_count);
-      triggerCartUpdate();
-      button.disabled = false;
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      button.disabled = false;
-    });
-    return;
-  }
-  
-  // Update cart quantity
-  fetch('/cart/change.js', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      id: variantId,
-      quantity: currentQty
-    })
-  })
-  .then(response => response.json())
-  .then(cart => {
-    qtyDisplay.textContent = currentQty;
-    updateHeaderCartCount(cart.item_count);
-    triggerCartUpdate();
-    button.disabled = false;
-  })
-  .catch(error => {
-    console.error('Error:', error);
-    button.disabled = false;
-  });
-}
-
-// Reset product UI to initial state
-function resetProductUI(variantId) {
-  const actionsContainer = document.querySelector(`.catprodrows__actions[data-variant-id="${variantId}"]`);
-  if (!actionsContainer) return;
-  
-  const counter = actionsContainer.querySelector('.qty--modern');
-  const addBtn = actionsContainer.querySelector('.catprodrows__cartbtn');
-  const qtyDisplay = actionsContainer.querySelector('.qty__display');
-  
-  if (counter) {
-    counter.classList.remove('show');
-    counter.style.display = 'none';
-  }
-  if (addBtn) {
-    addBtn.classList.remove('hide');
-  }
-  if (qtyDisplay) {
-    qtyDisplay.textContent = '0';
-  }
-}
-
-// Update header cart count - ENHANCED
-function updateHeaderCartCount(itemCount) {
-  console.log('🛒 Updating cart count to:', itemCount);
-  
-  // Comprehensive list of selectors
-  const selectors = [
-    // Top-right cart icon badge
-    'a[href="/cart"] span',
-    'a[href*="/cart"] span',
-    '.header__icon--cart span',
-    '.header-cart-count',
-    '.cart-count',
-    '.cart__count',
-    '#cart-count',
-    '#CartCount',
-    '.cart-link__bubble',
-    '.site-header__cart-count',
-    '.cart-count-bubble',
-    '[data-cart-count]',
-    '[data-header-cart-count]',
-    '.js-cart-count',
-    'cart-count-bubble',
-    '.cart-item-count',
-    '.cart-link__count',
-    '.header__cart-count',
-    '#cart-item-count',
-    '.cartToggle__count',
-    '[aria-label*="Cart"] span',
-    '[aria-label*="cart"] span',
-    // Add more theme-specific selectors
-    '.icon--cart + span',
-    'svg[class*="cart"] + span',
-    '.cart-icon + span'
-  ];
-  
-  let updatedCount = 0;
-  
-  selectors.forEach(selector => {
-    try {
-      const elements = document.querySelectorAll(selector);
-      elements.forEach(element => {
-        // Skip elements inside our product cards
-        if (element.closest('.catprodrows__card')) return;
-        
-        // Skip if element is a link or svg
-        if (element.tagName === 'A' || element.tagName === 'SVG') return;
-        
-        // Update the count
-        element.textContent = itemCount;
-        element.innerText = itemCount;
-        
-        // Update data attribute if it exists
-        if (element.hasAttribute('data-cart-count')) {
-          element.setAttribute('data-cart-count', itemCount);
-        }
-        
-        // Show/hide based on count
-        if (itemCount > 0) {
-          element.style.display = '';
-          element.style.opacity = '1';
-          element.style.visibility = 'visible';
-          element.classList.remove('hidden', 'hide', 'display-none');
-        } else {
-          // Some themes hide when 0
-          if (element.classList.contains('hide-when-empty')) {
-            element.style.display = 'none';
-          }
-        }
-        
-        updatedCount++;
-        console.log('✅ Updated:', selector, '→', itemCount);
-      });
-    } catch (e) {
-      // Silently skip invalid selectors
-    }
-  });
-  
-  if (updatedCount === 0) {
-    console.warn('⚠️ No cart count elements found!');
-  } else {
-    console.log(`✅ Updated ${updatedCount} cart count elements`);
-  }
-}
-
-// Trigger cart update events
-function triggerCartUpdate() {
-  // Custom event for Shopify themes
-  document.documentElement.dispatchEvent(new CustomEvent('cart:refresh', { bubbles: true }));
-  window.dispatchEvent(new CustomEvent('cart:updated', { bubbles: true }));
-  
-  // jQuery events if available
-  if (window.jQuery) {
-    jQuery(document).trigger('cart:updated');
-    jQuery(document).trigger('cart.requestComplete');
-  }
-  
-  // Theme-specific events
-  document.body.dispatchEvent(new CustomEvent('cart:change', { bubbles: true }));
-}
-
-// Load cart state and sync ALL products
-function loadCartState() {
-  console.log('🔄 Loading cart state...');
-  
-  fetch('/cart.js')
-    .then(res => res.json())
-    .then(cart => {
-      console.log('📦 Cart data:', cart);
-      console.log('📊 Total items:', cart.item_count);
-      console.log('🛍️ Cart items:', cart.items);
-      
-      // Create a map of variant IDs in cart
-      const cartVariantsMap = {};
-      cart.items.forEach(item => {
-        cartVariantsMap[item.variant_id] = item.quantity;
-      });
-      
-      // Update ALL product cards on the page
-      document.querySelectorAll('.catprodrows__actions').forEach(actionsContainer => {
-        const variantId = actionsContainer.dataset.variantId;
-        const quantityInCart = cartVariantsMap[variantId] || 0;
-        
-        const counter = actionsContainer.querySelector('.qty--modern');
-        const addBtn = actionsContainer.querySelector('.catprodrows__cartbtn');
-        const qtyDisplay = actionsContainer.querySelector('.qty__display');
-        
-        if (quantityInCart > 0) {
-          // Product IS in cart - show counter
-          console.log(`✅ Variant ${variantId}: ${quantityInCart} in cart - showing counter`);
-          qtyDisplay.textContent = quantityInCart;
-          counter.classList.add('show');
-          counter.style.display = 'flex';
-          addBtn.classList.add('hide');
-        } else {
-          // Product NOT in cart - show Add button
-          console.log(`➕ Variant ${variantId}: not in cart - showing Add button`);
-          qtyDisplay.textContent = '0';
-          counter.classList.remove('show');
-          counter.style.display = 'none';
-          addBtn.classList.remove('hide');
-        }
-      });
-      
-      // Update header cart count
-      updateHeaderCartCount(cart.item_count);
-    })
-    .catch(err => {
-      console.error('❌ Failed to load cart:', err);
-    });
-}
-
-// Add to Cart - First click
-function addToCartAjax(button) {
-  const variantId = button.dataset.variantId;
-  const productTitle = button.dataset.productTitle;
-  const actionsContainer = button.closest('.catprodrows__actions');
-  
-  button.disabled = true;
-  console.log('➕ Adding to cart:', variantId, productTitle);
-  
-  fetch('/cart/add.js', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      items: [{
-        id: variantId,
-        quantity: 1
-      }]
-    })
-  })
-  .then(response => {
-    if (!response.ok) throw new Error('Failed to add to cart');
-    return response.json();
-  })
-  .then(data => {
-    console.log('✅ Added to cart:', data);
-    
-    // Update UI immediately
-    button.classList.add('hide');
-    const counter = actionsContainer.querySelector('.qty--modern');
-    const qtyDisplay = actionsContainer.querySelector('.qty__display');
-    qtyDisplay.textContent = '1';
-    counter.classList.add('show');
-    counter.style.display = 'flex';
-    
-    // Show notification
-    showCartNotification(productTitle, 1);
-    
-    // Fetch updated cart and update count
-    return fetch('/cart.js');
-  })
-  .then(res => res.json())
-  .then(cart => {
-    updateHeaderCartCount(cart.item_count);
-    triggerCartUpdate();
-    button.disabled = false;
-  })
-  .catch(error => {
-    console.error('❌ Error:', error);
-    alert('Unable to add item to cart. Please try again.');
-    button.disabled = false;
-  });
-}
-
-// Watch for cart DOM changes
-function observeCartChanges() {
-  // Watch for any element that might be the cart
-  const observer = new MutationObserver((mutations) => {
-    clearTimeout(cartUpdateDebounce);
-    cartUpdateDebounce = setTimeout(() => {
-      console.log('🔍 Cart DOM changed - reloading state');
-      loadCartState();
-    }, 500);
-  });
-  
-  // Observe the body for cart-related changes
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true,
-    attributes: true,
-    attributeFilter: ['data-cart-count', 'class']
-  });
-  
-  console.log('👀 Started observing cart changes');
-}
-
-// Monitor clicks on cart-related buttons
-function monitorCartButtons() {
-  document.addEventListener('click', function(e) {
-    const target = e.target;
-    
-    // Check if it's a cart remove/update button
-    if (
-      target.closest('[data-cart-remove]') ||
-      target.closest('.cart-remove') ||
-      target.closest('[aria-label*="Remove"]') ||
-      target.closest('button[name="update"]') ||
-      target.closest('.cart__remove') ||
-      target.closest('[data-index]') // Cart item remove button
-    ) {
-      console.log('🗑️ Remove/update button clicked');
-      setTimeout(() => loadCartState(), 800);
-    }
-  }, true);
-}
-
-// Check cart every 2 seconds when page is active
-let cartCheckInterval;
-function startCartMonitoring() {
-  cartCheckInterval = setInterval(() => {
-    if (!document.hidden) {
-      loadCartState();
-    }
-  }, 2000);
-  console.log('⏱️ Started periodic cart checking');
-}
-
-function stopCartMonitoring() {
-  clearInterval(cartCheckInterval);
-  console.log('⏸️ Stopped cart monitoring');
-}
-
-// Initialize everything
 document.addEventListener('DOMContentLoaded', function () {
-  console.log('🚀 Initializing cart system...');
-  
-  // Load wishlist state
-  loadWishlist();
-  
-  // Initial cart state load
-  loadCartState();
-  
-  // Start monitoring
-  observeCartChanges();
-  monitorCartButtons();
-  startCartMonitoring();
-  
-  // Visibility change handling
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) {
-      console.log('👁️ Page visible - reloading cart');
-      loadCartState();
-      startCartMonitoring();
-    } else {
-      stopCartMonitoring();
-    }
-  });
-  
-  // Listen for custom cart events
-  document.addEventListener('cart:updated', () => {
-    console.log('📢 cart:updated event');
-    loadCartState();
-  });
-  
-  document.addEventListener('cart:refresh', () => {
-    console.log('📢 cart:refresh event');
-    loadCartState();
-  });
-  
-  // Initialize sliders
+  // Initialize each category slider
   {% for block in section.blocks %}
     {% assign col = collections[block.settings.collection] %}
     {% if col != blank and col.products.size > 0 %}
@@ -919,21 +318,89 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     {% endif %}
   {% endfor %}
+
+  // Noon-style ATC Logic
+  const updateCart = async (variantId, quantity) => {
+    const res = await fetch('/cart/change.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: variantId.toString(), quantity: quantity })
+    });
+    return res.json();
+  };
+
+  const addCart = async (variantId) => {
+    const res = await fetch('/cart/add.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: [{ id: variantId, quantity: 1 }] })
+    });
+    return res.json();
+  };
   
-  console.log('✅ Cart system initialized');
-});
-
-// Page navigation handling
-window.addEventListener('pageshow', function(event) {
-  if (event.persisted) {
-    console.log('📄 Page loaded from cache');
-    loadCartState();
+// Example of the updated dispatch logic
+document.dispatchEvent(new CustomEvent('cart:update', {
+  bubbles: true,
+  detail: {
+    resource: cart,
+    data: {
+      itemCount: cart.item_count
+    }
   }
-});
+}));
+  document.querySelectorAll('.catprodrows__form-wrapper').forEach(wrapper => {
+    const variantId = wrapper.dataset.variantId;
+    const actions = wrapper.querySelector('.catprodrows__actions');
+    const trigger = wrapper.querySelector('.catprodrows__atc-trigger');
+    const display = wrapper.querySelector('.qty__current');
+    const minusBtn = wrapper.querySelector('[data-action="minus"]');
 
-window.addEventListener('focus', function() {
-  console.log('🎯 Window focused');
-  loadCartState();
+    trigger?.addEventListener('click', async () => {
+      actions.classList.add('is-active');
+      display.textContent = '1';
+      await addCart(variantId);
+      // Trigger global cart update if needed
+      document.dispatchEvent(new CustomEvent('cart:updated'));
+    });
+
+    wrapper.addEventListener('click', async (e) => {
+      const btn = e.target.closest('.qty__btn');
+      if (!btn) return;
+
+      let current = parseInt(display.textContent);
+      const action = btn.dataset.action;
+
+      if (action === 'plus') {
+        current++;
+      } else {
+        current = Math.max(0, current - 1);
+      }
+
+      display.textContent = current;
+      
+      // Update minus button icon if it becomes 0 or 1
+      if(current <= 1) {
+        minusBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>';
+      } else {
+        minusBtn.innerHTML = '−';
+      }
+
+      if (current === 0) {
+        actions.classList.remove('is-active');
+      }
+
+      await updateCart(variantId, current);
+      document.dispatchEvent(new CustomEvent('cart:updated'));
+    });
+  });
+
+  // Favorite toggle
+  document.querySelectorAll('.catprodrows__heart').forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.classList.toggle('is-active');
+      // Potential wishlist API call here
+    });
+  });
 });
 </script>
 
