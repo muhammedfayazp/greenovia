@@ -242,6 +242,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    border: 1.5px solid #fff; /* Border instead of mask for better flexibility */
+    box-sizing: border-box;
   }
 
   .header-actions__cart-icon .cart-bubble__text,
@@ -259,13 +261,7 @@
   }
 
   .header-actions__cart-icon.header-actions__cart-icon--has-cart svg {
-    /* Create donut mask where the cart bubble sits */
-    mask: radial-gradient(
-      calc(var(--cart-bubble-size) + 2px) at calc(100% - var(--cart-bubble-right)) var(--cart-bubble-top),
-      transparent 45.45%,
-      #fff 45.45%,
-      #fff 100%
-    );
+    /* Mask removed to prevent cutting off multi-digit pill-shaped bubbles */
   }
 
   .cart-drawer__heading .cart-bubble__background {

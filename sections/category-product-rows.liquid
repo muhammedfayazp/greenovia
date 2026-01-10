@@ -29,7 +29,8 @@
                             data-product-id="{{ product.id }}"
                             data-product-handle="{{ product.handle }}"
                             onclick="toggleWishlist(this)">
-                      {% render 'icon', icon: 'heart' %}
+                      <svg class="heart-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                      <svg class="heart-filled" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
                     </button>
                     
                     <a href="{{ product.url }}" class="catprodrows__img">
@@ -47,18 +48,19 @@
                     <div class="catprodrows__vendor">{{ product.vendor }}</div>
                     <a href="{{ product.url }}" class="catprodrows__name">{{ product.title }}</a>
                     
-                    <div class="catprodrows__price">
-                      {{ product.price | money }}
-                    </div>
+                    <div class="catprodrows__bottom">
+                      <div class="catprodrows__price">
+                        {{ product.price | money }}
+                      </div>
 
-                    {%- assign cart_qty = cart | item_count_for_variant: product.selected_or_first_available_variant.id -%}
+                      {%- assign cart_qty = cart | item_count_for_variant: product.selected_or_first_available_variant.id -%}
 
-                    <product-form-component class="catprodrows__form-wrapper" data-section-id="{{ section.id }}" data-product-id="{{ product.id }}">
-                      <div class="visually-hidden" aria-live="assertive" role="status" aria-atomic="true" ref="liveRegion"></div>
-                      {%- form 'product', product, id: nil, class: 'catprodrows__form' -%}
-                        <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}" ref="variantId">
-                        
-                        <div class="catprodrows__actions {% if cart_qty > 0 %}is-active{% endif %}" data-cart-quantity="{{ cart_qty }}">
+                      <product-form-component class="catprodrows__form-wrapper" data-section-id="{{ section.id }}" data-product-id="{{ product.id }}" on:submit="/handleSubmit">
+                        <div class="visually-hidden" aria-live="assertive" role="status" aria-atomic="true" ref="liveRegion"></div>
+                        {%- form 'product', product, id: nil, class: 'catprodrows__form' -%}
+                          <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}" ref="variantId">
+                          
+                          <div class="catprodrows__actions {% if cart_qty > 0 %}is-active{% endif %}" data-cart-quantity="{{ cart_qty }}">
                           
                           <cart-quantity-selector-component class="catprodrows__qty-selector" data-variant-id="{{ product.selected_or_first_available_variant.id }}">
                             <button type="button" class="qty__btn" ref="minusButton">
@@ -88,6 +90,7 @@
                         </div>
                       {%- endform -%}
                     </product-form-component>
+                    </div>
                   </div>
 
                 </div>
@@ -106,6 +109,12 @@
 .catprodrows {
   padding: 60px 0;
   background: #f6f7f2;
+}
+.catprodrows__container {
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 .catprodrows__head {
   display: flex;
@@ -167,6 +176,14 @@
   font-size: 18px;
   font-weight: 700;
   color: #1f3d2b;
+  white-space: nowrap;
+}
+.catprodrows__bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+  gap: 12px;
 }
 
 /* Heart Icon */
@@ -422,14 +439,33 @@ document.addEventListener('DOMContentLoaded', function () {
       });
       button.classList.add('is-active');
     }
+    
+    // Toggle SVGs
+    const outline = button.querySelector('.heart-outline');
+    const filled = button.querySelector('.heart-filled');
+    if (outline && filled) {
+      if (button.classList.contains('is-active')) {
+        outline.style.display = 'none';
+        filled.style.display = 'block';
+      } else {
+        outline.style.display = 'block';
+        filled.style.display = 'none';
+      }
+    }
     localStorage.setItem('wishlist', JSON.stringify(wishlist));
   };
 
   // Load wishlist state
   const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
   wishlist.forEach(item => {
-    const button = document.querySelector(`.catprodrows__heart[data-product-id="${item.id}"]`);
-    if (button) button.classList.add('is-active');
+    const buttons = document.querySelectorAll(`.catprodrows__heart[data-product-id="${item.id}"]`);
+    buttons.forEach(button => {
+      button.classList.add('is-active');
+      const outline = button.querySelector('.heart-outline');
+      const filled = button.querySelector('.heart-filled');
+      if (outline) outline.style.display = 'none';
+      if (filled) filled.style.display = 'block';
+    });
   });
 });
 </script>
