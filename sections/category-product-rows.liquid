@@ -337,17 +337,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     return res.json();
   };
-  
-// Example of the updated dispatch logic
-document.dispatchEvent(new CustomEvent('cart:update', {
-  bubbles: true,
-  detail: {
-    resource: cart,
-    data: {
-      itemCount: cart.item_count
-    }
-  }
-}));
+
   document.querySelectorAll('.catprodrows__form-wrapper').forEach(wrapper => {
     const variantId = wrapper.dataset.variantId;
     const actions = wrapper.querySelector('.catprodrows__actions');
