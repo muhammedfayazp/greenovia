@@ -118,37 +118,10 @@ export class AddToCartComponent extends Component {
 
   /**
    * Animates the add to cart button.
+   * This is currently a placeholder as the "Fly to Cart" animation is handled separately.
    */
   animateAddToCart = async function () {
-    const { addToCartButton } = this.refs;
-
-    // Initialize the array if it doesn't exist
-    if (!this.#resetTimeouts) {
-      this.#resetTimeouts = [];
-    }
-
-    // Clear all existing timeouts
-    this.#resetTimeouts.forEach(/** @param {number} timeoutId */(timeoutId) => clearTimeout(timeoutId));
-    this.#resetTimeouts = [];
-
-    if (addToCartButton.dataset.added !== 'true') {
-      addToCartButton.dataset.added = 'true';
-    }
-
-    await onAnimationEnd(addToCartButton);
-
-    // Create new timeout and store it in the array
-    const timeoutId = setTimeout(() => {
-      addToCartButton.removeAttribute('data-added');
-
-      // Remove this timeout from the array
-      const index = this.#resetTimeouts.indexOf(timeoutId);
-      if (index > -1) {
-        this.#resetTimeouts.splice(index, 1);
-      }
-    }, 800);
-
-    this.#resetTimeouts.push(timeoutId);
+    // Feedback is primarily handled by the fly-to-cart animation.
   };
 }
 

@@ -46,7 +46,16 @@
                     aria-current="page"
                   {% endif %}
                 >
-                  {{- link.title -}}
+                  {%- assign is_cart_link = false -%}
+                  {%- if link.url == routes.cart_url or link.url == '/cart' or link.url == 'cart' -%}
+                    {%- assign is_cart_link = true -%}
+                  {%- endif -%}
+
+                  {%- if is_cart_link -%}
+                    {{ 'actions.cart' | t | default: 'Cart' }}
+                  {%- else -%}
+                    {{- link.title -}}
+                  {%- endif -%}
                 </a>
               </li>
             {% endfor %}
