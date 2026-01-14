@@ -62,8 +62,8 @@
                           
                           <div class="catprodrows__actions {% if cart_qty > 0 %}is-active{% endif %}" data-cart-quantity="{{ cart_qty }}">
                           
-                          <cart-quantity-selector-component class="catprodrows__qty-selector" data-variant-id="{{ product.selected_or_first_available_variant.id }}">
-                            <button type="button" class="qty__btn" ref="minusButton">
+                          <cart-quantity-selector-component class="catprodrows__qty-selector" data-variant-id="{{ product.selected_or_first_available_variant.id }}" ref="quantitySelector">
+                            <button type="button" class="qty__btn" ref="minusButton" on:click="/decreaseQuantity">
                               <span class="qty__minus-icon">{{ 'icon-minus.svg' | inline_asset_content }}</span>
                               <span class="qty__trash-icon">{{ 'icon-delete.svg' | inline_asset_content }}</span>
                             </button>
@@ -77,9 +77,11 @@
                               class="visually-hidden" 
                               ref="quantityInput"
                               data-cart-quantity="{{ cart_qty }}"
+                              on:blur="/setQuantity"
+                              on:focus="/selectInputValue"
                             >
                             <span class="qty__current" ref="quantityDisplay">{{ cart_qty }}</span>
-                            <button type="button" class="qty__btn" ref="plusButton">{{ 'icon-plus.svg' | inline_asset_content }}</button>
+                            <button type="button" class="qty__btn" ref="plusButton" on:click="/increaseQuantity">{{ 'icon-plus.svg' | inline_asset_content }}</button>
                           </cart-quantity-selector-component>
 
                           <add-to-cart-component class="catprodrows__atc-wrapper">
