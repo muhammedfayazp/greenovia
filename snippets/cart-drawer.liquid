@@ -82,7 +82,12 @@
               id="cart-drawer-heading"
             >
               {{ 'content.cart_title' | t }}
-              {% render 'cart-bubble' %}
+              <div class="cart-count-bubble">
+                {%- if cart.item_count < 100 -%}
+                  <span aria-hidden="true">{{ cart.item_count }}</span>
+                {%- endif -%}
+                <span class="visually-hidden">{{ 'sections.header.cart_count' | t: count: cart.item_count }}</span>
+              </div>
             </h2>
 
             <button
@@ -128,16 +133,23 @@
     flex-direction: column;
   }
 
-  .cart-drawer__heading .cart-bubble {
-    width: fit-content;
-    border-radius: var(--style-border-radius-buttons-primary);
-    aspect-ratio: auto;
-    padding: var(--cart-padding);
+  .cart-drawer__heading {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
   }
 
-  .cart-drawer__heading .cart-bubble[data-maintain-ratio] {
-    aspect-ratio: 1;
-    min-width: 26px;
+  .cart-count-bubble {
+    background-color: #EAEAEA;
+    color: var(--color-foreground);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    font-weight: var(--font-weight-medium);
   }
 
   .cart-drawer__header {

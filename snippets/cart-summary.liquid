@@ -136,4 +136,46 @@
   .cart__installments {
     color: var(--color-foreground);
   }
+
+  .cart__total-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 2rem;
+  }
+
+  .cart__total {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+  }
+
+  .cart__total-label {
+    font-size: 1.6rem;
+    font-weight: 500;
+  }
+
+  .cart__total-value {
+    font-size: 2rem;
+    font-weight: 600;
+  }
+
+  .cart__checkout-button {
+    background-color: #034821; /* Dark green from image */
+    color: #fff;
+    border-radius: 50px; /* Fully rounded */
+    font-size: 1.6rem;
+    font-weight: 500;
+    width: 100%;
+    padding: 1.5rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .cart__checkout-button:hover {
+    background-color: #023618;
+  }
 {% endstylesheet %}

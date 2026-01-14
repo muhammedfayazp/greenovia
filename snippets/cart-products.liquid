@@ -371,12 +371,13 @@
     --cart-item-price-width: 6rem;
 
     display: grid;
-    grid-template-columns: clamp(2.5rem, 15cqi, 7.5rem) minmax(0, 1fr) minmax(var(--cart-item-price-width), auto);
+    grid-template-columns: clamp(5rem, 15cqi, 8rem) minmax(0, 1fr) auto;
     grid-template-areas:
       'media details price'
-      'media quantity price'
+      'media quantity quantity'
       'media error error';
     column-gap: var(--gap-md);
+    row-gap: var(--gap-sm); /* Add gap between title and quantity */
     align-items: start;
     padding-bottom: var(--cart-items-gap);
     margin-bottom: var(--margin-lg);
@@ -474,7 +475,7 @@
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    gap: var(--gap-xs);
+    gap: 1.5rem; /* Space between selector and trash icon */
     width: fit-content;
   }
 
