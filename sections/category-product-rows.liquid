@@ -148,26 +148,28 @@
 }
 
 .catprodrows__info {
-  padding: 16px;
+  padding: 12px; /* Reduced padding from 16px */
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0; /* Removed gap completely */
 }
 
 .catprodrows__vendor {
-  font-size: 12px;
+  font-size: 11px; /* Slightly smaller */
   text-transform: uppercase;
   color: #777;
   letter-spacing: 0.5px;
+  margin-bottom: 2px;
 }
 
 .catprodrows__name {
-  font-size: 16px;
+  font-size: 15px; /* Reduced from 16px */
   font-weight: 600;
   color: #1f3d2b;
   text-decoration: none;
-  line-height: 1.4;
-  /* height: 2.8em; Removed to fix gap */
+  line-height: 1.3; /* Tighter line height */
+  height: auto;
+  margin-bottom: 0;
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -175,7 +177,7 @@
 }
 
 .catprodrows__price {
-  font-size: 18px;
+  font-size: 16px; /* Reduced from 18px */
   font-weight: 700;
   color: #1f3d2b;
   white-space: nowrap;
@@ -184,8 +186,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 4px;
-  gap: 12px;
+  margin-top: 4px; /* Minimal margin */
+  gap: 8px;
 }
 
 /* Heart Icon */
