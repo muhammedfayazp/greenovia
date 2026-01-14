@@ -54,7 +54,9 @@
       {% endif %}
     >
       <span class="visually-hidden">{{ 'accessibility.decrease_quantity' | t }}</span>
-      <span class="icon-minus">-</span>
+      <span class="svg-wrapper icon-minus">
+        {{- 'icon-minus.svg' | inline_asset_content -}}
+      </span>
     </button>
     <input
       type="number"
@@ -89,7 +91,9 @@
       {% endif %}
     >
       <span class="visually-hidden">{{ 'accessibility.increase_quantity' | t }}</span>
-      <span class="icon-plus">+</span>
+      <span class="svg-wrapper icon-plus">
+        {{- 'icon-plus.svg' | inline_asset_content -}}
+      </span>
     </button>
   </{{ component_name }}>
 
@@ -172,34 +176,46 @@
   .quantity-selector {
     display: flex;
     align-items: center;
-    border: 1px solid #124128; /* Green border color from image */
-    border-radius: 4px;
-    height: 44px; /* Adjust as needed */
-    width: 120px;
-    background-color: #fff;
+    background-color: #124128; /* Dark green from image */
+    border-radius: 50px;
+    height: 36px; /* Compact height */
+    width: fit-content;
+    min-width: 90px;
+    padding: 0 5px;
     overflow: hidden;
   }
 
   .quantity-selector .button {
-    width: 40px;
+    width: 30px;
     height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-size: 1.5rem;
-    color: #000;
+    font-size: 1.4rem;
+    color: #fff;
+  }
+
+  /* Target both SVG icon and text */
+  .quantity-selector .button .icon-minus,
+  .quantity-selector .button .icon-plus,
+  .quantity-selector .button svg {
+    color: #fff;
+    fill: currentColor;
+    width: 12px;
+    height: 12px;
   }
 
   .quantity-selector input {
-    width: 40px;
+    width: 30px;
     height: 100%;
     text-align: center;
     border: none;
     background: transparent;
     padding: 0;
     margin: 0;
-    font-size: 1.4rem;
+    font-size: 1.3rem;
+    color: #fff;
     -moz-appearance: textfield;
   }
 
