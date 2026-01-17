@@ -266,13 +266,14 @@ html {
 }
 
 .qty--modern .qty__input {
-  width: 36px;
+  width: 40px;
   text-align: center;
   border: none;
   background: transparent;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
-  color: #fff;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
   outline: none;
   appearance: textfield;
 }
@@ -313,14 +314,14 @@ html {
   color: var(--gv-text) !important;
   background-color: transparent !important;
   transition: all 0.2s ease !important;
-  min-width: 80px !important;
+  white-space: nowrap !important;
+  min-width: 120px !important;
+  width: auto !important;
+  padding: 10px 30px !important;
   display: inline-flex !important;
   justify-content: center !important;
   align-items: center !important;
-  box-shadow: none !important;
-  cursor: pointer !important;
-  margin: 0 !important;
-  overflow: hidden !important;
+  text-align: center !important;
 }
 
 /* Hide the inner pill element if it exists from default theme */
