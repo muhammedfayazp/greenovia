@@ -80,29 +80,62 @@
         </div>
       </div>
 
-      {%- comment -%} Light Requirement Filter {%- endcomment -%}
+      {%- comment -%} Flower Color Filter {%- endcomment -%}
       <div class="filter-group">
         <div class="filter-section">
           <div class="filter-section__header">
-            <h4>Light Requirement</h4>
+            <h4>Flower Color</h4>
+            <button class="filter-reset">Reset</button>
+          </div>
+          
+          <div class="filter-options">
+            {% assign flower_colors = 'Red,Pink,White,Yellow,Purple,Orange' | split: ',' %}
+            {% for color in flower_colors %}
+              <label class="filter-checkbox">
+                <input type="checkbox" name="flower_color" value="{{ color | downcase }}" data-filter="flower-color">
+                <span>{{ color }}</span>
+              </label>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      {%- comment -%} Pot Color Filter {%- endcomment -%}
+      <div class="filter-group">
+        <div class="filter-section">
+          <div class="filter-section__header">
+            <h4>Pot Color</h4>
+            <button class="filter-reset">Reset</button>
+          </div>
+          
+          <div class="filter-options">
+            {% assign pot_colors = 'White,Black,Grey,Terracotta,Brown' | split: ',' %}
+            {% for color in pot_colors %}
+              <label class="filter-checkbox">
+                <input type="checkbox" name="pot_color" value="{{ color | downcase }}" data-filter="pot-color">
+                <span>{{ color }}</span>
+              </label>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      {%- comment -%} Flowering Status Filter {%- endcomment -%}
+      <div class="filter-group">
+        <div class="filter-section">
+          <div class="filter-section__header">
+            <h4>Flowering</h4>
             <button class="filter-reset">Reset</button>
           </div>
           
           <div class="filter-options">
             <label class="filter-checkbox">
-              <input type="checkbox" name="light" value="low" data-filter="tag" data-tag="low-light">
-              <span>Low Light</span>
-              <span class="filter-count">(25)</span>
+              <input type="checkbox" name="flowering" value="with-flower">
+              <span>With Flower</span>
             </label>
             <label class="filter-checkbox">
-              <input type="checkbox" name="light" value="medium" data-filter="tag" data-tag="medium-light">
-              <span>Medium Light</span>
-              <span class="filter-count">(32)</span>
-            </label>
-            <label class="filter-checkbox">
-              <input type="checkbox" name="light" value="bright" data-filter="tag" data-tag="bright-light">
-              <span>Bright Light</span>
-              <span class="filter-count">(48)</span>
+              <input type="checkbox" name="flowering" value="without-flower">
+              <span>Without Flower</span>
             </label>
           </div>
         </div>
@@ -171,7 +204,9 @@
         {% for product in collection.products limit: 24 %}
           <div class="product-card" 
                data-price="{{ product.price }}" 
-               data-tags="{{ product.tags | join: ',' }}">
+               data-tags="{{ product.tags | join: ',' | downcase }}"
+               data-flower-color="{{ product.options_by_name['Flower Color'].values | join: ',' | downcase }} {{ product.options_by_name['Color'].values | join: ',' | downcase }}"
+               data-pot-color="{{ product.options_by_name['Pot Color'].values | join: ',' | downcase }}">
             
             <a href="{{ product.url }}" class="product-card__image">
               {% if product.featured_image %}
@@ -1040,15 +1075,19 @@ document.addEventListener('DOMContentLoaded', function() {
   const productCards = document.querySelectorAll('.product-card');
   
   // Filter function
+  // Filter function
   function filterProducts() {
-    const selectedCategories = Array.from(document.querySelectorAll('input[name="category"]:checked')).map(cb => cb.value);
-    const selectedLights = Array.from(document.querySelectorAll('input[name="light"]:checked')).map(cb => cb.dataset.tag);
+    const selectedFlowerColors = Array.from(document.querySelectorAll('input[name="flower_color"]:checked')).map(cb => cb.value);
+    const selectedPotColors = Array.from(document.querySelectorAll('input[name="pot_color"]:checked')).map(cb => cb.value);
+    const selectedFlowering = Array.from(document.querySelectorAll('input[name="flowering"]:checked')).map(cb => cb.value);
     const min = parseFloat(minPrice.value) || 0;
     const max = parseFloat(maxPrice.value) || Infinity;
     
     productCards.forEach(card => {
       const price = parseFloat(card.dataset.price) / 100;
-      const tags = card.dataset.tags.split(',');
+      const tags = card.dataset.tags.toLowerCase(); // Is already lowercase string
+      const flowerColors = card.dataset.flowerColor.toLowerCase(); // Includes Color and Flower Color
+      const potColors = card.dataset.potColor.toLowerCase();
       
       let showCard = true;
       
@@ -1057,10 +1096,38 @@ document.addEventListener('DOMContentLoaded', function() {
         showCard = false;
       }
       
-      // Light filter
-      if (selectedLights.length > 0) {
-        const hasMatchingLight = selectedLights.some(light => tags.includes(light));
-        if (!hasMatchingLight) showCard = false;
+      // Flower Color Filter
+      if (selectedFlowerColors.length > 0) {
+        // If product has ANY of the selected colors
+        const hasMatchingColor = selectedFlowerColors.some(color => flowerColors.includes(color));
+        if (!hasMatchingColor) showCard = false;
+      }
+
+      // Pot Color Filter
+      if (selectedPotColors.length > 0) {
+        const hasMatchingPot = selectedPotColors.some(color => potColors.includes(color));
+        if (!hasMatchingPot) showCard = false;
+      }
+
+      // Flowering Status Filter
+      if (selectedFlowering.length > 0) {
+        // Check filtering logic:
+        // 'with-flower' -> if tags contain 'flower' or similar, OR if it has flower color options?
+        // Let's assume tags 'with-flower' or 'without-flower' are used.
+        // OR we can check if data-flower-color is not empty for 'with-flower'?
+        
+        const isWithFlower = tags.includes('with-flower') || flowerColors.trim().length > 0;
+        const isWithoutFlower = tags.includes('without-flower') || (flowerColors.trim().length === 0 && !tags.includes('with-flower'));
+
+        const wantsWithFlower = selectedFlowering.includes('with-flower');
+        const wantsWithoutFlower = selectedFlowering.includes('without-flower');
+
+        if (wantsWithFlower && !wantsWithoutFlower && !isWithFlower) showCard = false;
+        if (wantsWithoutFlower && !wantsWithFlower && !isWithoutFlower) showCard = false;
+        if (wantsWithFlower && wantsWithoutFlower) {
+             // Show all if both checked (default behavior usually)
+             // or check if it matches at least one (it always will be one or the other)
+        }
       }
       
       card.style.display = showCard ? 'block' : 'none';

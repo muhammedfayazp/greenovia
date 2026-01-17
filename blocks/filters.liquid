@@ -38,6 +38,9 @@
   endcapture
 
   for filter in filters
+    if filter.label == 'Light Requirement'
+      continue
+    endif
     case filter.type
       when 'price_range'
         if filter.min_value.value != null or filter.max_value.value != null
@@ -171,6 +174,9 @@
 
               {% capture rendered_filters %}
                 {%- for filter in filters -%}
+                  {%- if filter.label == 'Light Requirement' -%}
+                    {%- continue -%}
+                  {%- endif -%}
                   {% case filter.type %}
                     {% when 'price_range' %}
                       {%- liquid
@@ -428,6 +434,9 @@
                 {% assign is_active = false %}
 
                 {%- for filter in filters -%}
+                  {%- if filter.label == 'Light Requirement' -%}
+                    {%- continue -%}
+                  {%- endif -%}
                   {% case filter.type %}
                     {% when 'price_range' %}
                       {%- liquid
