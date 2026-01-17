@@ -202,11 +202,24 @@
       {%- comment -%} Product Grid {%- endcomment -%}
       <div class="product-grid" id="product-grid">
         {% for product in collection.products limit: 24 %}
+        {%- assign type_lower = product.type | downcase -%}
+        {%- assign clean_flower_color = product.options_by_name['Flower Color'].values | join: ',' | downcase -%}
+        {%- assign clean_pot_color = product.options_by_name['Pot Color'].values | join: ',' | downcase -%}
+        {%- assign generic_color = product.options_by_name['Color'].values | join: ',' | downcase -%}
+        
+        {%- if type_lower contains 'pot' or type_lower contains 'planter' -%}
+          {%- assign final_pot_color = clean_pot_color | append: ' ' | append: generic_color -%}
+          {%- assign final_flower_color = clean_flower_color -%}
+        {%- else -%}
+          {%- assign final_flower_color = clean_flower_color | append: ' ' | append: generic_color -%}
+          {%- assign final_pot_color = clean_pot_color -%}
+        {%- endif -%}
+
           <div class="product-card" 
                data-price="{{ product.price }}" 
                data-tags="{{ product.tags | join: ',' | downcase }}"
-               data-flower-color="{{ product.options_by_name['Flower Color'].values | join: ',' | downcase }} {{ product.options_by_name['Color'].values | join: ',' | downcase }}"
-               data-pot-color="{{ product.options_by_name['Pot Color'].values | join: ',' | downcase }}">
+               data-flower-color="{{ final_flower_color }}"
+               data-pot-color="{{ final_pot_color }}">
             
             <a href="{{ product.url }}" class="product-card__image">
               {% if product.featured_image %}

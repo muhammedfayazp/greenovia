@@ -20,6 +20,7 @@
           <div class="catprodrows__swiper swiper swiper-{{ block.id }}">
             <div class="swiper-wrapper">
               {% for product in col.products limit: 12 %}
+                {% if product.available %}
                 <div class="catprodrows__card swiper-slide">
                   
                   <div class="catprodrows__img-container">
@@ -96,6 +97,7 @@
                   </div>
 
                 </div>
+                {% endif %}
               {% endfor %}
             </div>
           </div>
