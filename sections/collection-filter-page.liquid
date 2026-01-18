@@ -203,11 +203,23 @@
       <div class="product-grid" id="product-grid">
         {% for product in collection.products limit: 24 %}
         {%- assign type_lower = product.type | downcase -%}
+        {%- assign tags_lower = product.tags | join: ',' | downcase -%}
         {%- assign clean_flower_color = product.options_by_name['Flower Color'].values | join: ',' | downcase -%}
         {%- assign clean_pot_color = product.options_by_name['Pot Color'].values | join: ',' | downcase -%}
         {%- assign generic_color = product.options_by_name['Color'].values | join: ',' | downcase -%}
         
-        {%- if type_lower contains 'pot' or type_lower contains 'planter' -%}
+        {%- assign is_pot = false -%}
+        {%- if type_lower contains 'pot' or type_lower contains 'planter' or type_lower contains 'vase' or type_lower contains 'basket' or type_lower contains 'accessory' -%}
+          {%- assign is_pot = true -%}
+        {%- endif -%}
+        {%- if tags_lower contains 'pot' or tags_lower contains 'planter' -%}
+          {%- assign is_pot = true -%}
+        {%- endif -%}
+        {%- if clean_pot_color != blank -%}
+          {%- assign is_pot = true -%}
+        {%- endif -%}
+
+        {%- if is_pot -%}
           {%- assign final_pot_color = clean_pot_color | append: ' ' | append: generic_color -%}
           {%- assign final_flower_color = clean_flower_color -%}
         {%- else -%}
@@ -1111,14 +1123,16 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Flower Color Filter
       if (selectedFlowerColors.length > 0) {
-        // If product has ANY of the selected colors
-        const hasMatchingColor = selectedFlowerColors.some(color => flowerColors.includes(color));
+        // Strict token matching
+        const productFlowerTokens = flowerColors.split(/[ ,]+/).filter(Boolean);
+        const hasMatchingColor = selectedFlowerColors.some(color => productFlowerTokens.includes(color));
         if (!hasMatchingColor) showCard = false;
       }
 
       // Pot Color Filter
       if (selectedPotColors.length > 0) {
-        const hasMatchingPot = selectedPotColors.some(color => potColors.includes(color));
+        const productPotTokens = potColors.split(/[ ,]+/).filter(Boolean);
+        const hasMatchingPot = selectedPotColors.some(color => productPotTokens.includes(color));
         if (!hasMatchingPot) showCard = false;
       }
 
