@@ -48,9 +48,22 @@
                   {% assign has_sub = false %}
                   {% if link.links != blank %}{% assign has_sub = true %}{% endif %}
                   
+                  {% assign is_open = false %}
+                  {% if link.active or link.child_active %}{% assign is_open = true %}{% endif %}
+                  
+                  {% comment %} robust check for open state {% endcomment %}
+                  {% if has_sub and is_open == false %}
+                    {% for child in link.links %}
+                      {% if child.active or child.child_active %}{% assign is_open = true %}{% endif %}
+                      {% for grand in child.links %}
+                        {% if grand.active %}{% assign is_open = true %}{% endif %}
+                      {% endfor %}
+                    {% endfor %}
+                  {% endif %}
+
                   <div class="category-item">
                     {% if has_sub %}
-                      <details class="category-details" {% if link.active or link.child_active %}open{% endif %}>
+                      <details class="category-details" {% if is_open %}open{% endif %}>
                         <summary class="category-summary">
                           <a href="{{ link.url }}" class="category-link {% if link.active %}active{% endif %}">
                             <span>{{ link.title }}</span>
@@ -67,9 +80,18 @@
                             {% assign has_sub_sub = false %}
                             {% if child_link.links != blank %}{% assign has_sub_sub = true %}{% endif %}
                             
+                            {% assign child_is_open = false %}
+                            {% if child_link.active or child_link.child_active %}{% assign child_is_open = true %}{% endif %}
+
+                            {% if has_sub_sub and child_is_open == false %}
+                                {% for grand in child_link.links %}
+                                    {% if grand.active %}{% assign child_is_open = true %}{% endif %}
+                                {% endfor %}
+                            {% endif %}
+
                             <div class="category-item">
                               {% if has_sub_sub %}
-                                <details class="category-details" {% if child_link.active or child_link.child_active %}open{% endif %}>
+                                <details class="category-details" {% if child_is_open %}open{% endif %}>
                                   <summary class="category-summary">
                                     <a href="{{ child_link.url }}" class="category-link {% if child_link.active %}active{% endif %}">
                                       <span>{{ child_link.title }}</span>
