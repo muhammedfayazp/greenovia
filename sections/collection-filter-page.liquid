@@ -42,17 +42,92 @@
           </div>
           
           <div class="filter-options">
-            {% for block in section.blocks %}
-              {% if block.type == 'category_filter' %}
-                {% assign filter_collection = collections[block.settings.collection] %}
-                {% if filter_collection %}
-                  <a href="{{ filter_collection.url }}" class="filter-link {% if collection.handle == filter_collection.handle %}active{% endif %}">
-                    <span>{{ filter_collection.title }}</span>
-                    <span class="filter-count">({{ filter_collection.products_count }})</span>
-                  </a>
+            {% if section.settings.category_menu != blank %}
+              <div class="category-tree">
+                {% for link in linklists[section.settings.category_menu].links %}
+                  {% assign has_sub = false %}
+                  {% if link.links != blank %}{% assign has_sub = true %}{% endif %}
+                  
+                  <div class="category-item">
+                    {% if has_sub %}
+                      <details class="category-details" {% if link.active or link.child_active %}open{% endif %}>
+                        <summary class="category-summary">
+                          <a href="{{ link.url }}" class="category-link {% if link.active %}active{% endif %}">
+                            <span>{{ link.title }}</span>
+                            {% if link.type == 'collection_link' and link.object.products_count > 0 %}
+                              <span class="filter-count">({{ link.object.products_count }})</span>
+                            {% endif %}
+                          </a>
+                          <span class="category-toggle">
+                            <svg class="icon-caret" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+                          </span>
+                        </summary>
+                        <div class="category-submenu">
+                          {% for child_link in link.links %}
+                            {% assign has_sub_sub = false %}
+                            {% if child_link.links != blank %}{% assign has_sub_sub = true %}{% endif %}
+                            
+                            <div class="category-item">
+                              {% if has_sub_sub %}
+                                <details class="category-details" {% if child_link.active or child_link.child_active %}open{% endif %}>
+                                  <summary class="category-summary">
+                                    <a href="{{ child_link.url }}" class="category-link {% if child_link.active %}active{% endif %}">
+                                      <span>{{ child_link.title }}</span>
+                                      {% if child_link.type == 'collection_link' and child_link.object.products_count > 0 %}
+                                        <span class="filter-count">({{ child_link.object.products_count }})</span>
+                                      {% endif %}
+                                    </a>
+                                    <span class="category-toggle">
+                                      <svg class="icon-caret" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+                                    </span>
+                                  </summary>
+                                  <div class="category-submenu">
+                                    {% for grandchild_link in child_link.links %}
+                                       <a href="{{ grandchild_link.url }}" class="category-link nested {% if grandchild_link.active %}active{% endif %}">
+                                         <span>{{ grandchild_link.title }}</span>
+                                         {% if grandchild_link.type == 'collection_link' and grandchild_link.object.products_count > 0 %}
+                                           <span class="filter-count">({{ grandchild_link.object.products_count }})</span>
+                                         {% endif %}
+                                       </a>
+                                    {% endfor %}
+                                  </div>
+                                </details>
+                              {% else %}
+                                 <a href="{{ child_link.url }}" class="category-link {% if child_link.active %}active{% endif %}">
+                                   <span>{{ child_link.title }}</span>
+                                   {% if child_link.type == 'collection_link' and child_link.object.products_count > 0 %}
+                                      <span class="filter-count">({{ child_link.object.products_count }})</span>
+                                   {% endif %}
+                                 </a>
+                              {% endif %}
+                            </div>
+                          {% endfor %}
+                        </div>
+                      </details>
+                    {% else %}
+                      <a href="{{ link.url }}" class="category-link {% if link.active %}active{% endif %}">
+                        <span>{{ link.title }}</span>
+                        {% if link.type == 'collection_link' and link.object.products_count > 0 %}
+                          <span class="filter-count">({{ link.object.products_count }})</span>
+                        {% endif %}
+                      </a>
+                    {% endif %}
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              {% for block in section.blocks %}
+                {% if block.type == 'category_filter' %}
+                  {% assign filter_collection = collections[block.settings.collection] %}
+                  {% if filter_collection %}
+                    <a href="{{ filter_collection.url }}" class="filter-link {% if collection.handle == filter_collection.handle %}active{% endif %}">
+                      <span>{{ filter_collection.title }}</span>
+                      <span class="filter-count">({{ filter_collection.products_count }})</span>
+                    </a>
+                  {% endif %}
                 {% endif %}
-              {% endif %}
-            {% endfor %}
+              {% endfor %}
+            {% endif %}
           </div>
         </div>
       </div>
@@ -481,6 +556,82 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+/* Category Tree Styles */
+.category-tree {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.category-item {
+  position: relative;
+}
+.category-details > summary {
+  list-style: none;
+}
+.category-details > summary::-webkit-details-marker {
+  display: none;
+}
+.category-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+.category-link {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0 8px 8px;
+  border-radius: 6px;
+  text-decoration: none;
+  color: #333;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+.category-link:hover {
+  background: #f6f7f2;
+  color: #1f3d2b;
+}
+.category-link.active {
+  color: #1f3d2b;
+  font-weight: 600;
+  background: #f6f7f2;
+}
+.category-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: #999;
+  transition: color 0.2s;
+}
+.category-toggle:hover {
+  color: #1f3d2b;
+}
+.icon-caret {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+  transition: transform 0.2s ease;
+}
+details[open] > .category-summary .icon-caret {
+  transform: rotate(180deg);
+}
+.category-submenu {
+  padding-left: 14px;
+  margin-top: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-left: 1px solid #eee;
+  margin-left: 10px;
+}
+.category-link.nested {
+  padding-left: 12px;
 }
 
 .price-range-inputs{
@@ -1281,6 +1432,12 @@ document.addEventListener('DOMContentLoaded', function() {
 {
   "name": "Collection Filter Page",
   "settings": [
+    {
+      "type": "link_list",
+      "id": "category_menu",
+      "label": "Category Menu",
+      "info": "Select a menu to display as a hierarchical category tree. Overrides block settings."
+    },
     {
       "type": "checkbox",
       "id": "show_style_filter",
