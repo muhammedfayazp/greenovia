@@ -183,6 +183,7 @@
       ],
       "name": "Collection Filter Page",
       "settings": {
+        "category_menu": "main-menu",
         "show_style_filter": true
       }
     },

@@ -42,9 +42,13 @@
           </div>
           
           <div class="filter-options">
-            {% if section.settings.category_menu != blank %}
+          <div class="filter-options">
+            {% assign menu_handle = section.settings.category_menu %}
+            {% assign menu_links = linklists[menu_handle].links %}
+            
+            {% if menu_handle != blank and menu_links.size > 0 %}
               <div class="category-tree">
-                {% for link in linklists[section.settings.category_menu].links %}
+                {% for link in menu_links %}
                   {% assign has_sub = false %}
                   {% if link.links != blank %}{% assign has_sub = true %}{% endif %}
                   
