@@ -1190,42 +1190,60 @@
     left: 10px;
   }
   
-  /* Product actions - stack on mobile */
+  /* Product actions - optimized for mobile */
   .product-actions {
     flex-direction: row;
     gap: var(--gap-xs);
+    align-items: stretch;
   }
   
+  /* Smaller quantity counter for mobile */
   .quantity-wrapper {
     height: 48px;
-    min-width: 130px;
-    padding: 0 6px;
+    min-width: 110px;
+    max-width: 110px;
+    padding: 0 4px;
+    flex-shrink: 0;
   }
   
   .quantity-btn {
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
   }
   
   .quantity-btn svg {
-    width: 14px;
-    height: 14px;
+    width: 12px;
+    height: 12px;
   }
   
   .quantity-input {
-    width: 50px;
-    font-size: 1.15rem;
+    width: 38px;
+    font-size: 1rem;
+    font-weight: 700;
   }
   
+  /* Full width add to cart button */
   .add-to-cart-btn {
+    flex: 1;
     height: 48px;
-    padding: 0 var(--gap-md);
+    padding: 0 var(--gap-sm);
     font-size: 0.9rem;
+    min-width: 0;
+  }
+  
+  .btn-icon {
+    display: flex;
   }
   
   .btn-icon svg {
     width: 18px;
     height: 18px;
+  }
+  
+  .btn-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   
   /* Image slider - mobile */
@@ -1316,7 +1334,7 @@
     left: 8px;
   }
   
-  /* Stack quantity and cart button */
+  /* Stack on very small screens */
   .product-actions {
     flex-direction: column;
     gap: var(--gap-xs);
@@ -1324,6 +1342,8 @@
   
   .quantity-wrapper {
     width: 100%;
+    max-width: 100%;
+    justify-content: center;
   }
   
   .add-to-cart-btn {
@@ -1356,23 +1376,35 @@
     font-size: 0.75rem;
   }
   
+  /* Even smaller counter for tiny screens */
   .quantity-wrapper {
     height: 44px;
-    min-width: 120px;
+    min-width: 100px;
   }
   
   .quantity-btn {
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
+  }
+  
+  .quantity-btn svg {
+    width: 10px;
+    height: 10px;
   }
   
   .quantity-input {
-    font-size: 1rem;
+    width: 36px;
+    font-size: 0.95rem;
   }
   
   .add-to-cart-btn {
     height: 44px;
     font-size: 0.85rem;
+  }
+  
+  .btn-icon svg {
+    width: 16px;
+    height: 16px;
   }
   
   .product-thumbnails {
