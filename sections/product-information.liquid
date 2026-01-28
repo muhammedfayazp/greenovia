@@ -65,20 +65,6 @@
             <path d="M8 5V11M5 8H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
           </svg>
         </button>
-        <div class="slider-track" id="sliderTrack">
-          {% for media in product.media %}
-            {% if media.media_type == 'image' %}
-              <div class="slider-slide {% if forloop.first %}active{% endif %}" data-slide-index="{{ forloop.index0 }}">
-                <img 
-                  src="{{ media | image_url: width: 1000 }}" 
-                  alt="{{ media.alt | default: product.title | escape }}"
-                  class="slider-image"
-                  loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
-                />
-              </div>
-            {% endif %}
-          {% endfor %}
-        </div>
         
         {%- comment -%} Navigation Dots {%- endcomment -%}
         {% if product.media.size > 1 %}
