@@ -24,17 +24,8 @@
                 <div class="catprodrows__card swiper-slide">
                   
                   <div class="catprodrows__img-container">
-                    <button type="button" 
-                            class="catprodrows__heart" 
-                            aria-label="Add to wishlist"
-                            data-product-id="{{ product.id }}"
-                            data-product-handle="{{ product.handle }}"
-                            onclick="toggleWishlist(this)">
-                      <svg class="heart-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                      <svg class="heart-filled" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                    </button>
-                    
                     <a href="{{ product.url }}" class="catprodrows__img">
+
                       {% if product.featured_image %}
                         <img
                           src="{{ product.featured_image | image_url: width: 400 }}"
@@ -191,30 +182,6 @@
   margin-top: 4px; /* Minimal margin */
   gap: 8px;
 }
-
-/* Heart Icon */
-.catprodrows__heart {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 32px;
-  height: 32px;
-  background: #fff;
-  border-radius: 50%;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  cursor: pointer;
-  z-index: 2;
-  transition: transform 0.2s ease;
-  padding: 0;
-  color: #1f3d2b;
-}
-.catprodrows__heart:hover { transform: scale(1.1); }
-.catprodrows__heart svg { width: 18px; height: 18px; stroke-width: 1.5; }
-.catprodrows__heart.is-active { color: #ff3b30; }
 
 /* Actions & Buttons */
 .catprodrows__actions {
@@ -535,55 +502,10 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  // Wishlist functionality
-  window.toggleWishlist = function(button) {
-    const productId = button.dataset.productId;
-    const productHandle = button.dataset.productHandle;
-    
-    let wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
-    const index = wishlist.findIndex(item => item.id === productId);
-    
-    if (index > -1) {
-      wishlist.splice(index, 1);
-      button.classList.remove('is-active');
-    } else {
-      wishlist.push({
-        id: productId,
-        handle: productHandle,
-        addedAt: new Date().toISOString()
-      });
-      button.classList.add('is-active');
-    }
-    
-    // Toggle SVGs
-    const outline = button.querySelector('.heart-outline');
-    const filled = button.querySelector('.heart-filled');
-    if (outline && filled) {
-      if (button.classList.contains('is-active')) {
-        outline.style.display = 'none';
-        filled.style.display = 'block';
-      } else {
-        outline.style.display = 'block';
-        filled.style.display = 'none';
-      }
-    }
-    localStorage.setItem('wishlist', JSON.stringify(wishlist));
-  };
-
-  // Load wishlist state
-  const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
-  wishlist.forEach(item => {
-    const buttons = document.querySelectorAll(`.catprodrows__heart[data-product-id="${item.id}"]`);
-    buttons.forEach(button => {
-      button.classList.add('is-active');
-      const outline = button.querySelector('.heart-outline');
-      const filled = button.querySelector('.heart-filled');
-      if (outline) outline.style.display = 'none';
-      if (filled) filled.style.display = 'block';
-    });
   });
 });
 </script>
+
 
 {% schema %}
 {
