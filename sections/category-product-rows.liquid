@@ -1,63 +1,49 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 
-<section class="catprodrows">
-  <div class="catprodrows__container page-width">
+<section class="hps">
+  <div class="page-width">
 
     {% for block in section.blocks %}
       {% assign col = collections[block.settings.collection] %}
       {% if col != blank and col.products.size > 0 %}
 
-        <div class="catprodrows__section" {{ block.shopify_attributes }}>
-          
-          <div class="catprodrows__head">
-            <h2 class="catprodrows__title">{{ col.title }}</h2>
-            <a href="{{ col.url }}" class="catprodrows__more">View all →</a>
-          </div>
+      <div class="hps__section" {{ block.shopify_attributes }}>
+        <div class="hps__head">
+          <h2>{{ col.title }}</h2>
+          <a href="{{ col.url }}">View all →</a>
+        </div>
 
-          <div class="swiper catprodrows__swiper" data-swiper>
-            <div class="swiper-wrapper">
+        <div class="swiper hps__swiper" data-swiper>
+          <div class="swiper-wrapper">
 
-              {% for product in col.products limit: 12 %}
-                <div class="swiper-slide catprodrows__card">
+            {% for product in col.products limit: 12 %}
+            <div class="swiper-slide hps__card">
 
-                  <a href="{{ product.url }}" class="catprodrows__img">
-                    {% if product.featured_image %}
-                      {{ product.featured_image | image_url: width: 400 | image_tag: loading: 'lazy' }}
-                    {% endif %}
-                  </a>
+              <a href="{{ product.url }}" class="hps__img">
+                {{ product.featured_image | image_url: width: 400 | image_tag: loading: 'lazy' }}
+              </a>
 
-                  <div class="catprodrows__info">
-                    <div class="catprodrows__vendor">{{ product.vendor }}</div>
+              <div class="hps__info">
+                <div class="hps__title">{{ product.title }}</div>
+                <div class="hps__price">{{ product.price | money }}</div>
 
-                    <a href="{{ product.url }}" class="catprodrows__name">
-                      {{ product.title }}
-                    </a>
-
-                    <div class="catprodrows__bottom">
-                      <span class="catprodrows__price">
-                        {{ product.price | money }}
-                      </span>
-
-                      {% if product.available %}
-                        <form method="post" action="/cart/add">
-                          <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
-                          <button type="submit" class="catprodrows__atc">
-                            Add
-                          </button>
-                        </form>
-                      {% else %}
-                        <span class="catprodrows__soldout">Sold out</span>
-                      {% endif %}
-                    </div>
-                  </div>
-
+                {% if product.available %}
+                <div class="qty-atc" data-variant-id="{{ product.selected_or_first_available_variant.id }}">
+                  <button class="qty-btn minus">−</button>
+                  <span class="qty-count">0</span>
+                  <button class="qty-btn plus">+</button>
                 </div>
-              {% endfor %}
+                {% else %}
+                <div class="soldout">Sold out</div>
+                {% endif %}
+              </div>
 
             </div>
-          </div>
+            {% endfor %}
 
+          </div>
         </div>
+      </div>
 
       {% endif %}
     {% endfor %}
@@ -66,121 +52,72 @@
 </section>
 
 <style>
-.catprodrows {
-  padding: 60px 0;
-  background: #f6f7f2;
+.hps { padding: 50px 0; background:#f6f7f2; }
+.hps__head { display:flex; justify-content:space-between; margin-bottom:16px; }
+.hps__head h2 { margin:0; font-size:24px; }
+.hps__head a { text-decoration:none; font-weight:500; }
+
+.hps__card {
+  background:#fff;
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 6px 16px rgba(0,0,0,.08);
 }
 
-.catprodrows__container {
-  max-width: 1400px;
-  margin: auto;
-  padding: 0 20px;
+.hps__img img { width:100%; display:block; }
+
+.hps__info { padding:12px; }
+.hps__title {
+  font-size:14px;
+  font-weight:600;
+  margin-bottom:6px;
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+.hps__price { font-weight:700; margin-bottom:10px; }
+
+.qty-atc {
+  display:flex;
+  align-items:center;
+  background:#0066ff;
+  border-radius:8px;
+  height:36px;
+  overflow:hidden;
 }
 
-.catprodrows__head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+.qty-btn {
+  width:34px;
+  height:36px;
+  border:none;
+  background:transparent;
+  color:#fff;
+  font-size:18px;
+  cursor:pointer;
 }
 
-.catprodrows__title {
-  font-size: 28px;
-  color: #1f3d2b;
-  margin: 0;
+.qty-count {
+  flex:1;
+  text-align:center;
+  color:#fff;
+  font-weight:600;
 }
 
-.catprodrows__more {
-  color: #1f3d2b;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.catprodrows__swiper {
-  padding-bottom: 10px;
-}
-
-.catprodrows__card {
-  background: #fff;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 6px 18px rgba(0,0,0,.08);
-  display: flex;
-  flex-direction: column;
-}
-
-.catprodrows__img img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-.catprodrows__info {
-  padding: 12px;
-}
-
-.catprodrows__vendor {
-  font-size: 11px;
-  text-transform: uppercase;
-  color: #777;
-  margin-bottom: 4px;
-}
-
-.catprodrows__name {
-  font-size: 15px;
-  font-weight: 600;
-  color: #1f3d2b;
-  text-decoration: none;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.catprodrows__bottom {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 10px;
-}
-
-.catprodrows__price {
-  font-weight: 700;
-  font-size: 16px;
-  color: #1f3d2b;
-}
-
-.catprodrows__atc {
-  background: #1f3d2b;
-  color: #fff;
-  border: none;
-  padding: 6px 14px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 13px;
-}
-
-.catprodrows__atc:hover {
-  background: #2a523a;
-}
-
-.catprodrows__soldout {
-  font-size: 13px;
-  color: #999;
-}
-
-@media (max-width: 768px) {
-  .catprodrows__title {
-    font-size: 22px;
-  }
+.soldout {
+  font-size:13px;
+  color:#999;
 }
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-  document.querySelectorAll('[data-swiper]').forEach(swiperEl => {
-    new Swiper(swiperEl, {
+document.addEventListener('DOMContentLoaded', () => {
+
+  /* Swiper */
+  document.querySelectorAll('[data-swiper]').forEach(el => {
+    new Swiper(el, {
       slidesPerView: 1.2,
       spaceBetween: 16,
       grabCursor: true,
@@ -192,17 +129,60 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
   });
+
+  /* Quantity + Cart Drawer */
+  document.querySelectorAll('.qty-atc').forEach(wrapper => {
+    const variantId = wrapper.dataset.variantId;
+    const minus = wrapper.querySelector('.minus');
+    const plus = wrapper.querySelector('.plus');
+    const countEl = wrapper.querySelector('.qty-count');
+
+    plus.addEventListener('click', async () => {
+      await fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: variantId, quantity: 1 })
+      });
+
+      countEl.textContent = parseInt(countEl.textContent) + 1;
+      openDrawer();
+    });
+
+    minus.addEventListener('click', async () => {
+      let qty = parseInt(countEl.textContent);
+      if (qty <= 0) return;
+      qty--;
+
+      await fetch('/cart/change.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: variantId, quantity: qty })
+      });
+
+      countEl.textContent = qty;
+      openDrawer();
+    });
+  });
+
+  function openDrawer() {
+    const drawer = document.querySelector('cart-drawer');
+    if (drawer) {
+      drawer.open();
+    } else {
+      document.dispatchEvent(new CustomEvent('cart:open', { bubbles:true }));
+    }
+  }
+
 });
 </script>
 
 {% schema %}
 {
   "name": "Category Product Rows",
-  "settings": [],
   "blocks": [
     {
-      "type": "category",
-      "name": "Category",
+      "type": "collection",
+      "name": "Collection",
       "settings": [
         {
           "type": "collection",
@@ -216,8 +196,7 @@ document.addEventListener('DOMContentLoaded', function () {
     {
       "name": "Category Product Rows",
       "blocks": [
-        { "type": "category" },
-        { "type": "category" }
+        { "type": "collection" }
       ]
     }
   ]
