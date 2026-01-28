@@ -1,45 +1,80 @@
 {% comment %}
-  Enhanced Product Information Section
-  With dynamic image gallery and variant switching
+  Complete Product Information Section
+  Features: Image gallery with swipe, variant switching, working quantity selector
 {% endcomment %}
 
 <script type="application/ld+json">
   {{ product | structured_data }}
 </script>
 
-<div class="product-page-wrapper">
+<div class="product-page-wrapper" id="productPageWrapper">
   <div class="product-container">
-    {%- comment -%} Product Gallery with Thumbnails {%- endcomment -%}
+    {%- comment -%} Product Gallery with Swipe Support {%- endcomment -%}
     <div class="product-gallery">
-      {%- comment -%} Main Image {%- endcomment -%}
-      <div class="product-main-image-wrapper">
-        {% if product.featured_image %}
-          <img 
-            src="{{ product.featured_image | image_url: width: 800 }}" 
-            alt="{{ product.title | escape }}"
-            class="product-main-image"
-            id="mainProductImage"
-            data-main-image
-          />
+      {%- comment -%} Main Image with Swipe {%- endcomment -%}
+      <div class="product-image-slider" id="imageSlider">
+        <div class="slider-track" id="sliderTrack">
+          {% for media in product.media %}
+            {% if media.media_type == 'image' %}
+              <div class="slider-slide {% if forloop.first %}active{% endif %}" data-slide-index="{{ forloop.index0 }}">
+                <img 
+                  src="{{ media | image_url: width: 1000 }}" 
+                  alt="{{ media.alt | default: product.title | escape }}"
+                  class="slider-image"
+                  loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+                />
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+        
+        {%- comment -%} Navigation Dots {%- endcomment -%}
+        {% if product.media.size > 1 %}
+          <div class="slider-dots" id="sliderDots">
+            {% for media in product.media %}
+              {% if media.media_type == 'image' %}
+                <button 
+                  type="button"
+                  class="slider-dot {% if forloop.first %}active{% endif %}"
+                  data-slide="{{ forloop.index0 }}"
+                  aria-label="Go to slide {{ forloop.index }}"
+                ></button>
+              {% endif %}
+            {% endfor %}
+          </div>
+        {% endif %}
+        
+        {%- comment -%} Arrow Navigation {%- endcomment -%}
+        {% if product.media.size > 1 %}
+          <button type="button" class="slider-arrow slider-arrow-prev" id="prevSlide" aria-label="Previous image">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button type="button" class="slider-arrow slider-arrow-next" id="nextSlide" aria-label="Next image">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
         {% endif %}
       </div>
 
       {%- comment -%} Thumbnail Gallery {%- endcomment -%}
       {% if product.media.size > 1 %}
-        <div class="product-thumbnails">
-          {% for media in product.media limit: 6 %}
+        <div class="product-thumbnails" id="thumbnailGallery">
+          {% for media in product.media limit: 8 %}
             {% if media.media_type == 'image' %}
               <button 
                 type="button"
-                class="thumbnail-button {% if forloop.first %}active{% endif %}"
-                data-media-id="{{ media.id }}"
-                data-variant-ids="{{ media.alt | split: 'variant-' | last }}"
-                onclick="switchImage(this, '{{ media | image_url: width: 800 }}', {{ media.id }})"
+                class="thumbnail-item {% if forloop.first %}active{% endif %}"
+                data-thumbnail-index="{{ forloop.index0 }}"
+                data-image-url="{{ media | image_url: width: 1000 }}"
               >
                 <img 
-                  src="{{ media | image_url: width: 150 }}" 
+                  src="{{ media | image_url: width: 200 }}" 
                   alt="{{ media.alt | default: product.title | escape }}"
                   class="thumbnail-image"
+                  loading="lazy"
                 />
               </button>
             {% endif %}
@@ -53,44 +88,41 @@
       <h1 class="product-title">{{ product.title | escape }}</h1>
       
       <div class="product-price-wrapper">
-        {% if product.compare_at_price > product.price %}
-          <span class="product-price product-price--sale" data-price>{{ product.price | money }}</span>
-          <span class="product-price product-price--compare" data-compare-price>{{ product.compare_at_price | money }}</span>
-        {% else %}
-          <span class="product-price" data-price>{{ product.price | money }}</span>
+        {% assign current_variant = product.selected_or_first_available_variant %}
+        <span class="product-price {% if current_variant.compare_at_price > current_variant.price %}product-price--sale{% endif %}" id="productPrice">
+          {{ current_variant.price | money }}
+        </span>
+        {% if current_variant.compare_at_price > current_variant.price %}
+          <span class="product-price-compare" id="productComparePrice">{{ current_variant.compare_at_price | money }}</span>
         {% endif %}
       </div>
 
       {%- comment -%} Product Form {%- endcomment -%}
-      {% form 'product', product, id: 'product-form', data-product-form: '' %}
-        <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}" data-variant-id>
+      {% form 'product', product, id: 'product-form' %}
+        <input type="hidden" name="id" value="{{ current_variant.id }}" id="productVariantId">
         
-        {%- comment -%} Variant Selector {%- endcomment -%}
+        {%- comment -%} Variant Selectors {%- endcomment -%}
         {% unless product.has_only_default_variant %}
           <div class="product-variants">
             {% for option in product.options_with_values %}
               <div class="variant-selector">
                 <label class="variant-label">{{ option.name }}</label>
-                <div class="variant-options" data-option-name="{{ option.name }}">
+                <div class="variant-options">
                   {% for value in option.values %}
-                    {% assign option_index = forloop.index0 %}
                     <input 
                       type="radio" 
                       id="option-{{ option.position }}-{{ forloop.index }}"
-                      name="options[{{ option.name | escape }}]"
+                      name="option{{ option.position }}"
                       value="{{ value | escape }}"
-                      class="variant-input"
+                      class="variant-radio"
                       data-option-position="{{ option.position }}"
-                      data-option-value="{{ value | escape }}"
                       {% if option.selected_value == value %}checked{% endif %}
-                      onchange="handleVariantChange()"
                     />
                     <label 
                       for="option-{{ option.position }}-{{ forloop.index }}"
-                      class="variant-button"
-                      {% if option.name == 'Color' or option.name == 'Colour' %}
+                      class="variant-label-button"
+                      {% if option.name contains 'olor' or option.name contains 'olour' %}
                         data-color="{{ value | handleize }}"
-                        style="position: relative;"
                       {% endif %}
                     >
                       {{ value }}
@@ -102,93 +134,86 @@
           </div>
         {% endunless %}
 
-        {%- comment -%} Quantity Selector + Add to Cart {%- endcomment -%}
+        {%- comment -%} Quantity + Add to Cart {%- endcomment -%}
         <div class="product-actions">
-          <div class="quantity-selector-wrapper">
-            <div class="quantity-selector">
-              <button 
-                type="button" 
-                class="quantity-button quantity-decrease"
-                aria-label="Decrease quantity"
-              >
-                <svg width="12" height="2" viewBox="0 0 12 2" fill="none">
-                  <path d="M0 1H12" stroke="currentColor" stroke-width="2"/>
-                </svg>
-              </button>
-              
-              <input 
-                type="number" 
-                name="quantity" 
-                value="1" 
-                min="1" 
-                class="quantity-input"
-                aria-label="Quantity"
-              />
-              
-              <button 
-                type="button" 
-                class="quantity-button quantity-increase"
-                aria-label="Increase quantity"
-              >
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                  <path d="M6 0V12M0 6H12" stroke="currentColor" stroke-width="2"/>
-                </svg>
-              </button>
-            </div>
+          <div class="quantity-wrapper">
+            <button 
+              type="button" 
+              class="quantity-btn quantity-btn-minus"
+              id="quantityMinus"
+              aria-label="Decrease quantity"
+            >
+              <svg width="14" height="2" viewBox="0 0 14 2" fill="none">
+                <path d="M1 1H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+            
+            <input 
+              type="number" 
+              name="quantity" 
+              value="1" 
+              min="1" 
+              class="quantity-input"
+              id="quantityInput"
+              aria-label="Quantity"
+              readonly
+            />
+            
+            <button 
+              type="button" 
+              class="quantity-btn quantity-btn-plus"
+              id="quantityPlus"
+              aria-label="Increase quantity"
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M7 1V13M1 7H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
           </div>
 
           <button 
             type="submit" 
             name="add"
-            class="add-to-cart-button"
-            data-add-to-cart
+            class="add-to-cart-btn"
+            id="addToCartBtn"
+            {% unless current_variant.available %}disabled{% endunless %}
           >
-            <span class="add-to-cart-text">
-              <span data-button-text>Add to Cart</span>
+            <span class="btn-icon">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M6 1L3 4M3 4L6 7M3 4H11C13.2091 4 15 5.79086 15 8V8C15 10.2091 13.2091 12 11 12H4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <circle cx="7" cy="17" r="1.5" stroke="currentColor" stroke-width="1.5"/>
+                <circle cx="14" cy="17" r="1.5" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+            </span>
+            <span class="btn-text" id="addToCartText">
+              {% if current_variant.available %}
+                Add to Cart
+              {% else %}
+                Sold Out
+              {% endif %}
             </span>
           </button>
         </div>
 
         {%- comment -%} Payment Icons {%- endcomment -%}
-        <div class="payment-icons">
-          <div class="payment-icon">
-            <svg width="38" height="24" viewBox="0 0 38 24" fill="none">
-              <rect width="38" height="24" rx="4" fill="#1A1F71"/>
-              <path d="M13.5 12L16.5 9M16.5 9L13.5 6M16.5 9H8.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-              <circle cx="25" cy="12" r="3" fill="#FDB931"/>
+        <div class="trust-badges">
+          <div class="payment-methods">
+            <svg width="40" height="26" viewBox="0 0 40 26" fill="none">
+              <rect width="40" height="26" rx="4" fill="#1A1F71"/>
+              <text x="20" y="16" fill="white" font-size="8" text-anchor="middle" font-weight="600">VISA</text>
             </svg>
-          </div>
-          <div class="payment-icon">
-            <svg width="38" height="24" viewBox="0 0 38 24" fill="none">
-              <rect width="38" height="24" rx="4" fill="#EB001B"/>
-              <circle cx="15" cy="12" r="6" fill="#EB001B"/>
-              <circle cx="23" cy="12" r="6" fill="#FF5F00"/>
+            <svg width="40" height="26" viewBox="0 0 40 26" fill="none">
+              <rect width="40" height="26" rx="4" fill="#EB001B"/>
+              <circle cx="16" cy="13" r="7" fill="#EB001B"/>
+              <circle cx="24" cy="13" r="7" fill="#FF5F00"/>
             </svg>
-          </div>
-          <div class="payment-icon">
-            <svg width="38" height="24" viewBox="0 0 38 24" fill="none">
-              <rect width="38" height="24" rx="4" fill="#016FD0"/>
-              <path d="M8 8H12L14 16H10L8 8Z" fill="white"/>
-              <path d="M16 8H20L22 16H18L16 8Z" fill="white"/>
+            <svg width="40" height="26" viewBox="0 0 40 26" fill="none">
+              <rect width="40" height="26" rx="4" fill="#016FD0"/>
+              <text x="20" y="16" fill="white" font-size="7" text-anchor="middle" font-weight="700">AMEX</text>
             </svg>
-          </div>
-          <div class="payment-icon">
-            <svg width="38" height="24" viewBox="0 0 38 24" fill="none">
-              <rect width="38" height="24" rx="4" fill="#003087"/>
-              <path d="M12 9H15V15H12V9ZM17 9H20V15H17V9ZM22 9H25V15H22V9Z" fill="white"/>
-            </svg>
-          </div>
-          <div class="payment-icon">
-            <svg width="38" height="24" viewBox="0 0 38 24" fill="none">
-              <rect width="38" height="24" rx="4" fill="#00579F"/>
-              <circle cx="13" cy="12" r="4" fill="white"/>
-              <circle cx="25" cy="12" r="4" fill="white"/>
-            </svg>
-          </div>
-          <div class="payment-icon">
-            <svg width="38" height="24" viewBox="0 0 38 24" fill="none">
-              <rect width="38" height="24" rx="4" fill="#FF6000"/>
-              <path d="M10 8L14 16L18 8H22L16 20H12L6 8H10Z" fill="white"/>
+            <svg width="40" height="26" viewBox="0 0 40 26" fill="none">
+              <rect width="40" height="26" rx="4" fill="#003087"/>
+              <text x="20" y="15" fill="white" font-size="6" text-anchor="middle" font-weight="700">PayPal</text>
             </svg>
           </div>
         </div>
@@ -198,112 +223,227 @@
   </div>
 </div>
 
-{%- comment -%} Product JSON for JavaScript {%- endcomment -%}
-<script type="application/json" data-product-json>
-  {{ product | json }}
+{%- comment -%} Product Variants JSON for JavaScript {%- endcomment -%}
+<script id="product-json" type="application/json">
+  {
+    "product": {{ product | json }},
+    "variants": {{ product.variants | json }},
+    "images": [
+      {% for media in product.media %}
+        {% if media.media_type == 'image' %}
+          {
+            "id": {{ media.id }},
+            "src": "{{ media | image_url: width: 1000 }}",
+            "variant_ids": {{ media.variant_ids | json }},
+            "alt": {{ media.alt | default: product.title | json }}
+          }{% unless forloop.last %},{% endunless %}
+        {% endif %}
+      {% endfor %}
+    ]
+  }
 </script>
 
 {% stylesheet %}
-/* ========================================
-   MODERN PRODUCT PAGE STYLES
-   ======================================== */
+/* ==========================================
+   MODERN PRODUCT PAGE - COMPLETE STYLES
+   ========================================== */
 
 :root {
-  --color-forest-dark: #0d3d26;
-  --color-forest-medium: #1a5c3a;
-  --color-forest-light: #2d6e47;
-  --color-sage: #9db5a5;
-  --color-cream: #faf8f5;
-  --color-text: #1a1a1a;
-  --color-text-light: #666;
-  --color-border: #e5e5e5;
-  --color-sold-out: #9db5a5;
-  --spacing-xs: 8px;
-  --spacing-sm: 12px;
-  --spacing-md: 20px;
-  --spacing-lg: 32px;
-  --spacing-xl: 48px;
+  --forest-dark: #0d3d26;
+  --forest-medium: #1a5c3a;
+  --forest-light: #2d6e47;
+  --sage: #9db5a5;
+  --cream: #faf8f5;
+  --white: #ffffff;
+  --text-dark: #1a1a1a;
+  --text-medium: #666666;
+  --text-light: #999999;
+  --border-color: #e5e5e5;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
-  --radius-full: 999px;
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
-  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --radius-xl: 20px;
+  --radius-pill: 999px;
+  --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --gap-xs: 8px;
+  --gap-sm: 12px;
+  --gap-md: 20px;
+  --gap-lg: 32px;
+  --gap-xl: 48px;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 .product-page-wrapper {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: var(--spacing-xl) var(--spacing-md);
+  padding: var(--gap-xl) var(--gap-md);
 }
 
 .product-container {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-xl);
+  grid-template-columns: 1.2fr 1fr;
+  gap: var(--gap-xl);
   align-items: start;
 }
 
-/* ========================================
-   PRODUCT GALLERY
-   ======================================== */
+/* ==========================================
+   IMAGE GALLERY WITH SWIPE
+   ========================================== */
 
 .product-gallery {
   position: sticky;
-  top: var(--spacing-lg);
+  top: 20px;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: var(--gap-md);
 }
 
-.product-main-image-wrapper {
+.product-image-slider {
   position: relative;
+  border-radius: var(--radius-xl);
   overflow: hidden;
-  border-radius: var(--radius-lg);
-  background: var(--color-cream);
+  background: var(--cream);
   box-shadow: var(--shadow-md);
+  touch-action: pan-y pinch-zoom;
+  user-select: none;
 }
 
-.product-main-image {
+.slider-track {
+  display: flex;
+  transition: transform var(--transition-base);
+  cursor: grab;
+}
+
+.slider-track:active {
+  cursor: grabbing;
+}
+
+.slider-slide {
+  min-width: 100%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.slider-image {
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
   display: block;
-  transition: opacity 0.3s ease;
+  pointer-events: none;
 }
 
-.product-main-image.changing {
+/* Slider Arrows */
+.slider-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+  z-index: 10;
+  color: var(--text-dark);
   opacity: 0;
 }
 
-/* Thumbnail Gallery */
+.product-image-slider:hover .slider-arrow {
+  opacity: 1;
+}
+
+.slider-arrow:hover {
+  background: white;
+  box-shadow: var(--shadow-md);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.slider-arrow:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.slider-arrow-prev {
+  left: 16px;
+}
+
+.slider-arrow-next {
+  right: 16px;
+}
+
+/* Slider Dots */
+.slider-dots {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+
+.slider-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  padding: 0;
+}
+
+.slider-dot:hover {
+  background: rgba(255, 255, 255, 0.8);
+  transform: scale(1.2);
+}
+
+.slider-dot.active {
+  background: white;
+  width: 24px;
+  border-radius: var(--radius-pill);
+}
+
+/* Thumbnails */
 .product-thumbnails {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-  gap: var(--spacing-xs);
+  gap: var(--gap-xs);
 }
 
-.thumbnail-button {
-  position: relative;
-  padding: 0;
-  border: 2px solid transparent;
-  border-radius: var(--radius-sm);
-  background: var(--color-cream);
-  cursor: pointer;
-  transition: var(--transition);
-  overflow: hidden;
+.thumbnail-item {
   aspect-ratio: 1;
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--cream);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  padding: 0;
 }
 
-.thumbnail-button:hover {
-  border-color: var(--color-forest-light);
+.thumbnail-item:hover {
+  border-color: var(--forest-light);
   transform: translateY(-2px);
   box-shadow: var(--shadow-sm);
 }
 
-.thumbnail-button.active {
-  border-color: var(--color-forest-medium);
-  box-shadow: 0 0 0 1px var(--color-forest-medium);
+.thumbnail-item.active {
+  border-color: var(--forest-medium);
+  box-shadow: 0 0 0 1px var(--forest-medium);
 }
 
 .thumbnail-image {
@@ -313,201 +453,201 @@
   display: block;
 }
 
-/* ========================================
+/* ==========================================
    PRODUCT DETAILS
-   ======================================== */
+   ========================================== */
 
 .product-details {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  gap: var(--gap-lg);
 }
 
 .product-title {
-  font-size: 2.5rem;
+  font-size: 2.75rem;
   font-weight: 300;
   letter-spacing: -0.02em;
+  line-height: 1.1;
   margin: 0;
-  color: var(--color-text);
-  line-height: 1.2;
+  color: var(--text-dark);
 }
 
 .product-price-wrapper {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
+  gap: var(--gap-sm);
 }
 
 .product-price {
-  font-size: 1.75rem;
-  font-weight: 600;
-  color: var(--color-text);
-  transition: var(--transition);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  transition: var(--transition-fast);
 }
 
 .product-price--sale {
-  color: var(--color-forest-medium);
+  color: var(--forest-medium);
 }
 
-.product-price--compare {
-  font-size: 1.25rem;
-  color: var(--color-text-light);
+.product-price-compare {
+  font-size: 1.5rem;
+  color: var(--text-light);
   text-decoration: line-through;
   font-weight: 400;
 }
 
-/* ========================================
-   VARIANT SELECTOR
-   ======================================== */
+/* ==========================================
+   VARIANT SELECTORS
+   ========================================== */
 
 .product-variants {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: var(--gap-md);
 }
 
 .variant-selector {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-sm);
+  gap: var(--gap-sm);
 }
 
 .variant-label {
   font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--color-text);
+  font-weight: 700;
+  color: var(--text-dark);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
 }
 
 .variant-options {
   display: flex;
-  gap: var(--spacing-xs);
+  gap: var(--gap-xs);
   flex-wrap: wrap;
 }
 
-.variant-input {
+.variant-radio {
   position: absolute;
   opacity: 0;
   pointer-events: none;
 }
 
-.variant-button {
-  padding: var(--spacing-sm) var(--spacing-md);
-  border: 2px solid var(--color-border);
+.variant-label-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 20px;
+  border: 2px solid var(--border-color);
   border-radius: var(--radius-md);
   background: white;
-  color: var(--color-text);
+  color: var(--text-dark);
   font-size: 0.95rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: var(--transition);
+  transition: var(--transition-fast);
   user-select: none;
-  min-width: 80px;
-  text-align: center;
+  min-width: 90px;
 }
 
 /* Color swatches */
-.variant-button[data-color] {
+.variant-label-button[data-color] {
+  padding-left: 44px;
   position: relative;
-  padding-left: 40px;
 }
 
-.variant-button[data-color]::before {
+.variant-label-button[data-color]::before {
   content: '';
   position: absolute;
-  left: 10px;
+  left: 12px;
   top: 50%;
   transform: translateY(-50%);
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
-  border: 2px solid var(--color-border);
-  transition: var(--transition);
+  border: 2px solid var(--border-color);
+  transition: var(--transition-fast);
 }
 
 /* Color definitions */
-.variant-button[data-color="red"]::before { background: #ef4444; }
-.variant-button[data-color="blue"]::before { background: #3b82f6; }
-.variant-button[data-color="green"]::before { background: #10b981; }
-.variant-button[data-color="yellow"]::before { background: #f59e0b; }
-.variant-button[data-color="pink"]::before { background: #ec4899; }
-.variant-button[data-color="purple"]::before { background: #a855f7; }
-.variant-button[data-color="orange"]::before { background: #f97316; }
-.variant-button[data-color="white"]::before { background: #ffffff; border-color: #ccc; }
-.variant-button[data-color="black"]::before { background: #1f2937; }
-.variant-button[data-color="gray"]::before,
-.variant-button[data-color="grey"]::before { background: #6b7280; }
+.variant-label-button[data-color="red"]::before { background: #ef4444; }
+.variant-label-button[data-color="blue"]::before { background: #3b82f6; }
+.variant-label-button[data-color="green"]::before { background: #10b981; }
+.variant-label-button[data-color="yellow"]::before { background: #f59e0b; }
+.variant-label-button[data-color="pink"]::before { background: #ec4899; }
+.variant-label-button[data-color="purple"]::before { background: #a855f7; }
+.variant-label-button[data-color="orange"]::before { background: #f97316; }
+.variant-label-button[data-color="white"]::before { background: #ffffff; }
+.variant-label-button[data-color="black"]::before { background: #1f2937; }
+.variant-label-button[data-color="gray"]::before,
+.variant-label-button[data-color="grey"]::before { background: #6b7280; }
 
-.variant-button:hover {
-  border-color: var(--color-forest-medium);
-  background: rgba(26, 92, 58, 0.04);
+.variant-label-button:hover {
+  border-color: var(--forest-medium);
+  background: rgba(26, 92, 58, 0.05);
+  transform: translateY(-1px);
 }
 
-.variant-input:checked + .variant-button {
-  border-color: var(--color-forest-medium);
-  background: var(--color-forest-medium);
+.variant-radio:checked + .variant-label-button {
+  border-color: var(--forest-medium);
+  background: var(--forest-medium);
   color: white;
+  box-shadow: 0 4px 12px rgba(26, 92, 58, 0.3);
 }
 
-.variant-input:checked + .variant-button::before {
+.variant-radio:checked + .variant-label-button::before {
   border-color: white;
 }
 
-.variant-input:disabled + .variant-button {
-  opacity: 0.3;
+.variant-radio:disabled + .variant-label-button {
+  opacity: 0.35;
   cursor: not-allowed;
   position: relative;
 }
 
-.variant-input:disabled + .variant-button::after {
+.variant-radio:disabled + .variant-label-button::after {
   content: '';
   position: absolute;
   top: 50%;
-  left: 10%;
-  right: 10%;
+  left: 12%;
+  right: 12%;
   height: 2px;
-  background: var(--color-text-light);
-  transform: rotate(-15deg);
+  background: var(--text-medium);
+  transform: rotate(-12deg);
 }
 
-/* ========================================
+/* ==========================================
    QUANTITY SELECTOR
-   ======================================== */
+   ========================================== */
 
 .product-actions {
   display: flex;
-  gap: var(--spacing-sm);
-  margin-top: var(--spacing-md);
+  gap: var(--gap-sm);
+  margin-top: var(--gap-md);
 }
 
-.quantity-selector-wrapper {
-  flex-shrink: 0;
-}
-
-.quantity-selector {
+.quantity-wrapper {
   display: inline-flex;
   align-items: center;
   justify-content: space-between;
-  height: 56px;
-  min-width: 140px;
-  padding: 0 6px;
+  height: 58px;
+  min-width: 150px;
+  padding: 0 8px;
   
-  background: linear-gradient(135deg, #1a5c3a 0%, #0d3d26 100%);
-  border: 2px solid rgba(255, 255, 255, 0.15);
-  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--forest-medium) 0%, var(--forest-dark) 100%);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-pill);
   
   box-shadow: 
-    0 4px 12px rgba(18, 65, 40, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+    0 4px 16px rgba(26, 92, 58, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.15);
   
   position: relative;
   overflow: hidden;
-  transition: var(--transition);
+  transition: var(--transition-fast);
 }
 
-.quantity-selector::before {
+.quantity-wrapper::before {
   content: '';
   position: absolute;
   top: 0;
@@ -516,84 +656,79 @@
   height: 1px;
   background: linear-gradient(90deg, 
     transparent 0%, 
-    rgba(255, 255, 255, 0.3) 50%, 
+    rgba(255, 255, 255, 0.4) 50%, 
     transparent 100%);
 }
 
-.quantity-selector:hover {
-  background: linear-gradient(135deg, #1f6b44 0%, #10462d 100%);
-  border-color: rgba(255, 255, 255, 0.25);
+.quantity-wrapper:hover {
+  background: linear-gradient(135deg, var(--forest-light) 0%, var(--forest-medium) 100%);
+  border-color: rgba(255, 255, 255, 0.3);
   box-shadow: 
-    0 6px 16px rgba(18, 65, 40, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    0 6px 20px rgba(26, 92, 58, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
-.quantity-button {
-  width: 40px;
-  height: 40px;
+.quantity-btn {
+  width: 42px;
+  height: 42px;
   
   display: flex;
   align-items: center;
   justify-content: center;
   
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 50%;
   
   color: white;
   cursor: pointer;
-  transition: var(--transition);
+  transition: var(--transition-fast);
   
   position: relative;
   overflow: hidden;
 }
 
-.quantity-button::before {
+.quantity-btn::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.25) 0%, transparent 70%);
   opacity: 0;
-  transition: opacity 0.2s ease;
+  transition: opacity var(--transition-fast);
 }
 
-.quantity-button:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.35);
-  transform: scale(1.08);
-}
-
-.quantity-button:hover::before {
-  opacity: 1;
-}
-
-.quantity-button:active {
-  transform: scale(0.92);
-}
-
-.quantity-button svg {
-  width: 14px;
-  height: 14px;
-  stroke: white;
-  transition: transform 0.2s ease;
-}
-
-.quantity-button:hover svg {
+.quantity-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.4);
   transform: scale(1.1);
 }
 
+.quantity-btn:hover::before {
+  opacity: 1;
+}
+
+.quantity-btn:active {
+  transform: scale(0.9);
+}
+
+.quantity-btn svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2.5;
+}
+
 .quantity-input {
-  width: 50px;
+  width: 60px;
   height: 100%;
   
   border: none;
   background: transparent;
   
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-size: 1.4rem;
+  font-weight: 800;
   color: white;
   text-align: center;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.02em;
   
   -moz-appearance: textfield;
   appearance: textfield;
@@ -609,125 +744,132 @@
   outline: none;
 }
 
-/* ========================================
+/* ==========================================
    ADD TO CART BUTTON
-   ======================================== */
+   ========================================== */
 
-.add-to-cart-button {
+.add-to-cart-btn {
   flex: 1;
-  height: 56px;
-  padding: 0 var(--spacing-lg);
+  height: 58px;
+  padding: 0 var(--gap-lg);
   
-  background: var(--color-forest-medium);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gap-sm);
+  
+  background: var(--forest-medium);
   border: none;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-pill);
   
   color: white;
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: 0.03em;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   
   cursor: pointer;
-  transition: var(--transition);
+  transition: var(--transition-fast);
   
   box-shadow: 
-    0 4px 12px rgba(26, 92, 58, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    0 4px 16px rgba(26, 92, 58, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
   
   position: relative;
   overflow: hidden;
 }
 
-.add-to-cart-button::before {
+.add-to-cart-btn::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, transparent 100%);
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity var(--transition-fast);
 }
 
-.add-to-cart-button:hover:not(:disabled) {
-  background: var(--color-forest-light);
+.add-to-cart-btn:hover:not(:disabled) {
+  background: var(--forest-light);
   transform: translateY(-2px);
   box-shadow: 
-    0 6px 20px rgba(26, 92, 58, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    0 8px 24px rgba(26, 92, 58, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
-.add-to-cart-button:hover:not(:disabled)::before {
+.add-to-cart-btn:hover:not(:disabled)::before {
   opacity: 1;
 }
 
-.add-to-cart-button:active:not(:disabled) {
+.add-to-cart-btn:active:not(:disabled) {
   transform: translateY(0);
-  box-shadow: 
-    0 2px 8px rgba(26, 92, 58, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
-.add-to-cart-button:disabled {
-  background: var(--color-sold-out);
+.add-to-cart-btn:disabled {
+  background: var(--sage);
   cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-/* ========================================
-   PAYMENT ICONS
-   ======================================== */
-
-.payment-icons {
-  display: flex;
-  gap: var(--spacing-xs);
-  flex-wrap: wrap;
-  margin-top: var(--spacing-sm);
   opacity: 0.7;
 }
 
-.payment-icon {
-  transition: var(--transition);
+.btn-icon {
+  display: flex;
+  transition: transform var(--transition-fast);
 }
 
-.payment-icon:hover {
+.add-to-cart-btn:hover:not(:disabled) .btn-icon {
+  transform: scale(1.1);
+}
+
+/* ==========================================
+   TRUST BADGES
+   ========================================== */
+
+.trust-badges {
+  padding-top: var(--gap-md);
+  border-top: 1px solid var(--border-color);
+}
+
+.payment-methods {
+  display: flex;
+  gap: var(--gap-xs);
+  flex-wrap: wrap;
+  opacity: 0.75;
+}
+
+.payment-methods svg {
+  transition: var(--transition-fast);
+  border-radius: 6px;
+  box-shadow: var(--shadow-sm);
+}
+
+.payment-methods svg:hover {
   opacity: 1;
   transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
-.payment-icon svg {
-  display: block;
-  box-shadow: var(--shadow-sm);
-  border-radius: 4px;
-}
-
-/* ========================================
+/* ==========================================
    RESPONSIVE DESIGN
-   ======================================== */
+   ========================================== */
 
-@media screen and (max-width: 990px) {
+@media screen and (max-width: 1024px) {
   .product-container {
     grid-template-columns: 1fr;
-    gap: var(--spacing-lg);
+    gap: var(--gap-lg);
   }
   
   .product-gallery {
     position: relative;
     top: 0;
   }
+}
+
+@media screen and (max-width: 768px) {
+  .product-page-wrapper {
+    padding: var(--gap-md);
+  }
   
   .product-title {
     font-size: 2rem;
-  }
-}
-
-@media screen and (max-width: 749px) {
-  .product-page-wrapper {
-    padding: var(--spacing-md);
-  }
-  
-  .product-title {
-    font-size: 1.75rem;
   }
   
   .product-price {
@@ -738,20 +880,25 @@
     flex-direction: column;
   }
   
-  .quantity-selector-wrapper {
+  .quantity-wrapper {
     width: 100%;
   }
   
-  .quantity-selector {
+  .add-to-cart-btn {
     width: 100%;
   }
   
-  .add-to-cart-button {
-    width: 100%;
+  .slider-arrow {
+    width: 40px;
+    height: 40px;
   }
   
-  .product-thumbnails {
-    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+  .slider-arrow-prev {
+    left: 12px;
+  }
+  
+  .slider-arrow-next {
+    right: 12px;
   }
 }
 
@@ -760,221 +907,269 @@
     font-size: 1.5rem;
   }
   
-  .variant-button {
-    min-width: 70px;
-    padding: var(--spacing-xs) var(--spacing-sm);
+  .variant-label-button {
+    min-width: 75px;
+    padding: 10px 16px;
     font-size: 0.875rem;
   }
   
-  .variant-button[data-color] {
-    padding-left: 35px;
+  .variant-label-button[data-color] {
+    padding-left: 38px;
   }
   
-  .variant-button[data-color]::before {
-    width: 16px;
-    height: 16px;
-    left: 8px;
+  .variant-label-button[data-color]::before {
+    width: 18px;
+    height: 18px;
+    left: 10px;
   }
   
-  .payment-icons {
-    gap: 6px;
-  }
-  
-  .payment-icon svg {
-    width: 32px;
-    height: 20px;
+  .product-thumbnails {
+    grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
   }
 }
 
-/* ========================================
+/* ==========================================
    ACCESSIBILITY
-   ======================================== */
+   ========================================== */
 
-.quantity-button:focus-visible,
-.add-to-cart-button:focus-visible,
-.variant-button:focus-visible,
-.thumbnail-button:focus-visible {
-  outline: 3px solid var(--color-forest-light);
+.quantity-btn:focus-visible,
+.add-to-cart-btn:focus-visible,
+.variant-label-button:focus-visible,
+.thumbnail-item:focus-visible,
+.slider-arrow:focus-visible,
+.slider-dot:focus-visible {
+  outline: 3px solid var(--forest-light);
   outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
 }
 {% endstylesheet %}
 
 <script>
-  // Product functionality
-  (function() {
-    const productJSON = document.querySelector('[data-product-json]');
-    if (!productJSON) return;
+(function() {
+  'use strict';
+  
+  // Get product data
+  const productData = JSON.parse(document.getElementById('product-json').textContent);
+  
+  // ==========================================
+  // IMAGE SLIDER WITH SWIPE
+  // ==========================================
+  
+  const slider = document.getElementById('imageSlider');
+  const sliderTrack = document.getElementById('sliderTrack');
+  const slides = sliderTrack.querySelectorAll('.slider-slide');
+  const dots = document.querySelectorAll('.slider-dot');
+  const prevBtn = document.getElementById('prevSlide');
+  const nextBtn = document.getElementById('nextSlide');
+  
+  let currentSlide = 0;
+  let startX = 0;
+  let currentX = 0;
+  let isDragging = false;
+  
+  function goToSlide(index) {
+    if (index < 0) index = slides.length - 1;
+    if (index >= slides.length) index = 0;
     
-    const product = JSON.parse(productJSON.textContent);
-    const form = document.querySelector('[data-product-form]');
-    const variantIdInput = document.querySelector('[data-variant-id]');
-    const addToCartButton = document.querySelector('[data-add-to-cart]');
-    const buttonText = document.querySelector('[data-button-text]');
-    const priceElement = document.querySelector('[data-price]');
-    const comparePriceElement = document.querySelector('[data-compare-price]');
-    const mainImage = document.querySelector('#mainProductImage');
+    currentSlide = index;
+    sliderTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
     
-    // Quantity Selector
-    const quantitySelector = document.querySelector('.quantity-selector');
-    if (quantitySelector) {
-      const decreaseBtn = quantitySelector.querySelector('.quantity-decrease');
-      const increaseBtn = quantitySelector.querySelector('.quantity-increase');
-      const input = quantitySelector.querySelector('.quantity-input');
-      
-      function updateQuantity(change) {
-        let currentValue = parseInt(input.value) || 1;
-        let newValue = currentValue + change;
-        if (newValue < 1) newValue = 1;
-        input.value = newValue;
+    // Update dots
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('active', i === currentSlide);
+    });
+    
+    // Update thumbnails
+    const thumbnails = document.querySelectorAll('.thumbnail-item');
+    thumbnails.forEach((thumb, i) => {
+      thumb.classList.toggle('active', i === currentSlide);
+    });
+  }
+  
+  // Arrow navigation
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => goToSlide(currentSlide - 1));
+  }
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => goToSlide(currentSlide + 1));
+  }
+  
+  // Dot navigation
+  dots.forEach((dot, index) => {
+    dot.addEventListener('click', () => goToSlide(index));
+  });
+  
+  // Touch/Mouse swipe
+  function handleStart(e) {
+    isDragging = true;
+    startX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
+    sliderTrack.style.transition = 'none';
+  }
+  
+  function handleMove(e) {
+    if (!isDragging) return;
+    
+    currentX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
+    const diff = currentX - startX;
+    const offset = -currentSlide * slider.offsetWidth + diff;
+    sliderTrack.style.transform = `translateX(${offset}px)`;
+  }
+  
+  function handleEnd() {
+    if (!isDragging) return;
+    
+    isDragging = false;
+    sliderTrack.style.transition = '';
+    
+    const diff = currentX - startX;
+    const threshold = slider.offsetWidth * 0.2;
+    
+    if (diff > threshold && currentSlide > 0) {
+      goToSlide(currentSlide - 1);
+    } else if (diff < -threshold && currentSlide < slides.length - 1) {
+      goToSlide(currentSlide + 1);
+    } else {
+      goToSlide(currentSlide);
+    }
+  }
+  
+  if (slider) {
+    slider.addEventListener('mousedown', handleStart);
+    slider.addEventListener('mousemove', handleMove);
+    slider.addEventListener('mouseup', handleEnd);
+    slider.addEventListener('mouseleave', handleEnd);
+    
+    slider.addEventListener('touchstart', handleStart, { passive: true });
+    slider.addEventListener('touchmove', handleMove, { passive: true });
+    slider.addEventListener('touchend', handleEnd);
+  }
+  
+  // Thumbnail click
+  const thumbnails = document.querySelectorAll('.thumbnail-item');
+  thumbnails.forEach((thumb, index) => {
+    thumb.addEventListener('click', () => goToSlide(index));
+  });
+  
+  // ==========================================
+  // QUANTITY SELECTOR
+  // ==========================================
+  
+  const quantityInput = document.getElementById('quantityInput');
+  const minusBtn = document.getElementById('quantityMinus');
+  const plusBtn = document.getElementById('quantityPlus');
+  
+  function updateQuantity(change) {
+    let value = parseInt(quantityInput.value) || 1;
+    value += change;
+    if (value < 1) value = 1;
+    if (value > 99) value = 99;
+    quantityInput.value = value;
+  }
+  
+  if (minusBtn) {
+    minusBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      updateQuantity(-1);
+    });
+  }
+  
+  if (plusBtn) {
+    plusBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      updateQuantity(1);
+    });
+  }
+  
+  // ==========================================
+  // VARIANT SWITCHING
+  // ==========================================
+  
+  const variantRadios = document.querySelectorAll('.variant-radio');
+  const variantIdInput = document.getElementById('productVariantId');
+  const priceElement = document.getElementById('productPrice');
+  const comparePriceElement = document.getElementById('productComparePrice');
+  const addToCartBtn = document.getElementById('addToCartBtn');
+  const addToCartText = document.getElementById('addToCartText');
+  
+  function getSelectedOptions() {
+    const options = {};
+    variantRadios.forEach(radio => {
+      if (radio.checked) {
+        const position = radio.dataset.optionPosition;
+        options[`option${position}`] = radio.value;
       }
-      
-      decreaseBtn.addEventListener('click', () => updateQuantity(-1));
-      increaseBtn.addEventListener('click', () => updateQuantity(1));
-      
-      input.addEventListener('change', function() {
-        let value = parseInt(this.value) || 1;
-        if (value < 1) value = 1;
-        this.value = value;
-      });
+    });
+    return options;
+  }
+  
+  function findVariant(options) {
+    return productData.variants.find(variant => {
+      return Object.keys(options).every(key => variant[key] === options[key]);
+    });
+  }
+  
+  function updateVariant() {
+    const selectedOptions = getSelectedOptions();
+    const variant = findVariant(selectedOptions);
+    
+    if (!variant) return;
+    
+    // Update hidden input
+    variantIdInput.value = variant.id;
+    
+    // Update price
+    const price = (variant.price / 100).toFixed(2);
+    priceElement.textContent = `Dhs. ${price} AED`;
+    
+    if (variant.compare_at_price && variant.compare_at_price > variant.price) {
+      const comparePrice = (variant.compare_at_price / 100).toFixed(2);
+      priceElement.classList.add('product-price--sale');
+      if (comparePriceElement) {
+        comparePriceElement.textContent = `Dhs. ${comparePrice} AED`;
+        comparePriceElement.style.display = 'inline';
+      }
+    } else {
+      priceElement.classList.remove('product-price--sale');
+      if (comparePriceElement) {
+        comparePriceElement.style.display = 'none';
+      }
     }
     
-    // Get currently selected options
-    function getSelectedOptions() {
-      const options = {};
-      document.querySelectorAll('.variant-input:checked').forEach(input => {
-        const position = input.dataset.optionPosition;
-        const value = input.dataset.optionValue;
-        options[`option${position}`] = value;
-      });
-      return options;
+    // Update button
+    if (variant.available) {
+      addToCartBtn.disabled = false;
+      addToCartText.textContent = 'Add to Cart';
+    } else {
+      addToCartBtn.disabled = true;
+      addToCartText.textContent = 'Sold Out';
     }
     
-    // Find variant by selected options
-    function findMatchingVariant(selectedOptions) {
-      return product.variants.find(variant => {
-        return Object.keys(selectedOptions).every(key => {
-          return variant[key] === selectedOptions[key];
-        });
-      });
-    }
-    
-    // Update product based on selected variant
-    function updateProduct(variant) {
-      if (!variant) return;
+    // Update image based on variant
+    if (variant.featured_image) {
+      const imageIndex = productData.images.findIndex(img => 
+        img.src.includes(variant.featured_image.src.split('?')[0].split('/').pop())
+      );
       
-      // Update hidden variant ID
-      variantIdInput.value = variant.id;
-      
-      // Update price
-      if (priceElement) {
-        const price = formatMoney(variant.price);
-        priceElement.textContent = price;
-        
-        if (variant.compare_at_price && variant.compare_at_price > variant.price) {
-          priceElement.classList.add('product-price--sale');
-          if (comparePriceElement) {
-            comparePriceElement.textContent = formatMoney(variant.compare_at_price);
-            comparePriceElement.style.display = 'inline';
-          }
-        } else {
-          priceElement.classList.remove('product-price--sale');
-          if (comparePriceElement) {
-            comparePriceElement.style.display = 'none';
-          }
-        }
-      }
-      
-      // Update button state
-      if (addToCartButton && buttonText) {
-        if (variant.available) {
-          addToCartButton.disabled = false;
-          buttonText.textContent = 'Add to Cart';
-          addToCartButton.style.background = '';
-        } else {
-          addToCartButton.disabled = true;
-          buttonText.textContent = 'Sold Out';
-        }
-      }
-      
-      // Update image if variant has featured image
-      if (variant.featured_image && mainImage) {
-        updateMainImage(variant.featured_image.src);
-      }
-      
-      // Update URL
-      if (window.history.replaceState) {
-        const url = new URL(window.location);
-        url.searchParams.set('variant', variant.id);
-        window.history.replaceState({}, '', url);
+      if (imageIndex !== -1 && imageIndex !== currentSlide) {
+        goToSlide(imageIndex);
       }
     }
     
-    // Update main product image
-    function updateMainImage(imageSrc) {
-      if (!mainImage) return;
-      
-      mainImage.classList.add('changing');
-      
-      setTimeout(() => {
-        mainImage.src = imageSrc;
-        mainImage.classList.remove('changing');
-      }, 150);
-      
-      // Update active thumbnail
-      document.querySelectorAll('.thumbnail-button').forEach(btn => {
-        btn.classList.remove('active');
-        const img = btn.querySelector('img');
-        if (img && img.src.includes(imageSrc.split('?')[0])) {
-          btn.classList.add('active');
-        }
-      });
-    }
-    
-    // Format money (basic implementation)
-    function formatMoney(cents) {
-      const amount = (cents / 100).toFixed(2);
-      return `Dhs. ${amount} AED`;
-    }
-    
-    // Handle variant change
-    window.handleVariantChange = function() {
-      const selectedOptions = getSelectedOptions();
-      const variant = findMatchingVariant(selectedOptions);
-      
-      if (variant) {
-        updateProduct(variant);
-      }
-    };
-    
-    // Image gallery
-    window.switchImage = function(button, imageUrl, mediaId) {
-      // Update main image
-      if (mainImage) {
-        updateMainImage(imageUrl);
-      }
-      
-      // Update active state
-      document.querySelectorAll('.thumbnail-button').forEach(btn => {
-        btn.classList.remove('active');
-      });
-      button.classList.add('active');
-    };
-    
-    // Initialize on page load
-    const currentVariantId = new URLSearchParams(window.location.search).get('variant');
-    if (currentVariantId) {
-      const variant = product.variants.find(v => v.id == currentVariantId);
-      if (variant) {
-        updateProduct(variant);
-      }
-    }
-  })();
+    // Update URL
+    const url = new URL(window.location);
+    url.searchParams.set('variant', variant.id);
+    window.history.replaceState({}, '', url);
+  }
+  
+  variantRadios.forEach(radio => {
+    radio.addEventListener('change', updateVariant);
+  });
+  
+})();
 </script>
