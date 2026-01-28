@@ -127,7 +127,18 @@
   text-decoration: none;
   font-weight: 500;
 }
+/* Swiper Fixes */
+.catprodrows__swiper {
+  overflow: visible;
+  padding-bottom: 20px;
+}
+.catprodrows__swiper .swiper-wrapper {
+  display: flex !important;
+}
 .catprodrows__card {
+  flex-shrink: 0;
+  flex-grow: 0;
+  height: auto;
   display: flex;
   flex-direction: column;
   background: #fff;
