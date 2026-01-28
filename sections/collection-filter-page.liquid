@@ -24,18 +24,9 @@
           {% endif %}
 
           {% if is_ancestor %}
-            {% comment %} Optionally skip the very first level if it matches 'Outdoor Plants' and user wants Home / Palms... {% endcomment %}
+            {% comment %} Show all ancestor links except utility pages {% endcomment %}
             {% assign link_title_dc = link.title | downcase | strip %}
-            {% if link_title_dc != 'home' and link_title_dc != 'outdoor plants' %}
-                <span>/</span>
-                <a href="{{ link.url }}">{{ link.title }}</a>
-                {% assign found_breadcrumb = true %}
-            {% elsif link_title_dc == 'outdoor plants' %}
-                {% comment %} Decided to show it for completeness, UNLESS explicitly told to skip. 
-                   The user asked for Home / Palms / Date Palm. Palms is L2. 
-                   If I'm on L3, I show L2 and L3. 
-                   Wait, I will show L1 for now to be safe, but skip if it's 'Home' menu item.
-                {% endcomment %}
+            {% if link_title_dc != 'home' %}
                 <span>/</span>
                 <a href="{{ link.url }}">{{ link.title }}</a>
                 {% assign found_breadcrumb = true %}
