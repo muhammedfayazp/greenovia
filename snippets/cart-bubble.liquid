@@ -33,9 +33,361 @@
       aria-hidden="true"
       data-testid="cart-bubble"
     >
-      {%- if limit == blank or cart.item_count < limit %}
+      {%- if limit == blank or cart.item_count < limit -%}
         {{- cart.item_count -}}
+      {%- else -%}
+        {{- limit | minus: 1 -}}+
       {%- endif -%}
     </span>
   </span>
 </div>
+
+{% stylesheet %}
+/* ==========================================
+   MODERN CART BUBBLE - GREEN GARDEN THEME
+   ========================================== */
+
+:root {
+  --bubble-size: 20px;
+  --bubble-size-large: 24px;
+  --bubble-green: #1a5c3a;
+  --bubble-green-light: #2d6e47;
+  --bubble-green-dark: #0d3d26;
+}
+
+/* ==========================================
+   CART BUBBLE BASE
+   ========================================== */
+
+.cart-bubble {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  min-width: var(--bubble-size);
+  height: var(--bubble-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 2;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cart-bubble[data-maintain-ratio] {
+  aspect-ratio: 1;
+}
+
+/* Show animation when cart is not empty */
+.cart-bubble:not(.visually-hidden) {
+  animation: bubblePop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes bubblePop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ==========================================
+   BUBBLE BACKGROUND - GRADIENT STYLE
+   ========================================== */
+
+.cart-bubble__background {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--bubble-green-light) 0%, var(--bubble-green-dark) 100%);
+  border-radius: 50%;
+  box-shadow: 
+    0 2px 8px rgba(26, 92, 58, 0.4),
+    0 1px 3px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  z-index: 1;
+  transition: all 0.3s ease;
+}
+
+/* Subtle pulse animation */
+@keyframes subtlePulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.cart-bubble__background::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 40%;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* ==========================================
+   BUBBLE TEXT - PERFECT SIZING
+   ========================================== */
+
+.cart-bubble__text {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cart-bubble__text-count {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}
+
+/* ==========================================
+   COUNT UPDATE ANIMATION
+   ========================================== */
+
+@keyframes countUpdate {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.cart-bubble__text-count.updating {
+  animation: countUpdate 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* ==========================================
+   HOVER & INTERACTION STATES
+   ========================================== */
+
+.header-actions__action:hover .cart-bubble__background,
+.cart-trigger-btn:hover .cart-bubble__background {
+  background: linear-gradient(135deg, var(--bubble-green) 0%, var(--bubble-green-light) 100%);
+  box-shadow: 
+    0 3px 12px rgba(26, 92, 58, 0.5),
+    0 1px 4px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transform: scale(1.05);
+}
+
+.header-actions__action:active .cart-bubble__background,
+.cart-trigger-btn:active .cart-bubble__background {
+  transform: scale(0.95);
+}
+
+/* ==========================================
+   LARGER BUBBLE FOR DOUBLE DIGITS
+   ========================================== */
+
+.cart-bubble:has(.cart-bubble__text-count:is([data-count*="1"], [data-count*="2"], [data-count*="3"], [data-count*="4"], [data-count*="5"], [data-count*="6"], [data-count*="7"], [data-count*="8"], [data-count*="9"])) {
+  min-width: var(--bubble-size-large);
+  height: var(--bubble-size-large);
+}
+
+/* Style for 10+ items */
+.cart-bubble__text-count:not(:empty) {
+  min-width: var(--bubble-size);
+  padding: 0 4px;
+}
+
+/* ==========================================
+   MOBILE RESPONSIVE
+   ========================================== */
+
+@media screen and (max-width: 749px) {
+  :root {
+    --bubble-size: 18px;
+    --bubble-size-large: 22px;
+  }
+  
+  .cart-bubble {
+    top: -5px;
+    right: -6px;
+  }
+  
+  .cart-bubble__text-count {
+    font-size: 0.6rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  :root {
+    --bubble-size: 16px;
+    --bubble-size-large: 20px;
+  }
+  
+  .cart-bubble {
+    top: -4px;
+    right: -5px;
+  }
+  
+  .cart-bubble__text-count {
+    font-size: 0.55rem;
+    font-weight: 700;
+  }
+}
+
+/* ==========================================
+   DESKTOP - LARGER SCREENS
+   ========================================== */
+
+@media screen and (min-width: 1024px) {
+  :root {
+    --bubble-size: 22px;
+    --bubble-size-large: 26px;
+  }
+  
+  .cart-bubble {
+    top: -7px;
+    right: -9px;
+  }
+  
+  .cart-bubble__text-count {
+    font-size: 0.7rem;
+  }
+}
+
+/* ==========================================
+   HIGH DENSITY DISPLAYS
+   ========================================== */
+
+@media screen and (min-resolution: 192dpi) {
+  .cart-bubble__text-count {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* ==========================================
+   ACCESSIBILITY
+   ========================================== */
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .cart-bubble,
+  .cart-bubble__background,
+  .cart-bubble__text-count {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ==========================================
+   SPECIAL STATES
+   ========================================== */
+
+/* Loading state */
+.cart-bubble.loading {
+  opacity: 0.6;
+}
+
+.cart-bubble.loading .cart-bubble__background {
+  animation: subtlePulse 1.5s ease-in-out infinite;
+}
+
+/* Empty state (hidden but with transition) */
+.cart-bubble.visually-hidden {
+  animation: bubbleHide 0.3s ease forwards;
+}
+
+@keyframes bubbleHide {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+/* ==========================================
+   99+ STYLING (LARGE NUMBERS)
+   ========================================== */
+
+.cart-bubble__text-count:contains("+") {
+  font-size: 0.6rem;
+  letter-spacing: -0.02em;
+}
+
+/* Slightly wider for "99+" */
+.cart-bubble:has(.cart-bubble__text-count:contains("+")) {
+  min-width: calc(var(--bubble-size) + 6px);
+  padding: 0 2px;
+}
+
+/* ==========================================
+   GLOW EFFECT ON NEW ITEMS
+   ========================================== */
+
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 
+      0 2px 8px rgba(26, 92, 58, 0.4),
+      0 1px 3px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+  50% {
+    box-shadow: 
+      0 0 20px rgba(26, 92, 58, 0.8),
+      0 2px 8px rgba(26, 92, 58, 0.6),
+      0 1px 3px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+}
+
+.cart-bubble.new-item-added .cart-bubble__background {
+  animation: glowPulse 0.6s ease-out;
+}
+
+/* ==========================================
+   PRINT STYLES
+   ========================================== */
+
+@media print {
+  .cart-bubble {
+    display: none !important;
+  }
+}
+{% endstylesheet %}
