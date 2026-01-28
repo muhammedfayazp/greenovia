@@ -1,34 +1,36 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 
-<section class="hps">
+<section class="catprodrows">
   <div class="page-width">
 
     {% for block in section.blocks %}
       {% assign col = collections[block.settings.collection] %}
       {% if col != blank and col.products.size > 0 %}
 
-      <div class="hps__section" {{ block.shopify_attributes }}>
-        <div class="hps__head">
-          <h2>{{ col.title }}</h2>
-          <a href="{{ col.url }}">View all →</a>
+      <div class="catprodrows__section" {{ block.shopify_attributes }}>
+
+        <div class="catprodrows__head">
+          <h2 class="catprodrows__title">{{ col.title }}</h2>
+          <a href="{{ col.url }}" class="catprodrows__more">View all →</a>
         </div>
 
-        <div class="swiper hps__swiper" data-swiper>
+        <div class="swiper catprodrows__swiper" data-swiper>
           <div class="swiper-wrapper">
 
             {% for product in col.products limit: 12 %}
-            <div class="swiper-slide hps__card">
+            <div class="swiper-slide catprodrows__card">
 
-              <a href="{{ product.url }}" class="hps__img">
+              <a href="{{ product.url }}" class="catprodrows__img">
                 {{ product.featured_image | image_url: width: 400 | image_tag: loading: 'lazy' }}
               </a>
 
-              <div class="hps__info">
-                <div class="hps__title">{{ product.title }}</div>
-                <div class="hps__price">{{ product.price | money }}</div>
+              <div class="catprodrows__info">
+                <div class="catprodrows__name">{{ product.title }}</div>
+                <div class="catprodrows__price">{{ product.price | money }}</div>
 
                 {% if product.available %}
-                <div class="qty-atc" data-variant-id="{{ product.selected_or_first_available_variant.id }}">
+                <div class="qty-atc"
+                     data-variant-id="{{ product.selected_or_first_available_variant.id }}">
                   <button class="qty-btn minus">−</button>
                   <span class="qty-count">0</span>
                   <button class="qty-btn plus">+</button>
@@ -43,8 +45,8 @@
 
           </div>
         </div>
-      </div>
 
+      </div>
       {% endif %}
     {% endfor %}
 
@@ -52,31 +54,32 @@
 </section>
 
 <style>
-.hps { padding: 50px 0; background:#f6f7f2; }
-.hps__head { display:flex; justify-content:space-between; margin-bottom:16px; }
-.hps__head h2 { margin:0; font-size:24px; }
-.hps__head a { text-decoration:none; font-weight:500; }
+.catprodrows { padding:60px 0; background:#f6f7f2; }
+.catprodrows__head {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:20px;
+}
+.catprodrows__title { margin:0; font-size:26px; }
+.catprodrows__more { text-decoration:none; font-weight:500; }
 
-.hps__card {
+.catprodrows__card {
   background:#fff;
-  border-radius:14px;
+  border-radius:16px;
   overflow:hidden;
-  box-shadow:0 6px 16px rgba(0,0,0,.08);
+  box-shadow:0 6px 18px rgba(0,0,0,.08);
 }
 
-.hps__img img { width:100%; display:block; }
+.catprodrows__img img { width:100%; display:block; }
 
-.hps__info { padding:12px; }
-.hps__title {
-  font-size:14px;
-  font-weight:600;
-  margin-bottom:6px;
+.catprodrows__info { padding:12px; }
+.catprodrows__name {
+  font-size:14px; font-weight:600;
   display:-webkit-box;
   -webkit-line-clamp:2;
   -webkit-box-orient:vertical;
   overflow:hidden;
 }
-.hps__price { font-weight:700; margin-bottom:10px; }
+.catprodrows__price { font-weight:700; margin:8px 0; }
 
 .qty-atc {
   display:flex;
@@ -86,7 +89,6 @@
   height:36px;
   overflow:hidden;
 }
-
 .qty-btn {
   width:34px;
   height:36px;
@@ -96,7 +98,6 @@
   font-size:18px;
   cursor:pointer;
 }
-
 .qty-count {
   flex:1;
   text-align:center;
@@ -104,10 +105,7 @@
   font-weight:600;
 }
 
-.soldout {
-  font-size:13px;
-  color:#999;
-}
+.soldout { font-size:13px; color:#999; }
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
@@ -115,7 +113,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
-  /* Swiper */
+  /* Swiper init */
   document.querySelectorAll('[data-swiper]').forEach(el => {
     new Swiper(el, {
       slidesPerView: 1.2,
@@ -130,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  /* Quantity + Cart Drawer */
+  /* Qty + AJAX Cart */
   document.querySelectorAll('.qty-atc').forEach(wrapper => {
     const variantId = wrapper.dataset.variantId;
     const minus = wrapper.querySelector('.minus');
@@ -139,38 +137,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     plus.addEventListener('click', async () => {
       await fetch('/cart/add.js', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: variantId, quantity: 1 })
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ id:variantId, quantity:1 })
       });
-
-      countEl.textContent = parseInt(countEl.textContent) + 1;
+      countEl.textContent = +countEl.textContent + 1;
       openDrawer();
     });
 
     minus.addEventListener('click', async () => {
-      let qty = parseInt(countEl.textContent);
+      let qty = +countEl.textContent;
       if (qty <= 0) return;
       qty--;
 
       await fetch('/cart/change.js', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: variantId, quantity: qty })
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ id:variantId, quantity:qty })
       });
-
       countEl.textContent = qty;
       openDrawer();
     });
   });
 
-  function openDrawer() {
+  function openDrawer(){
     const drawer = document.querySelector('cart-drawer');
-    if (drawer) {
-      drawer.open();
-    } else {
-      document.dispatchEvent(new CustomEvent('cart:open', { bubbles:true }));
-    }
+    if (drawer) drawer.open();
+    else document.dispatchEvent(new CustomEvent('cart:open',{bubbles:true}));
   }
 
 });
@@ -181,8 +174,8 @@ document.addEventListener('DOMContentLoaded', () => {
   "name": "Category Product Rows",
   "blocks": [
     {
-      "type": "collection",
-      "name": "Collection",
+      "type": "category",
+      "name": "Category",
       "settings": [
         {
           "type": "collection",
@@ -196,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
     {
       "name": "Category Product Rows",
       "blocks": [
-        { "type": "collection" }
+        { "type": "category" }
       ]
     }
   ]
