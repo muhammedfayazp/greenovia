@@ -1,4 +1,6 @@
 {% stylesheet %}
+ 
+
 .quantity-selector-wrapper {
   display: flex;
   align-items: center;
@@ -12,96 +14,249 @@
 
 /* MAIN CONTAINER */
 .quantity-selector {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  background-color: #124128 !important; /* locked green */
+  justify-content: space-between;
+  
+  /* Green Garden Colors */
+  background: linear-gradient(135deg, #1a5c3a 0%, #0d3d26 100%);
+  border: 2px solid rgba(255, 255, 255, 0.15);
   border-radius: 50px;
-  height: 36px;
-  min-width: 90px;
-  padding: 0 6px;
+  
+  /* Sizing */
+  height: 44px;
+  min-width: 110px;
+  padding: 0 8px;
+  
+  /* Subtle shadow for depth */
+  box-shadow: 
+    0 2px 8px rgba(18, 65, 40, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  
+  transition: all 0.25s ease;
+  position: relative;
   overflow: hidden;
+}
 
-  /* prevent all visual effects */
-  transition: none !important;
+.quantity-selector::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.2) 50%, 
+    transparent 100%);
+  opacity: 0.5;
+}
+
+.quantity-selector:hover {
+  background: linear-gradient(135deg, #1f6b44 0%, #10462d 100%);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 
+    0 4px 12px rgba(18, 65, 40, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 /* BUTTONS */
 .quantity-selector .button {
-  width: 30px;
-  height: 100%;
+  width: 32px;
+  height: 32px;
+  
   display: flex;
   align-items: center;
   justify-content: center;
-
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  outline: none !important;
-
+  
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 50%;
+  
   color: #ffffff !important;
   cursor: pointer;
+  
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
 
-  transition: none !important;
+.quantity-selector .button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.quantity-selector .button:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  transform: scale(1.05);
+}
+
+.quantity-selector .button:hover::before {
+  opacity: 1;
+}
+
+.quantity-selector .button:active {
+  transform: scale(0.95);
+  background: rgba(255, 255, 255, 0.15) !important;
+}
+
+.quantity-selector .button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.quantity-selector .button:disabled:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
 }
 
 /* ICONS (SVG + INLINE) */
 .quantity-selector .button svg,
 .quantity-selector .button .icon-minus,
 .quantity-selector .button .icon-plus {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   fill: #ffffff !important;
   color: #ffffff !important;
+  stroke: #ffffff !important;
+  stroke-width: 2px;
+  
+  transition: transform 0.2s ease;
+  position: relative;
+  z-index: 1;
+}
 
-  transition: none !important;
+.quantity-selector .button:hover svg,
+.quantity-selector .button:hover .icon-minus,
+.quantity-selector .button:hover .icon-plus {
+  transform: scale(1.1);
 }
 
 /* INPUT */
 .quantity-selector input {
-  width: 30px;
+  width: 40px;
   height: 100%;
   text-align: center;
-
+  
   border: none !important;
   background: transparent !important;
-  box-shadow: none !important;
-  outline: none !important;
-
-  font-size: 1.3rem;
+  
+  font-size: 1.4rem;
+  font-weight: 600;
   color: #ffffff !important;
-
-  padding: 0;
+  letter-spacing: 0.5px;
+  
+  padding: 0 4px;
   margin: 0;
-
+  
+  /* Remove number spinner arrows */
   -moz-appearance: textfield;
+  appearance: textfield;
 }
 
-/* REMOVE NUMBER SPINNERS */
 .quantity-selector input::-webkit-outer-spin-button,
 .quantity-selector input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-/* DISABLE ALL HOVER / FOCUS / ACTIVE STATES */
-.quantity-selector:hover,
-.quantity-selector:focus,
-.quantity-selector:active,
-.quantity-selector .button:hover,
-.quantity-selector .button:focus,
-.quantity-selector .button:active,
-.quantity-selector input:hover,
 .quantity-selector input:focus {
-  background-color: #124128 !important;
-  color: #ffffff !important;
-  box-shadow: none !important;
   outline: none !important;
+  box-shadow: none !important;
 }
 
-/* DISABLED STATE (OPTIONAL – still same color, just opacity) */
-.quantity-selector .button:disabled,
-.quantity-selector input:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+/* LABEL STYLING (if you have a label) */
+.quantity-selector-wrapper label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #2d5a3d;
+  letter-spacing: 0.3px;
 }
+
+/* MOBILE RESPONSIVE */
+@media screen and (max-width: 749px) {
+  .quantity-selector {
+    height: 40px;
+    min-width: 100px;
+    padding: 0 6px;
+  }
+  
+  .quantity-selector .button {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .quantity-selector .button svg,
+  .quantity-selector .button .icon-minus,
+  .quantity-selector .button .icon-plus {
+    width: 12px;
+    height: 12px;
+  }
+  
+  .quantity-selector input {
+    width: 36px;
+    font-size: 1.2rem;
+  }
+}
+
+/* SMALL MOBILE */
+@media screen and (max-width: 389px) {
+  .quantity-selector {
+    height: 38px;
+    min-width: 95px;
+  }
+  
+  .quantity-selector input {
+    width: 32px;
+    font-size: 1.1rem;
+  }
+}
+
+/* ACCESSIBILITY - FOCUS STATES */
+.quantity-selector .button:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
+}
+
+.quantity-selector input:focus-visible {
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+/* ALTERNATIVE LIGHT VARIANT (Optional) */
+.quantity-selector.quantity-selector--light {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-color: rgba(45, 90, 61, 0.2);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.quantity-selector.quantity-selector--light .button {
+  background: rgba(45, 90, 61, 0.1) !important;
+  border-color: rgba(45, 90, 61, 0.15) !important;
+}
+
+.quantity-selector.quantity-selector--light .button svg,
+.quantity-selector.quantity-selector--light .button .icon-minus,
+.quantity-selector.quantity-selector--light .button .icon-plus {
+  fill: #1a5c3a !important;
+  color: #1a5c3a !important;
+  stroke: #1a5c3a !important;
+}
+
+.quantity-selector.quantity-selector--light input {
+  color: #1a5c3a !important;
+}
+
+.quantity-selector.quantity-selector--light:hover {
+  background: linear-gradient(135deg, #f1f8f1 0%, #d4edd6 100%);
+  border-color: rgba(45, 90, 61, 0.3);
+}
+
 {% endstylesheet %}
