@@ -3,74 +3,101 @@
 <section class="catprodrows">
   <div class="catprodrows__container page-width">
 
-    {% for block in section.blocks %}
-      {% assign col = collections[block.settings.collection] %}
-      {% if col != blank and col.products.size > 0 %}
-        
-        <div class="catprodrows__section" {{ block.shopify_attributes }}>
+    {%- if section.blocks.size > 0 -%}
+  <script src="{{ 'component-cart-quantity-selector.js' | asset_url }}" type="module" fetchpriority="low"></script>
+{%- endif -%}
+
+{% for block in section.blocks %}
+  {% assign col = collections[block.settings.collection] %}
+  {% if col != blank and col.products.size > 0 %}
+    <div class="catprodrows__section" {{ block.shopify_attributes }}>
           
-          {%- comment -%} Category Header {%- endcomment -%}
           <div class="catprodrows__head">
             <h2 class="catprodrows__title">{{ col.title }}</h2>
-            <a href="{{ col.url }}" class="catprodrows__more">
-              View all →
-            </a>
+            <a href="{{ col.url }}" class="catprodrows__more">View all →</a>
           </div>
 
-          {%- comment -%} Products Slider {%- endcomment -%}
           <div class="catprodrows__swiper swiper swiper-{{ block.id }}">
             <div class="swiper-wrapper">
               {% for product in col.products limit: 12 %}
+                {% if product.available %}
                 <div class="catprodrows__card swiper-slide">
                   
                   <div class="catprodrows__img-container">
+                    <button type="button" 
+                            class="catprodrows__heart" 
+                            aria-label="Add to wishlist"
+                            data-product-id="{{ product.id }}"
+                            data-product-handle="{{ product.handle }}"
+                            onclick="toggleWishlist(this)">
+                      <svg class="heart-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                      <svg class="heart-filled" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                    </button>
+                    
                     <a href="{{ product.url }}" class="catprodrows__img">
                       {% if product.featured_image %}
                         <img
-                          src="{{ product.featured_image | image_url: width: 600 }}"
+                          src="{{ product.featured_image | image_url: width: 400 }}"
                           alt="{{ product.title | escape }}"
                           loading="lazy"
                         >
                       {% endif %}
                     </a>
-                    <button type="button" class="catprodrows__heart" aria-label="Add to wishlist" data-product-id="{{ product.id }}">
-                      {% render 'icon', icon: 'heart' %}
-                    </button>
                   </div>
 
                   <div class="catprodrows__info">
-                    <a href="{{ product.url }}">
-                      <h3>{{ product.title }}</h3>
-                    </a>
-
-                    <div class="catprodrows__price">
-                      {{ product.price | money }}
-                    </div>
-
-                    {%- assign cart_qty = 0 -%}
-                    {%- for item in cart.items -%}
-                      {%- if item.variant_id == product.selected_or_first_available_variant.id -%}
-                        {%- assign cart_qty = item.quantity -%}
-                        {%- break -%}
-                      {%- endif -%}
-                    {%- endfor -%}
-
-                    <product-form class="catprodrows__form-wrapper" data-variant-id="{{ product.selected_or_first_available_variant.id }}">
-                      <div class="catprodrows__actions {% if cart_qty > 0 %}is-active{% endif %}">
-                        <div class="catprodrows__qty-selector">
-                          <button type="button" class="qty__btn" data-action="minus">{% if cart_qty == 1 %}{% render 'icon', icon: 'delete' %}{% else %}−{% endif %}</button>
-                          <span class="qty__current">{{ cart_qty }}</span>
-                          <button type="button" class="qty__btn" data-action="plus">+</button>
-                        </div>
-                        
-                        <button type="button" class="catprodrows__atc-trigger" aria-label="Add to cart">
-                          <span>+</span>
-                        </button>
+                    <div class="catprodrows__vendor">{{ product.vendor }}</div>
+                    <a href="{{ product.url }}" class="catprodrows__name">{{ product.title }}</a>
+                    
+                    <div class="catprodrows__bottom">
+                      <div class="catprodrows__price">
+                        {{ product.price | money }}
                       </div>
-                    </product-form>
+
+                      {%- assign cart_qty = cart | item_count_for_variant: product.selected_or_first_available_variant.id -%}
+
+                      <product-form-component class="catprodrows__form-wrapper" data-section-id="{{ section.id }}" data-product-id="{{ product.id }}" on:submit="/handleSubmit">
+                        <div class="visually-hidden" aria-live="assertive" role="status" aria-atomic="true" ref="liveRegion"></div>
+                        {%- form 'product', product, id: nil, class: 'catprodrows__form' -%}
+                          <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}" ref="variantId">
+                          
+                          <div class="catprodrows__actions {% if cart_qty > 0 %}is-active{% endif %}" data-cart-quantity="{{ cart_qty }}">
+                          
+                          <cart-quantity-selector-component class="catprodrows__qty-selector" data-variant-id="{{ product.selected_or_first_available_variant.id }}" ref="quantitySelector">
+                            <button type="button" class="qty__btn" ref="minusButton" on:click="/decreaseQuantity">
+                              <span class="qty__minus-icon">{{ 'icon-minus.svg' | inline_asset_content }}</span>
+                              <span class="qty__trash-icon">{{ 'icon-delete.svg' | inline_asset_content }}</span>
+                            </button>
+                            <input 
+                              type="number" 
+                              name="quantity" 
+                              value="{{ cart_qty | at_least: 1 }}" 
+                              min="0" 
+                              {% if product.selected_or_first_available_variant.quantity_rule.max %}max="{{ product.selected_or_first_available_variant.quantity_rule.max }}"{% endif %}
+                              step="{{ product.selected_or_first_available_variant.quantity_rule.increment | default: 1 }}"
+                              class="visually-hidden" 
+                              ref="quantityInput"
+                              data-cart-quantity="{{ cart_qty }}"
+                              on:blur="/setQuantity"
+                              on:focus="/selectInputValue"
+                            >
+                            <span class="qty__current" ref="quantityDisplay">{{ cart_qty }}</span>
+                            <button type="button" class="qty__btn" ref="plusButton" on:click="/increaseQuantity">{{ 'icon-plus.svg' | inline_asset_content }}</button>
+                          </cart-quantity-selector-component>
+
+                          <add-to-cart-component class="catprodrows__atc-wrapper">
+                            <button type="submit" class="catprodrows__atc-trigger" aria-label="Add to cart" ref="addToCartButton">
+                              {{ 'icon-add-to-cart.svg' | inline_asset_content }}
+                            </button>
+                          </add-to-cart-component>
+                        </div>
+                      {%- endform -%}
+                    </product-form-component>
+                    </div>
                   </div>
 
                 </div>
+                {% endif %}
               {% endfor %}
             </div>
           </div>
@@ -83,101 +110,86 @@
 </section>
 
 <style>
-.catprodrows{
-  background:#f6f7f2;
-  padding: 30px 0 50px;
+.catprodrows {
+  padding: 60px 0;
+  background: #f6f7f2;
 }
-.catprodrows__container{
-  padding-left: 24px !important;
-  padding-right: 24px !important;
+.catprodrows__container {
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+  max-width: 1400px;
+  margin: 0 auto;
 }
-
-/* Each category section */
-.catprodrows__section{
-  margin-bottom: 50px;
+.catprodrows__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 24px;
 }
-.catprodrows__section:last-child{
-  margin-bottom: 0;
+.catprodrows__title {
+  margin: 0;
+  font-size: 32px;
+  color: #1f3d2b;
 }
-
-/* Category Header */
-.catprodrows__head{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom: 26px;
+.catprodrows__more {
+  color: #1f3d2b;
+  text-decoration: none;
+  font-weight: 500;
 }
-.catprodrows__title{
-  margin:0;
-  font-size: 28px;
-  color:#1f3d2b;
-}
-.catprodrows__more{
-  font-size:14px;
-  color:#1f3d2b;
-  text-decoration:none;
-  white-space:nowrap;
-}
-.catprodrows__more:hover{ text-decoration: underline; }
-
-/* Swiper */
-.catprodrows__swiper{ width:100%; }
-
-/* Product Card */
-.catprodrows__card{
-  height:100%;
-  display:flex;
-  flex-direction:column;
-  background:#fff;
-  border-radius:18px;
-  overflow:hidden;
+.catprodrows__card {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
   box-shadow: 0 6px 18px rgba(0,0,0,.08);
-  transition: transform .25s ease;
 }
-.catprodrows__card:hover{
-  transform: translateY(-4px);
-}
-
-/* Image */
-.catprodrows__img{
-  display:block;
-  aspect-ratio: 1/1;
-  background:#eee;
-}
-.catprodrows__img img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-
-/* Info */
-.catprodrows__info{
-  padding: 12px;
-  text-align:center;
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-}
-.catprodrows__info h3{
-  margin:0 0 6px;
-  font-size:15px;
-  font-weight:600;
-  color:#1f3d2b;
-}
-.catprodrows__info a{ text-decoration:none; }
-
-.catprodrows__price{
-  font-size:15px;
-  margin-bottom: 10px;
-  color:#1f3d2b;
-  font-weight:500;
-}
-
-/* Image Container */
 .catprodrows__img-container {
   position: relative;
   overflow: hidden;
+}
+
+.catprodrows__info {
+  padding: 12px; /* Reduced padding from 16px */
+  display: flex;
+  flex-direction: column;
+  gap: 0; /* Removed gap completely */
+}
+
+.catprodrows__vendor {
+  font-size: 11px; /* Slightly smaller */
+  text-transform: uppercase;
+  color: #777;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.catprodrows__name {
+  font-size: 15px; /* Reduced from 16px */
+  font-weight: 600;
+  color: #1f3d2b;
+  text-decoration: none;
+  line-height: 1.3; /* Tighter line height */
+  height: auto;
+  margin-bottom: 0;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.catprodrows__price {
+  font-size: 16px; /* Reduced from 18px */
+  font-weight: 700;
+  color: #1f3d2b;
+  white-space: nowrap;
+}
+.catprodrows__bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px; /* Minimal margin */
+  gap: 8px;
 }
 
 /* Heart Icon */
@@ -210,6 +222,7 @@
   display: flex;
   justify-content: flex-end;
   height: 40px;
+  margin-top: 8px;
 }
 
 .catprodrows__atc-trigger {
@@ -223,9 +236,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1;
+}
+
+.catprodrows__atc-trigger svg {
+  width: 20px;
+  height: 20px;
 }
 
 .catprodrows__qty-selector {
@@ -234,6 +251,7 @@
   top: 0;
   height: 40px;
   width: 40px;
+  min-width: 40px;
   background: #1f3d2b;
   border-radius: 20px;
   display: flex;
@@ -245,16 +263,18 @@
   pointer-events: none;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-sizing: border-box;
+  box-shadow: 0 4px 12px rgba(31, 61, 43, 0.2);
 }
 
-.catprodrows__actions.is-active .catprodrows__atc-trigger {
+.catprodrows__actions.is-active .catprodrows__atc-wrapper {
   opacity: 0;
   pointer-events: none;
   transform: scale(0.8);
 }
 
 .catprodrows__actions.is-active .catprodrows__qty-selector {
-  width: 100%;
+  width: auto;
+  min-width: 105px;
   opacity: 1;
   pointer-events: auto;
 }
@@ -262,8 +282,9 @@
 .catprodrows__qty-selector .qty__btn {
   width: 32px;
   height: 32px;
+  flex-shrink: 0;
   border-radius: 50%;
-  background: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.15);
   color: #fff;
   border: none;
   cursor: pointer;
@@ -271,14 +292,82 @@
   align-items: center;
   justify-content: center;
   font-size: 18px;
+  padding: 0;
+  transition: background 0.2s ease;
+}
+.catprodrows__qty-selector .qty__btn:hover {
+  background: rgba(255,255,255,0.25);
 }
 
-.catprodrows__qty-selector .qty__btn svg { width: 14px; height: 14px; }
+.catprodrows__qty-selector .qty__trash-icon {
+  display: none;
+}
+
+.catprodrows__actions[data-cart-quantity="1"] .qty__minus-icon {
+  display: none;
+}
+
+.catprodrows__actions[data-cart-quantity="1"] .qty__trash-icon {
+  display: flex;
+}
+
+.catprodrows__qty-selector .qty__btn svg { 
+  width: 14px; 
+  height: 14px; 
+  display: block;
+}
 
 .catprodrows__qty-selector .qty__current {
   color: #fff;
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1;
+  flex: 1;
+  text-align: center;
+  min-width: 24px;
+}
+
+.catprodrows__bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  gap: 8px;
+  min-height: 40px;
+}
+
+.catprodrows__price {
   font-size: 16px;
+  font-weight: 700;
+  color: #1f3d2b;
+  white-space: nowrap;
+}
+
+.catprodrows__form-wrapper {
+  flex: 0 0 auto;
+}
+
+.catprodrows__atc-trigger:hover {
+  background: #2a523a;
+  transform: scale(1.05);
+}
+
+.catprodrows__atc-trigger:active {
+  transform: scale(0.95);
+}
+
+.catprodrows__actions.is-loading .catprodrows__atc-trigger {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.catprodrows__actions.is-loading .catprodrows__atc-trigger svg {
+  animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 /* Mobile */
@@ -319,76 +408,178 @@ document.addEventListener('DOMContentLoaded', function () {
     {% endif %}
   {% endfor %}
 
-  // Noon-style ATC Logic
-  const updateCart = async (variantId, quantity) => {
-    const res = await fetch('/cart/change.js', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: variantId.toString(), quantity: quantity })
-    });
-    return res.json();
+  // Bridge Logic for syncing theme components with custom UI
+  const themeEvents = {
+    cartUpdate: 'cart:update',
+    qtyUpdate: 'quantity-selector:update'
   };
 
-  const addCart = async (variantId) => {
-    const res = await fetch('/cart/add.js', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ items: [{ id: variantId, quantity: 1 }] })
-    });
-    return res.json();
-  };
+  // 1. Sync all cards when cart is updated globally
+  document.addEventListener(themeEvents.cartUpdate, async (event) => {
+    let cart = event.detail.resource;
+    if (!cart || !cart.items) {
+      const res = await fetch('/cart.js');
+      cart = await res.json();
+    }
+    if (!cart || !cart.items) return;
 
-  document.querySelectorAll('.catprodrows__form-wrapper').forEach(wrapper => {
-    const variantId = wrapper.dataset.variantId;
-    const actions = wrapper.querySelector('.catprodrows__actions');
-    const trigger = wrapper.querySelector('.catprodrows__atc-trigger');
-    const display = wrapper.querySelector('.qty__current');
-    const minusBtn = wrapper.querySelector('[data-action="minus"]');
+    document.querySelectorAll('.catprodrows__form-wrapper').forEach(wrapper => {
+      const variantId = wrapper.querySelector('[ref="variantId"]')?.value;
+      if (!variantId) return;
 
-    trigger?.addEventListener('click', async () => {
-      actions.classList.add('is-active');
-      display.textContent = '1';
-      await addCart(variantId);
-      // Trigger global cart update if needed
-      document.dispatchEvent(new CustomEvent('cart:updated'));
-    });
-
-    wrapper.addEventListener('click', async (e) => {
-      const btn = e.target.closest('.qty__btn');
-      if (!btn) return;
-
-      let current = parseInt(display.textContent);
-      const action = btn.dataset.action;
-
-      if (action === 'plus') {
-        current++;
-      } else {
-        current = Math.max(0, current - 1);
-      }
-
-      display.textContent = current;
+      const item = cart.items.find(i => i.variant_id.toString() === variantId.toString());
+      const qty = item ? item.quantity : 0;
       
-      // Update minus button icon if it becomes 0 or 1
-      if(current <= 1) {
-        minusBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>';
-      } else {
-        minusBtn.innerHTML = '−';
-      }
+      const actions = wrapper.querySelector('.catprodrows__actions');
+      const display = wrapper.querySelector('.qty__current');
+      const input = wrapper.querySelector('cart-quantity-selector-component input');
 
-      if (current === 0) {
-        actions.classList.remove('is-active');
+      if (actions) {
+        actions.dataset.cartQuantity = qty;
+        actions.classList.toggle('is-active', qty > 0);
       }
-
-      await updateCart(variantId, current);
-      document.dispatchEvent(new CustomEvent('cart:updated'));
+      if (display) display.textContent = qty;
+      if (input) {
+        input.dataset.cartQuantity = qty;
+        input.value = qty > 0 ? qty : 1; // Keep input at 1 for next add if removed
+      }
     });
   });
 
-  // Favorite toggle
-  document.querySelectorAll('.catprodrows__heart').forEach(btn => {
-    btn.addEventListener('click', () => {
-      btn.classList.toggle('is-active');
-      // Potential wishlist API call here
+  // 2. Handle immediate updates from quantity selectors in this section
+  document.addEventListener(themeEvents.qtyUpdate, async (event) => {
+    const qtySelector = event.target.closest('cart-quantity-selector-component');
+    if (!qtySelector || !qtySelector.closest('.catprodrows')) return;
+
+    const wrapper = qtySelector.closest('.catprodrows__form-wrapper');
+    const variantId = wrapper.querySelector('[ref="variantId"]')?.value;
+    const quantity = event.detail.quantity;
+    const display = qtySelector.querySelector('[ref="quantityDisplay"]');
+    
+    // Optimistic UI update for the display text
+    if (display) display.textContent = quantity;
+
+    try {
+      // Trigger cart change
+      const res = await fetch('/cart/change.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          id: variantId.toString(), 
+          quantity: quantity,
+          sections_url: window.location.pathname
+        })
+      });
+      const cart = await res.json();
+
+      // Dispatch cart:update with forced cart-icon refresh
+      const updateEvent = new CustomEvent(themeEvents.cartUpdate, {
+        bubbles: true,
+        detail: {
+          resource: cart,
+          data: {
+            itemCount: cart.item_count,
+            source: 'catprodrows'
+          }
+        }
+      });
+      document.dispatchEvent(updateEvent);
+
+      // Sync all product cards on the page
+      document.querySelectorAll('.catprodrows__actions').forEach(actions => {
+        const vIdInput = actions.closest('product-form-component')?.querySelector('[name="id"]');
+        const vId = vIdInput?.value;
+        if (!vId) return;
+        
+        const item = cart.items.find(i => i.variant_id.toString() === vId.toString());
+        const qty = item ? item.quantity : 0;
+        
+        actions.dataset.cartQuantity = qty;
+        const display = actions.querySelector('.qty__current');
+        if (display) display.textContent = qty;
+        
+        if (qty > 0) {
+          actions.classList.add('is-active');
+        } else {
+          actions.classList.remove('is-active');
+        }
+      });
+    } catch (e) {
+      console.error('Cart update failed', e);
+    }
+  });
+
+  // Handle successful ATCs from product-form.js too
+  document.addEventListener('cart:update', async (event) => {
+    if (event.detail?.data?.source === 'catprodrows') return;
+    
+    // If update came from elsewhere, sync our cards
+    // Use the resource if available, otherwise fetch
+    let cart = event.detail?.resource;
+    if (!cart || !cart.items) {
+      const res = await fetch('/cart.js');
+      cart = await res.json();
+    }
+    
+    document.querySelectorAll('.catprodrows__actions').forEach(actions => {
+      const vIdInput = actions.closest('product-form-component')?.querySelector('[name="id"]');
+      const vId = vIdInput?.value;
+      if (!vId) return;
+      const item = cart.items.find(i => i.variant_id.toString() === vId.toString());
+      const qty = item ? item.quantity : 0;
+      actions.dataset.cartQuantity = qty;
+      const display = actions.querySelector('.qty__current');
+      if (display) display.textContent = qty;
+      if (qty > 0) actions.classList.add('is-active');
+      else actions.classList.remove('is-active');
+    });
+  });
+
+  // Wishlist functionality
+  window.toggleWishlist = function(button) {
+    const productId = button.dataset.productId;
+    const productHandle = button.dataset.productHandle;
+    
+    let wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+    const index = wishlist.findIndex(item => item.id === productId);
+    
+    if (index > -1) {
+      wishlist.splice(index, 1);
+      button.classList.remove('is-active');
+    } else {
+      wishlist.push({
+        id: productId,
+        handle: productHandle,
+        addedAt: new Date().toISOString()
+      });
+      button.classList.add('is-active');
+    }
+    
+    // Toggle SVGs
+    const outline = button.querySelector('.heart-outline');
+    const filled = button.querySelector('.heart-filled');
+    if (outline && filled) {
+      if (button.classList.contains('is-active')) {
+        outline.style.display = 'none';
+        filled.style.display = 'block';
+      } else {
+        outline.style.display = 'block';
+        filled.style.display = 'none';
+      }
+    }
+    localStorage.setItem('wishlist', JSON.stringify(wishlist));
+  };
+
+  // Load wishlist state
+  const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+  wishlist.forEach(item => {
+    const buttons = document.querySelectorAll(`.catprodrows__heart[data-product-id="${item.id}"]`);
+    buttons.forEach(button => {
+      button.classList.add('is-active');
+      const outline = button.querySelector('.heart-outline');
+      const filled = button.querySelector('.heart-filled');
+      if (outline) outline.style.display = 'none';
+      if (filled) filled.style.display = 'block';
     });
   });
 });
