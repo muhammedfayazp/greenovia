@@ -11,24 +11,61 @@
       {% if menu_handle != blank %}
         {% assign found_breadcrumb = false %}
         {% for link in menu_links %}
-          {% if link.active or link.child_active %}
-            <span>/</span>
-            <a href="{{ link.url }}">{{ link.title }}</a>
-            {% assign found_breadcrumb = true %}
+          {% comment %} Ancestor check {% endcomment %}
+          {% assign is_ancestor = false %}
+          {% if link.active or link.child_active %}{% assign is_ancestor = true %}{% endif %}
+          {% if is_ancestor == false and link.links != blank %}
+             {% for child in link.links %}
+               {% if child.active or child.child_active %}{% assign is_ancestor = true %}{% endif %}
+               {% for grand in child.links %}
+                 {% if grand.active %}{% assign is_ancestor = true %}{% endif %}
+               {% endfor %}
+             {% endfor %}
+          {% endif %}
+
+          {% if is_ancestor %}
+            {% comment %} Optionally skip the very first level if it matches 'Outdoor Plants' and user wants Home / Palms... {% endcomment %}
+            {% assign link_title_dc = link.title | downcase | strip %}
+            {% if link_title_dc != 'home' and link_title_dc != 'outdoor plants' %}
+                <span>/</span>
+                <a href="{{ link.url }}">{{ link.title }}</a>
+                {% assign found_breadcrumb = true %}
+            {% elsif link_title_dc == 'outdoor plants' %}
+                {% comment %} Decided to show it for completeness, UNLESS explicitly told to skip. 
+                   The user asked for Home / Palms / Date Palm. Palms is L2. 
+                   If I'm on L3, I show L2 and L3. 
+                   Wait, I will show L1 for now to be safe, but skip if it's 'Home' menu item.
+                {% endcomment %}
+                <span>/</span>
+                <a href="{{ link.url }}">{{ link.title }}</a>
+                {% assign found_breadcrumb = true %}
+            {% endif %}
             
             {% for child_link in link.links %}
-              {% if child_link.active or child_link.child_active %}
+               {% assign is_child_ancestor = false %}
+               {% if child_link.active or child_link.child_active %}{% assign is_child_ancestor = true %}{% endif %}
+               {% if is_child_ancestor == false and child_link.links != blank %}
+                 {% for grand in child_link.links %}
+                   {% if grand.active %}{% assign is_child_ancestor = true %}{% endif %}
+                 {% endfor %}
+               {% endif %}
+
+              {% if is_child_ancestor %}
                 <span>/</span>
-                <a href="{{ child_link.url }}">{{ child_link.title }}</a>
+                {% if child_link.active and child_link.child_active == false %}
+                    <span>{{ child_link.title }}</span>
+                {% else %}
+                    <a href="{{ child_link.url }}">{{ child_link.title }}</a>
+                {% endif %}
+                {% assign found_breadcrumb = true %}
                 
                 {% for grandchild_link in child_link.links %}
                   {% if grandchild_link.active %}
                     <span>/</span>
                     <span>{{ grandchild_link.title }}</span>
+                    {% assign found_breadcrumb = true %}
                   {% endif %}
                 {% endfor %}
-              {% elsif child_link.active == false and child_link.child_active == false and forloop.last and found_breadcrumb %}
-                {% comment %} Already rendered parent, checking if we need the current collection at the end if it's not a menu item {% endcomment %}
               {% endif %}
             {% endfor %}
           {% endif %}
@@ -100,9 +137,10 @@
             {% if menu_handle != blank and menu_links.size > 0 %}
               <div class="category-tree">
                 {% for link in menu_links %}
-                  {% comment %} Skip utility links {% endcomment %}
-                  {% assign link_title_dc = link.title | downcase %}
-                  {% if link_title_dc == 'home' or link_title_dc == 'contact' or link_title_dc == 'contact us' %}
+                  {% comment %} Skip utility links (Home, Contact, etc.) {% endcomment %}
+                  {% assign link_title_dc = link.title | downcase | strip %}
+                  {% assign link_url = link.url | remove: shop.url | remove: 'https://' | remove: 'http://' %}
+                  {% if link_title_dc == 'home' or link_title_dc == 'contact' or link_title_dc == 'contact us' or link_url == '/' or link_url == '' or link_url contains 'pages/contact' %}
                     {% continue %}
                   {% endif %}
 
