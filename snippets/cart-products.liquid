@@ -725,6 +725,18 @@
     const cartForm = document.querySelector('.modern-cart-form');
     if (!cartForm) return;
 
+    // Get Shopify money format from theme settings
+    const moneyFormat = window.theme && window.theme.moneyFormat ? window.theme.moneyFormat : '{{amount}}';
+
+    // Format money using Shopify's formatter
+    function formatMoney(cents) {
+      if (typeof Shopify !== 'undefined' && Shopify.formatMoney) {
+        return Shopify.formatMoney(cents, moneyFormat);
+      }
+      // Fallback basic formatter
+      return '$' + (cents / 100).toFixed(2);
+    }
+
     // Update cart display
     function updateCartDisplay(cart) {
       // Update cart count if element exists
@@ -755,11 +767,29 @@
 
       // Trigger custom event for cart update (for totals section)
       document.dispatchEvent(new CustomEvent('cart:updated', { detail: cart }));
-    }
-
-    // Format money (basic formatter - adjust based on your currency settings)
-    function formatMoney(cents) {
-      return '$' + (cents / 100).toFixed(2);
+      
+      // If cart is empty, show empty state without page reload
+      if (cart.item_count === 0) {
+        const cartWrapper = document.querySelector('.modern-cart-wrapper');
+        if (cartWrapper) {
+          cartWrapper.innerHTML = `
+            <div class="cart-empty-state">
+              <div class="cart-empty-icon">
+                <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+                  <circle cx="40" cy="40" r="38" stroke="currentColor" stroke-width="2" opacity="0.2"/>
+                  <path d="M25 30L22 35V55C22 56.1 22.9 57 24 57H56C57.1 57 58 56.1 58 55V35L55 30H25Z" stroke="currentColor" stroke-width="2" fill="none"/>
+                  <path d="M32 35V30C32 25.6 35.6 22 40 22C44.4 22 48 25.6 48 30V35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <h3 class="cart-empty-heading">Your cart is empty</h3>
+              <p class="cart-empty-text">Add items to get started</p>
+              <a class="cart-empty-button" href="/collections/all">
+                Continue Shopping
+              </a>
+            </div>
+          `;
+        }
+      }
     }
 
     // Handle quantity change
@@ -787,11 +817,6 @@
             setTimeout(() => {
               cartItem.remove();
               updateCartDisplay(cart);
-              
-              // Check if cart is empty and reload
-              if (cart.item_count === 0) {
-                window.location.reload();
-              }
             }, 300);
           }
         } else {
