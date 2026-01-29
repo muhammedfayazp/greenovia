@@ -739,9 +739,9 @@
       }
 
       // Fallback: detect currency symbol dynamically
-      var currencySymbol = 'AED'; // Default, can be dynamic
+      var currencySymbol = 'Dhs'; // Default, can be dynamic
       if (typeof Shopify !== 'undefined' && Shopify.currency) {
-        currencySymbol = Shopify.currency.active || 'AED';
+        currencySymbol = Shopify.currency.active || 'Dhs';
       }
 
       return currencySymbol + ' ' + (cents / 100).toFixed(2);
