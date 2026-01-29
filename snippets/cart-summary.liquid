@@ -349,7 +349,7 @@
     const cart = event.detail;
     
     // Get money format from Shopify theme
-const moneyFormat = window.theme && window.theme.moneyFormat ? window.theme.moneyFormat : '{{amount}} AED';
+const moneyFormat = window.theme && window.theme.moneyFormat ? window.theme.moneyFormat : '{{amount}} Dhs';
 
 // Format money helper
 function formatMoney(cents) {
@@ -361,9 +361,9 @@ function formatMoney(cents) {
   }
 
   // Fallback: use store currency symbol from Shopify settings if available
-  let currencySymbol = 'AED'; // Default to AED
+  let currencySymbol = 'Dhs'; // Default to Dhs
   if (typeof Shopify !== 'undefined' && Shopify.currency && Shopify.currency.active) {
-    currencySymbol = Shopify.currency.active; // Will return 'AED' if store currency is AED
+    currencySymbol = Shopify.currency.active; // Will return 'Dhs' if store currency is Dhs
   }
 
   return currencySymbol + ' ' + (cents / 100).toFixed(2);
