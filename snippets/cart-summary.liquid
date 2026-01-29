@@ -348,16 +348,27 @@
   document.addEventListener('cart:updated', function(event) {
     const cart = event.detail;
     
-    // Get money format
-    const moneyFormat = window.theme && window.theme.moneyFormat ? window.theme.moneyFormat : '{{amount}}';
-    
-    // Format money helper
-    function formatMoney(cents) {
-      if (typeof Shopify !== 'undefined' && Shopify.formatMoney) {
-        return Shopify.formatMoney(cents, moneyFormat);
-      }
-      return '$' + (cents / 100).toFixed(2);
-    }
+    // Get money format from Shopify theme
+const moneyFormat = window.theme && window.theme.moneyFormat ? window.theme.moneyFormat : '{{amount}} AED';
+
+// Format money helper
+function formatMoney(cents) {
+  cents = Number(cents);
+
+  if (typeof Shopify !== 'undefined' && Shopify.formatMoney) {
+    // Use Shopify's formatter, will respect theme currency
+    return Shopify.formatMoney(cents, moneyFormat);
+  }
+
+  // Fallback: use store currency symbol from Shopify settings if available
+  let currencySymbol = 'AED'; // Default to AED
+  if (typeof Shopify !== 'undefined' && Shopify.currency && Shopify.currency.active) {
+    currencySymbol = Shopify.currency.active; // Will return 'AED' if store currency is AED
+  }
+
+  return currencySymbol + ' ' + (cents / 100).toFixed(2);
+}
+
     
     // Update estimated total
     const cartTotalValueEl = document.querySelector('.cart__total-value');
