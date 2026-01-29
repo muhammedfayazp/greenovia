@@ -343,12 +343,41 @@
 {% endstylesheet %}
 
 <script>
-  // Listen for cart updates from cart-items.liquid
+  // Listen for cart updates and update totals dynamically
   document.addEventListener('cart:updated', function(event) {
     const cart = event.detail;
     
-    // Reload the page to update cart totals
-    // You can also update specific elements here instead of reloading
-    window.location.reload();
+    // Update cart total value
+    const cartTotalEl = document.querySelector('.cart__total-value');
+    if (cartTotalEl && cart.total_price !== undefined) {
+      // Use Shopify's money format
+      cartTotalEl.textContent = Shopify.formatMoney(cart.total_price, theme.moneyFormat || '{{amount}}');
+    }
+    
+    // Update original total if there are discounts
+    const originalTotalEl = document.querySelector('.cart__original-total-value');
+    if (originalTotalEl && cart.original_total_price !== undefined) {
+      originalTotalEl.textContent = Shopify.formatMoney(cart.original_total_price, theme.moneyFormat || '{{amount}}');
+    }
+    
+    // Update discount amounts
+    if (cart.cart_level_discount_applications && cart.cart_level_discount_applications.length > 0) {
+      cart.cart_level_discount_applications.forEach((discount, index) => {
+        const discountValueEl = document.querySelectorAll('.cart__discount-value')[index];
+        if (discountValueEl) {
+          discountValueEl.textContent = '-' + Shopify.formatMoney(discount.total_allocated_amount, theme.moneyFormat || '{{amount}}');
+        }
+      });
+    }
+    
+    // Disable checkout button if cart is empty
+    const checkoutBtn = document.getElementById('checkout');
+    if (checkoutBtn) {
+      if (cart.item_count === 0) {
+        checkoutBtn.disabled = true;
+      } else {
+        checkoutBtn.disabled = false;
+      }
+    }
   });
 </script>
