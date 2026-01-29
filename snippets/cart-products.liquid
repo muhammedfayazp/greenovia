@@ -725,27 +725,17 @@
     const cartForm = document.querySelector('.modern-cart-form');
     if (!cartForm) return;
 
-    // Get money format from Shopify theme
-const moneyFormat = window.theme && window.theme.moneyFormat ? window.theme.moneyFormat : '{{amount}} Dhs.';
+    // Get Shopify money format from theme settings
+    const moneyFormat = window.theme && window.theme.moneyFormat ? window.theme.moneyFormat : '{{amount}}';
 
-// Format money helper
-function formatMoney(cents) {
-  cents = Number(cents);
-
-  if (typeof Shopify !== 'undefined' && Shopify.formatMoney) {
-    // Use Shopify's formatter, will respect theme currency
-    return Shopify.formatMoney(cents, moneyFormat);
-  }
-
-  // Fallback: use store currency symbol from Shopify settings if available
-  let currencySymbol = 'Dhs.'; // Default to AED
-  if (typeof Shopify !== 'undefined' && Shopify.currency && Shopify.currency.active) {
-    currencySymbol = Shopify.currency.active; // Will return 'Dhs' if store currency is Dhs
-  }
-
-  return currencySymbol + ' ' + (cents / 100).toFixed(2);
-}
-
+    // Format money using Shopify's formatter
+    function formatMoney(cents) {
+      if (typeof Shopify !== 'undefined' && Shopify.formatMoney) {
+        return Shopify.formatMoney(cents, moneyFormat);
+      }
+      // Fallback basic formatter
+      return 'Dhs.' + (cents / 100).toFixed(2);
+    }
 
     // Update cart display
     function updateCartDisplay(cart) {
