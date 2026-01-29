@@ -183,9 +183,9 @@
    ========================================== */
 
 :root {
-  --cart-green: #1a5c3a;
-  --cart-green-light: #2d6e47;
-  --cart-green-dark: #0d3d26;
+  --cart-green: #174F19;
+  --cart-green-light: #1e6322;
+  --cart-green-dark: #0f3511;
   --cart-sage: #9db5a5;
   --cart-red: #dc3545;
   --cart-border: #e8e8e8;
@@ -246,12 +246,12 @@
   text-decoration: none;
   cursor: pointer;
   transition: all 0.25s ease;
-  box-shadow: 0 4px 12px rgba(26, 92, 58, 0.3);
+  box-shadow: 0 4px 12px rgba(23, 79, 25, 0.3);
 }
 
 .cart-empty-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(26, 92, 58, 0.4);
+  box-shadow: 0 6px 20px rgba(23, 79, 25, 0.4);
 }
 
 /* ==========================================
@@ -428,7 +428,7 @@
 }
 
 /* ==========================================
-   QUANTITY CONTROLS - INLINE
+   QUANTITY CONTROLS - STANDARD WHITE DESIGN
    ========================================== */
 
 .cart-item__controls {
@@ -445,20 +445,15 @@
   height: 36px;
   min-width: 100px;
   padding: 0 4px;
-  background: linear-gradient(135deg, var(--cart-green) 0%, var(--cart-green-dark) 100%);
-  border: 2px solid rgba(255, 255, 255, 0.15);
-  border-radius: 50px;
-  box-shadow: 
-    0 2px 8px rgba(26, 92, 58, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  background: #ffffff;
+  border: 1.5px solid var(--cart-border);
+  border-radius: 8px;
   transition: all 0.2s ease;
 }
 
 .cart-item__quantity:hover {
-  background: linear-gradient(135deg, var(--cart-green-light) 0%, var(--cart-green) 100%);
-  box-shadow: 
-    0 3px 10px rgba(26, 92, 58, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  border-color: var(--cart-green);
+  box-shadow: 0 2px 6px rgba(23, 79, 25, 0.1);
 }
 
 .qty-btn {
@@ -467,18 +462,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-  color: white;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: var(--cart-text);
   cursor: pointer;
   transition: all 0.2s ease;
   padding: 0;
 }
 
 .qty-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: scale(1.08);
+  background: rgba(23, 79, 25, 0.08);
+  color: var(--cart-green);
 }
 
 .qty-btn:active {
@@ -497,8 +492,8 @@
   border: none;
   background: transparent;
   font-size: 0.95rem;
-  font-weight: 700;
-  color: white;
+  font-weight: 600;
+  color: var(--cart-text);
   text-align: center;
   -moz-appearance: textfield;
   appearance: textfield;
