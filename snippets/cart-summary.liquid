@@ -244,6 +244,7 @@
     font-size: 16px;
     font-weight: 700;
     color: #000000;
+    text-transform: none;
   }
 
   .cart__total-value {
@@ -274,7 +275,7 @@
 
   /* Checkout Button - MAXIMUM VISIBILITY */
   .cart__checkout-button {
-    background: #10b981; /* Bright solid green */
+    background: #174F19; /* Primary green color */
     color: #ffffff;
     border-radius: 10px;
     font-size: 18px;
@@ -282,23 +283,23 @@
     letter-spacing: 0.5px;
     width: 100%;
     padding: 1.125rem 2rem;
-    border: 3px solid #059669;
+    border: 3px solid #0f3511;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    box-shadow: 0 4px 12px rgba(23, 79, 25, 0.4);
     text-transform: uppercase;
   }
 
   .cart__checkout-button:hover:not(:disabled) {
-    background: #059669;
-    border-color: #047857;
-    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.5);
+    background: #0f3511;
+    border-color: #0a2509;
+    box-shadow: 0 6px 16px rgba(23, 79, 25, 0.5);
     transform: translateY(-2px);
   }
 
   .cart__checkout-button:active:not(:disabled) {
     transform: translateY(0);
-    box-shadow: 0 3px 8px rgba(16, 185, 129, 0.3);
+    box-shadow: 0 3px 8px rgba(23, 79, 25, 0.3);
   }
 
   .cart__checkout-button:disabled {
@@ -347,17 +348,34 @@
   document.addEventListener('cart:updated', function(event) {
     const cart = event.detail;
     
-    // Update cart total value
-    const cartTotalEl = document.querySelector('.cart__total-value');
-    if (cartTotalEl && cart.total_price !== undefined) {
-      // Use Shopify's money format
-      cartTotalEl.textContent = Shopify.formatMoney(cart.total_price, theme.moneyFormat || '{{amount}}');
+    // Get money format
+    const moneyFormat = window.theme && window.theme.moneyFormat ? window.theme.moneyFormat : '{{amount}}';
+    
+    // Format money helper
+    function formatMoney(cents) {
+      if (typeof Shopify !== 'undefined' && Shopify.formatMoney) {
+        return Shopify.formatMoney(cents, moneyFormat);
+      }
+      return '$' + (cents / 100).toFixed(2);
     }
     
-    // Update original total if there are discounts
+    // Update estimated total
+    const cartTotalValueEl = document.querySelector('.cart__total-value');
+    if (cartTotalValueEl && cart.total_price !== undefined) {
+      const formattedPrice = formatMoney(cart.total_price);
+      cartTotalValueEl.textContent = formattedPrice;
+      
+      // Also update the text-component value attribute if it exists
+      const textComponent = document.querySelector('text-component[ref="cartTotal"]');
+      if (textComponent) {
+        textComponent.setAttribute('value', formattedPrice);
+      }
+    }
+    
+    // Update original total (subtotal) if there are discounts
     const originalTotalEl = document.querySelector('.cart__original-total-value');
     if (originalTotalEl && cart.original_total_price !== undefined) {
-      originalTotalEl.textContent = Shopify.formatMoney(cart.original_total_price, theme.moneyFormat || '{{amount}}');
+      originalTotalEl.textContent = formatMoney(cart.original_total_price);
     }
     
     // Update discount amounts
@@ -365,12 +383,12 @@
       cart.cart_level_discount_applications.forEach((discount, index) => {
         const discountValueEl = document.querySelectorAll('.cart__discount-value')[index];
         if (discountValueEl) {
-          discountValueEl.textContent = '-' + Shopify.formatMoney(discount.total_allocated_amount, theme.moneyFormat || '{{amount}}');
+          discountValueEl.textContent = '-' + formatMoney(discount.total_allocated_amount);
         }
       });
     }
     
-    // Disable checkout button if cart is empty
+    // Disable/enable checkout button based on cart count
     const checkoutBtn = document.getElementById('checkout');
     if (checkoutBtn) {
       if (cart.item_count === 0) {
