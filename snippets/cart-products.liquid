@@ -720,39 +720,90 @@
 {% endstylesheet %}
 
 <script>
-  // Modern Cart Functionality
+  // Modern Cart Functionality - No Page Refresh
   document.addEventListener('DOMContentLoaded', function() {
     const cartForm = document.querySelector('.modern-cart-form');
     if (!cartForm) return;
 
+    // Update cart display
+    function updateCartDisplay(cart) {
+      // Update cart count if element exists
+      const cartCount = document.querySelector('[ref="cartItemCount"]');
+      if (cartCount) {
+        cartCount.textContent = cart.item_count;
+      }
+
+      // Update each item
+      cart.items.forEach((item, index) => {
+        const lineIndex = index;
+        const cartItem = document.querySelector(`[data-line-index="${lineIndex}"]`);
+        
+        if (cartItem) {
+          // Update quantity input
+          const qtyInput = cartItem.querySelector('.qty-input');
+          if (qtyInput) {
+            qtyInput.value = item.quantity;
+          }
+
+          // Update line total
+          const lineTotal = cartItem.querySelector('.cart-item__total');
+          if (lineTotal) {
+            lineTotal.textContent = formatMoney(item.final_line_price);
+          }
+        }
+      });
+
+      // Trigger custom event for cart update (for totals section)
+      document.dispatchEvent(new CustomEvent('cart:updated', { detail: cart }));
+    }
+
+    // Format money (basic formatter - adjust based on your currency settings)
+    function formatMoney(cents) {
+      return '$' + (cents / 100).toFixed(2);
+    }
+
     // Handle quantity change
-    function updateQuantity(line, newQuantity) {
-      const formData = new FormData();
-      formData.append('line', line);
-      formData.append('quantity', newQuantity);
+    function updateQuantity(line, newQuantity, button) {
+      // Disable button during update
+      if (button) button.disabled = true;
 
       fetch('/cart/change.js', {
         method: 'POST',
-        body: formData
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          line: line,
+          quantity: newQuantity
+        })
       })
       .then(response => response.json())
-      .then(data => {
+      .then(cart => {
         if (newQuantity === 0) {
           // Remove item with animation
           const cartItem = document.querySelector(`[data-line-index="${line - 1}"]`);
           if (cartItem) {
             cartItem.classList.add('removing');
             setTimeout(() => {
-              window.location.reload();
+              cartItem.remove();
+              updateCartDisplay(cart);
+              
+              // Check if cart is empty and reload
+              if (cart.item_count === 0) {
+                window.location.reload();
+              }
             }, 300);
           }
         } else {
-          window.location.reload();
+          updateCartDisplay(cart);
         }
       })
       .catch(error => {
         console.error('Error:', error);
         showError(line, 'Unable to update quantity');
+      })
+      .finally(() => {
+        if (button) button.disabled = false;
       });
     }
 
@@ -769,33 +820,38 @@
 
     // Decrease button
     document.querySelectorAll('[data-action="decrease"]').forEach(btn => {
-      btn.addEventListener('click', function() {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
         const line = parseInt(this.dataset.line);
         const input = document.querySelector(`.qty-input[data-line="${line}"]`);
         const currentValue = parseInt(input.value);
         const newValue = Math.max(0, currentValue - 1);
-        input.value = newValue;
-        updateQuantity(line, newValue);
+        
+        if (newValue >= 0) {
+          updateQuantity(line, newValue, this);
+        }
       });
     });
 
     // Increase button
     document.querySelectorAll('[data-action="increase"]').forEach(btn => {
-      btn.addEventListener('click', function() {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
         const line = parseInt(this.dataset.line);
         const input = document.querySelector(`.qty-input[data-line="${line}"]`);
         const currentValue = parseInt(input.value);
         const newValue = currentValue + 1;
-        input.value = newValue;
-        updateQuantity(line, newValue);
+        
+        updateQuantity(line, newValue, this);
       });
     });
 
     // Remove button
     document.querySelectorAll('[data-action="remove"]').forEach(btn => {
-      btn.addEventListener('click', function() {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
         const line = parseInt(this.dataset.line);
-        updateQuantity(line, 0);
+        updateQuantity(line, 0, this);
       });
     });
   });
