@@ -341,3 +341,14 @@
     }
   }
 {% endstylesheet %}
+
+<script>
+  // Listen for cart updates from cart-items.liquid
+  document.addEventListener('cart:updated', function(event) {
+    const cart = event.detail;
+    
+    // Reload the page to update cart totals
+    // You can also update specific elements here instead of reloading
+    window.location.reload();
+  });
+</script>
