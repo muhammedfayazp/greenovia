@@ -730,12 +730,23 @@
 
     // Format money using Shopify's formatter
     function formatMoney(cents) {
+      // Ensure cents is a number
+      cents = Number(cents);
+
       if (typeof Shopify !== 'undefined' && Shopify.formatMoney) {
+        // Use Shopify's formatter if available
         return Shopify.formatMoney(cents, moneyFormat);
       }
-      // Fallback basic formatter
-      return '$' + (cents / 100).toFixed(2);
+
+      // Fallback: detect currency symbol dynamically
+      var currencySymbol = 'AED'; // Default, can be dynamic
+      if (typeof Shopify !== 'undefined' && Shopify.currency) {
+        currencySymbol = Shopify.currency.active || 'AED';
+      }
+
+      return currencySymbol + ' ' + (cents / 100).toFixed(2);
     }
+
 
     // Update cart display
     function updateCartDisplay(cart) {
