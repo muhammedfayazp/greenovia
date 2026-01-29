@@ -730,31 +730,31 @@
 
     // Format money using Shopify's formatter
     function formatMoney(cents) {
-      // Ensure cents is a number
-      cents = Number(cents);
-
       if (typeof Shopify !== 'undefined' && Shopify.formatMoney) {
-        // Use Shopify's formatter if available
         return Shopify.formatMoney(cents, moneyFormat);
       }
-
-      // Fallback: detect currency symbol dynamically
-      var currencySymbol = 'Dhs'; // Default, can be dynamic
-      if (typeof Shopify !== 'undefined' && Shopify.currency) {
-        currencySymbol = Shopify.currency.active || 'Dhs';
-      }
-
-      return currencySymbol + ' ' + (cents / 100).toFixed(2);
+      // Fallback basic formatter
+      return '$' + (cents / 100).toFixed(2);
     }
-
 
     // Update cart display
     function updateCartDisplay(cart) {
-      // Update cart count if element exists
-      const cartCount = document.querySelector('[ref="cartItemCount"]');
-      if (cartCount) {
-        cartCount.textContent = cart.item_count;
-      }
+      // Update cart count - try multiple selectors for cart count
+      const cartCountSelectors = [
+        '[ref="cartItemCount"]',
+        '.cart-count',
+        '.cart-item-count',
+        '[data-cart-count]',
+        '#cart-count'
+      ];
+      
+      cartCountSelectors.forEach(selector => {
+        const cartCount = document.querySelector(selector);
+        if (cartCount) {
+          cartCount.textContent = cart.item_count;
+          cartCount.setAttribute('data-count', cart.item_count);
+        }
+      });
 
       // Update each item
       cart.items.forEach((item, index) => {
