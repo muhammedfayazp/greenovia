@@ -1,0 +1,81 @@
+{% comment %}
+  Renders a tree-style mega menu with a fixed left sidebar and dynamic right content.
+  Accepts:
+  - parent_link: The Level 1 link object containing the sub-menus.
+{% endcomment %}
+
+<div class="mega-menu-tree page-width" data-mega-menu-tree>
+  <div class="mega-menu-tree__container">
+    
+    <!-- Left Sidebar: Level 2 Items -->
+    <div class="mega-menu-tree__sidebar">
+      <ul class="mega-menu-tree__sidebar-list list-unstyled">
+        {% for link in parent_link.links %}
+          <li class="mega-menu-tree__sidebar-item" data-target="submenu-{{ link.handle }}-{{ forloop.index }}">
+            <a href="{{ link.url }}" class="mega-menu-tree__sidebar-link {% if forloop.first %}is-active{% endif %}">
+              {{ link.title }}
+              <span class="mega-menu-tree__arrow">{% render 'icon-arrow' %}</span>
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <!-- Right Content: Level 3 Items -->
+    <div class="mega-menu-tree__content">
+      {% for link in parent_link.links %}
+        <div 
+          id="submenu-{{ link.handle }}-{{ forloop.index }}" 
+          class="mega-menu-tree__content-panel {% if forloop.first %}is-visible{% endif %}"
+        >
+          {% if link.links != blank %}
+            <ul class="mega-menu-tree__grid list-unstyled">
+              {% for child_link in link.links %}
+                <li class="mega-menu-tree__grid-item">
+                  <a href="{{ child_link.url }}" class="mega-menu-tree__grid-link">
+                    {{ child_link.title }}
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+             <div class="mega-menu-tree__empty">
+                <p>No items found under {{ link.title }}</p>
+             </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const trees = document.querySelectorAll('[data-mega-menu-tree]');
+    
+    trees.forEach(tree => {
+      const sidebarLinks = tree.querySelectorAll('.mega-menu-tree__sidebar-item');
+      const panels = tree.querySelectorAll('.mega-menu-tree__content-panel');
+      
+      sidebarLinks.forEach(link => {
+        link.addEventListener('mouseenter', function() {
+          // Remove active class from all links
+          sidebarLinks.forEach(l => l.querySelector('a').classList.remove('is-active'));
+          // Add active class to current
+          this.querySelector('a').classList.add('is-active');
+          
+          // Hide all panels
+          panels.forEach(p => p.classList.remove('is-visible'));
+          
+          // Show target panel
+          const targetId = this.dataset.target;
+          const targetPanel = tree.querySelector(`#${targetId}`);
+          if (targetPanel) {
+            targetPanel.classList.add('is-visible');
+          }
+        });
+      });
+    });
+  });
+</script>

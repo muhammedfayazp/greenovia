@@ -554,3 +554,119 @@ slideshow-component {
 .swatch {
   background-color: var(--swatch-background);
 }
+
+/* Mega Menu Tree Styles */
+.mega-menu-tree {
+  width: 100%;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+.mega-menu-tree__container {
+  display: flex;
+  gap: 2rem;
+  background-color: rgb(var(--color-background));
+  min-height: 400px;
+  /* Ensure a reasonable height */
+}
+
+/* Sidebar Styles */
+.mega-menu-tree__sidebar {
+  width: 250px;
+  flex-shrink: 0;
+  border-right: 1px solid rgba(var(--color-foreground), 0.1);
+  padding-right: 1rem;
+}
+
+.mega-menu-tree__sidebar-item {
+  margin-bottom: 0.5rem;
+}
+
+.mega-menu-tree__sidebar-link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  text-decoration: none;
+  color: rgb(var(--color-foreground));
+  font-weight: 500;
+  border-radius: var(--button-radius, 4px);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.mega-menu-tree__sidebar-link:hover,
+.mega-menu-tree__sidebar-link.is-active {
+  background-color: rgba(var(--color-foreground), 0.05);
+  /* Light gray/hover effect */
+  color: rgb(var(--color-foreground));
+  font-weight: 600;
+}
+
+/* Right Content Styles */
+.mega-menu-tree__content {
+  flex-grow: 1;
+  padding-left: 1rem;
+}
+
+.mega-menu-tree__content-panel {
+  display: none;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.mega-menu-tree__content-panel.is-visible {
+  display: block;
+}
+
+.mega-menu-tree__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  /* 4 columns by default */
+  gap: 1.5rem;
+}
+
+.mega-menu-tree__grid-item {
+  margin-bottom: 0.5rem;
+}
+
+.mega-menu-tree__grid-link {
+  text-decoration: none;
+  color: rgb(var(--color-foreground));
+  font-size: 0.95rem;
+  transition: color 0.2s ease;
+}
+
+.mega-menu-tree__grid-link:hover {
+  text-decoration: underline;
+  color: rgb(var(--color-link-hover));
+  /* Assuming this variable exists, else falls back to foreground */
+}
+
+.mega-menu-tree__empty {
+  color: rgba(var(--color-foreground), 0.6);
+  font-style: italic;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile responsiveness: Not designed for mobile, but ensure it doesn't break layout if shown */
+@media screen and (max-width: 989px) {
+  .mega-menu-tree__container {
+    flex-direction: column;
+  }
+
+  .mega-menu-tree__sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid rgba(var(--color-foreground), 0.1);
+  }
+}
