@@ -1,0 +1,35 @@
+<div x-data="{
+    selected: '{{ collections.first.title }}',
+    plants: {
+      {% for collection in collections %}
+        '{{ collection.title }}': [
+          {% for product in collection.products %}
+            '{{ product.title }}'{% unless forloop.last %},{% endunless %}
+          {% endfor %}
+        ]{% unless forloop.last %},{% endunless %}
+      {% endfor %}
+    }
+  }" class="flex gap-10 w-full">
+
+  <!-- Left fixed menu -->
+  <div class="flex flex-col w-1/4 sticky top-20 hidden lg:flex">
+    {% for collection in collections %}
+      <div
+        @mouseenter="selected = '{{ collection.title }}'"
+        class="p-3 cursor-pointer rounded hover:bg-green-100"
+        :class="selected === '{{ collection.title }}' ? 'bg-green-200 font-bold' : ''">
+        {{ collection.title }}
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Right dynamic content -->
+  <div class="flex-1 bg-gray-50 p-5 rounded shadow">
+    <h2 class="text-xl font-semibold mb-4" x-text="selected"></h2>
+    <ul class="list-disc list-inside space-y-2">
+      <template x-for="item in plants[selected]" :key="item">
+        <li x-text="item"></li>
+      </template>
+    </ul>
+  </div>
+</div>
