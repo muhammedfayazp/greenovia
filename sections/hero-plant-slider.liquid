@@ -1,88 +1,3 @@
-
-<style>
-/* CRITICAL HERO CSS - MOVE TO TOP */
-.hero-slider-wrapper {
-  position: relative;
-  width: 100%;
-  margin-bottom: 40px;
-  background: #fff;
-  overflow: hidden;
-  height: 650px;
-  opacity: 0;
-  transition: opacity 0.5s ease;
-}
-.hero-slider-wrapper.is-ready { opacity: 1; }
-
-.hero-swiper {
-  height: 100%;
-  width: 100%;
-  position: relative;
-}
-.swiper-wrapper {
-  display: flex !important;
-  flex-wrap: nowrap !important;
-}
-.swiper-slide {
-  height: 100%;
-  width: 100%;
-  flex-shrink: 0;
-}
-.hero-slide-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  height: 100%;
-  align-items: center;
-}
-.hero-content {
-  padding: 60px 80px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  position: relative;
-  z-index: 2;
-  background: #fff;
-  height: 100%;
-}
-.hero-title {
-  font-size: 3.5rem;
-  color: #1a3c1a; 
-  line-height: 1.1;
-  margin-bottom: 1.5rem;
-  font-weight: 700;
-}
-.hero-description {
-  font-size: 1.125rem;
-  color: #555;
-  margin-bottom: 2.5rem;
-  line-height: 1.6;
-}
-.hero-image-container {
-  height: 100%;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
-}
-.hero-plant-img {
-  width: 85%;
-  height: 85%;
-  object-fit: contain;
-}
-
-@media (max-width: 768px) {
-  .hero-slider-wrapper { height: 500px; margin-bottom: 20px; }
-  .hero-slide-grid { display: flex; flex-direction: column; }
-  .hero-image-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
-  .hero-image-container::after { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); z-index: 2; }
-  .hero-plant-img { width: 100%; height: 100%; object-fit: cover; }
-  .hero-content { position: relative; z-index: 3; padding: 24px; text-align: center; background: transparent; width: 100%; height: 100%; align-items: center; }
-  .hero-title { color: #fff; font-size: 2.5rem; }
-  .hero-description { color: #f0f0f0; }
-}
-</style>
-
 {% schema %}
 {
   "name": "Hero Plant Slider",
@@ -221,7 +136,271 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
 <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
 
+<style>
+  /* Section Layout */
+  .hero-slider-wrapper {
+    position: relative;
+    width: 100%;
+    margin-bottom: 40px;
+    background: #fff;
+    overflow: hidden;
+    height: 650px; /* Fixed height for consistency */
+  }
 
+  .hero-swiper {
+    height: 100%;
+    width: 100%;
+    position: relative;
+  }
+
+  .swiper-slide {
+    height: 100%;
+    width: 100%;
+  }
+
+  .hero-slide-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    height: 100%;
+    align-items: center;
+  }
+
+  /* Left Content */
+  .hero-content {
+    padding: 60px 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+    background: #fff;
+    height: 100%;
+  }
+
+  .hero-content-inner {
+    max-width: 500px;
+  }
+
+  .hero-title {
+    font-size: 3.5rem;
+    color: #1a3c1a; 
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    font-family: var(--font-heading-family); 
+    font-weight: 700;
+  }
+
+  .hero-description {
+    font-size: 1.125rem;
+    color: #555;
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
+    max-width: 440px;
+  }
+
+  .hero-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 16px 32px;
+    background: #2b4e2b;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    width: fit-content;
+    font-size: 1.05rem;
+  }
+
+  .hero-btn:hover {
+    background: #1a3c1a;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(43, 78, 43, 0.2);
+  }
+
+  /* Right Image */
+  .hero-image-container {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-plant-img {
+    width: 85%;
+    height: 85%;
+    object-fit: contain;
+    filter: drop-shadow(0 20px 40px rgba(0,0,0,0.12));
+    transition: transform 0.5s ease;
+  }
+
+  .swiper-slide-active .hero-plant-img {
+    transform: scale(1.02);
+  }
+  
+  .placeholder {
+    width: 100%;
+    height: 100%;
+    opacity: 0.5;
+  }
+  
+  /* Swiper Pagination - Vertical on the Right */
+  .hero-slider-wrapper .swiper-pagination {
+    position: absolute !important;
+    right: 30px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    left: auto !important;
+    bottom: auto !important;
+    width: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    z-index: 20;
+  }
+  
+  .hero-slider-wrapper .swiper-pagination-bullet {
+    width: 12px !important;
+    height: 12px !important;
+    background: transparent !important;
+    border: 2px solid #1a3c1a !important;
+    opacity: 1 !important;
+    margin: 0 !important;
+    transition: all 0.3s ease;
+    border-radius: 50%;
+    display: block !important;
+  }
+  
+  .hero-slider-wrapper .swiper-pagination-bullet-active {
+    background: #1a3c1a !important;
+    transform: scale(1.2);
+  }
+
+  /* Responsive */
+  @media (max-width: 1200px) {
+    .hero-title { font-size: 3rem; }
+    .hero-content { padding: 40px; }
+  }
+
+  @media (max-width: 900px) {
+    .hero-title { font-size: 2.5rem; }
+  }
+
+  @media (max-width: 768px) {
+    .hero-slider-wrapper {
+      height: 500px; /* Reduced height for mobile */
+      margin-bottom: 20px;
+    }
+
+    .hero-slide-grid {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      position: relative;
+    }
+    
+    /* Image as Background on Mobile */
+    .hero-image-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      order: unset;
+      padding: 0;
+    }
+
+    /* Override inline background color on mobile to let image show or use overlay */
+    .hero-image-container::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4); /* Dark overlay for text readability */
+      z-index: 2;
+    }
+
+    .hero-plant-img {
+      width: 100%;
+      height: 100%;
+      max-width: none;
+      max-height: none;
+      object-fit: cover;
+      filter: none; /* Remove drop shadow */
+    }
+    
+    .hero-content {
+      position: relative;
+      z-index: 3;
+      padding: 24px;
+      text-align: center;
+      background: transparent;
+      width: 100%;
+      height: 100%;
+      align-items: center;
+    }
+    
+    .hero-content-inner {
+      margin: 0 auto;
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hero-title {
+      color: #fff;
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .hero-description {
+      color: #f0f0f0;
+      max-width: 100%;
+      font-size: 1rem;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+    
+    .hero-btn {
+      background: #fff;
+      color: #1a3c1a;
+      border: none;
+    }
+    
+    .hero-btn:hover {
+      background: #f0f0f0;
+      transform: translateY(-2px);
+    }
+
+    .hero-slider-wrapper .swiper-pagination {
+      display: flex !important;
+      bottom: 20px !important;
+      top: auto !important;
+      right: 0 !important;
+      left: 0 !important;
+      width: 100% !important;
+      transform: none !important;
+      flex-direction: row !important;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .hero-slider-wrapper .swiper-pagination-bullet {
+      background: transparent !important;
+      border-color: #fff !important;
+    }
+    
+    .hero-slider-wrapper .swiper-pagination-bullet-active {
+      background: #fff !important;
+    }
+  }
+</style>
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
@@ -248,7 +427,6 @@
             clickable: true,
           }
         });
-        wrapper.classList.add('is-ready');
       }
     });
   });
