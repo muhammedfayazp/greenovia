@@ -710,3 +710,56 @@ slideshow-component {
     /* Hide content on mobile detailed view to rely on standard mobile menu */
   }
 }
+
+/* ===============================
+   PREMIUM MENU REFINEMENTS
+================================ */
+
+/* Top Level Links */
+.menu-list__link {
+  font-family: var(--menu-top-level-font-family);
+  font-weight: 700 !important;
+  /* Bold headers */
+  font-size: 1rem !important;
+  /* Larger text */
+  letter-spacing: 0.02em;
+  padding: 1.25rem 1rem !important;
+  /* More breathing room */
+  transition: color 0.2s ease;
+  position: relative;
+}
+
+.menu-list__link:hover {
+  color: var(--gv-primary);
+}
+
+/* Underline effect on hover */
+.menu-list__link::after {
+  content: '';
+  position: absolute;
+  bottom: 0.75rem;
+  left: 1rem;
+  width: 0;
+  height: 2px;
+  background-color: var(--gv-primary);
+  transition: width 0.3s ease;
+}
+
+.menu-list__link:hover::after,
+.menu-list__link--active::after {
+  width: calc(100% - 2rem);
+}
+
+/* Mega Menu Dropdown Container - Floating Card Effect */
+.menu-list__submenu {
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1) !important;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+/* Make sure the tree runs flush */
+.mega-menu-tree {
+  border-top: none;
+}
