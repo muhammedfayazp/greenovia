@@ -1,41 +1,6 @@
 <script src="{{ 'component-cart-quantity-selector.js' | asset_url }}" type="module" fetchpriority="low"></script>
 <script src="{{ 'component-add-to-cart.js' | asset_url }}" type="module" fetchpriority="low"></script>
 <script src="{{ 'product-form.js' | asset_url }}" type="module" fetchpriority="low"></script>
-
-<style>
-/* Critical Layout CSS - Loads First */
-.collection-filter-page {
-  background: #fff;
-  min-height: 100vh;
-  opacity: 0; 
-  transition: opacity 0.3s ease;
-}
-.collection-container {
-  display: grid;
-  grid-template-columns: 250px 1fr !important;
-  gap: 40px !important;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 32px 24px;
-}
-.product-grid {
-  display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important;
-  gap: 24px !important;
-}
-.style-cards.swiper-container { overflow: hidden; }
-.style-cards .swiper-wrapper { display: flex !important; flex-wrap: nowrap !important; }
-.style-card { flex: 0 0 100%; min-width: 100%; }
-
-@media (max-width: 991px) {
-  .collection-container { 
-    grid-template-columns: 1fr !important; 
-    gap: 20px !important; 
-  }
-  .filter-sidebar { display: none; }
-}
-</style>
-
 <div class="collection-filter-page">
   
   {%- comment -%} Breadcrumb {%- endcomment -%}
@@ -674,38 +639,27 @@
 </div>
 
 <style>
-/* Layout CSS moved to top for faster execution */
+/* Base Styles */
 .collection-filter-page{
   background: #fff;
   min-height: 100vh;
-  opacity: 0; 
+  opacity: 0; /* Start hidden to prevent FOUC */
   transition: opacity 0.3s ease;
 }
-.collection-container{
-  display: grid;
-  grid-template-columns: 250px 1fr;
-  gap: 40px;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 32px 24px;
+
+/* Logic to hide initially hidden products via CSS if possible */
+[data-price-hidden="true"],
+[data-color-hidden="true"] {
+  display: none !important;
 }
+
 .product-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 24px;
+  min-height: 400px; /* Prevent collapse */
 }
-.style-cards.swiper-container { overflow: hidden; }
-.style-cards .swiper-wrapper { display: flex !important; flex-wrap: nowrap !important; }
-.style-card { flex: 0 0 100%; min-width: 100%; }
 
-@media (max-width: 991px) {
-  .collection-container { grid-template-columns: 1fr; gap: 20px; }
-  .filter-sidebar { display: none; }
-}
-</style>
-
-<style>
-/* Base Styles */
 .page-width{
   max-width: 1400px;
   margin: 0 auto;
