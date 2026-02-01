@@ -120,12 +120,22 @@
                     <div class="dailydeals__actions {% if cart_qty > 0 %}is-active{% endif %}" data-cart-quantity="{{ cart_qty }}">
                     
                       <cart-quantity-selector-component class="dailydeals__qty-selector">
-                        <button type="button" class="qty__btn" on:click="/decreaseQuantity">
+                        <button type="button" class="qty__btn" ref="minusButton" on:click="/decreaseQuantity">
                           <span class="qty__minus-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg></span>
                           <span class="qty__trash-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></span>
                         </button>
-                        <span class="qty__current">{{ cart_qty }}</span>
-                        <button type="button" class="qty__btn" on:click="/increaseQuantity">
+                        <input 
+                          type="number" 
+                          name="quantity" 
+                          value="{{ cart_qty | at_least: 1 }}" 
+                          min="1" 
+                          class="qty__current" 
+                          ref="quantityInput"
+                          style="width: 30px; text-align: center; border: none; background: transparent; color: #fff; font-weight: 700; -moz-appearance: textfield;"
+                          on:focus="/selectInputValue"
+                          on:blur="/setQuantity"
+                        >
+                        <button type="button" class="qty__btn" ref="plusButton" on:click="/increaseQuantity">
                           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                         </button>
                       </cart-quantity-selector-component>
