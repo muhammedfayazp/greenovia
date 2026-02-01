@@ -1,3 +1,5 @@
+<script src="{{ 'component-cart-quantity-selector.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'component-add-to-cart.js' | asset_url }}" type="module" fetchpriority="low"></script>
 <div class="collection-filter-page">
   
   {%- comment -%} Breadcrumb {%- endcomment -%}
@@ -449,26 +451,47 @@
               {%- comment -%} Quantity and Add to Cart {%- endcomment -%}
 
               {%- comment -%} Quantity and Add to Cart {%- endcomment -%}
-              <form method="post" action="/cart/add" class="product-form">
-                <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
-                
-                <div class="product-actions">
-                  <div class="qty-counter">
-                    <button type="button" class="qty-btn" onclick="updateQty(this, -1)">−</button>
-                    <input type="number" name="quantity" value="1" min="1" class="qty-input">
-                    <button type="button" class="qty-btn" onclick="updateQty(this, 1)">+</button>
-                  </div>
+              {%- assign cart_qty = cart | item_count_for_variant: product.selected_or_first_available_variant.id -%}
+              <product-form-component class="modern-product-form-wrapper" data-section-id="{{ section.id }}" data-product-id="{{ product.id }}">
+                {%- form 'product', product, id: nil, class: 'modern-product-form' -%}
+                  <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
                   
-                  <button type="submit" class="cart-btn">
-                    <svg viewBox="0 0 24 24" fill="none">
-                      <path d="M3 3h2l2.2 11.4a2 2 0 0 0 2 1.6h7.5a2 2 0 0 0 2-1.6L21 7H6"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      <circle cx="10" cy="20" r="1.5" fill="currentColor"/>
-                      <circle cx="18" cy="20" r="1.5" fill="currentColor"/>
-                    </svg>
-                  </button>
-                </div>
-              </form>
+                  <div class="modern-product-actions {% if cart_qty > 0 %}is-active{% endif %}" data-cart-quantity="{{ cart_qty }}">
+                  
+                    <cart-quantity-selector-component class="modern-qty-selector">
+                      <button type="button" class="qty__btn" ref="minusButton" on:click="/decreaseQuantity">
+                        <span class="qty__minus-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg></span>
+                        <span class="qty__trash-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></span>
+                      </button>
+                      <input 
+                        type="number" 
+                        name="quantity" 
+                        value="{{ cart_qty | at_least: 1 }}" 
+                        min="1" 
+                        class="qty__current" 
+                        ref="quantityInput"
+                        style="width: 30px; text-align: center; border: none; background: transparent; color: #fff; font-weight: 700; -moz-appearance: textfield;"
+                        on:focus="/selectInputValue"
+                        on:blur="/setQuantity"
+                      >
+                      <button type="button" class="qty__btn" ref="plusButton" on:click="/increaseQuantity">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                      </button>
+                    </cart-quantity-selector-component>
+
+                    <add-to-cart-component class="modern-atc-wrapper">
+                      <button type="submit" class="modern-cart-btn" aria-label="Add to cart">
+                        <svg viewBox="0 0 24 24" fill="none">
+                          <path d="M3 3h2l2.2 11.4a2 2 0 0 0 2 1.6h7.5a2 2 0 0 0 2-1.6L21 7H6"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          <circle cx="10" cy="20" r="1.5" fill="currentColor"/>
+                          <circle cx="18" cy="20" r="1.5" fill="currentColor"/>
+                        </svg>
+                      </button>
+                    </add-to-cart-component>
+                  </div>
+                {%- endform -%}
+              </product-form-component>
             </div>
           </div>
         {% endfor %}
@@ -776,18 +799,111 @@ details[open] > .category-summary .category-link {
   flex-wrap: wrap; /* Allow wrapping if very tight */
 }
 
-.qty-counter{
+/* Actions & Buttons */
+.modern-product-actions {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  height: 40px;
+  margin-top: 8px;
+}
+
+.modern-cart-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #1f3d2b;
+  color: #fff;
+  border: none;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  background: #f6f7f2;
-  border-radius: 999px;
-  padding: 2px; /* Reduced padding */
-  gap: 0;
-  box-shadow: inset 0 0 0 1px #e3e6de;
-  flex: 1; /* Take available space */
-  justify-content: space-between;
-  min-width: 90px; /* Minimum width for usability */
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
 }
+
+.modern-cart-btn:hover {
+  background: #2a523a;
+  transform: scale(1.05);
+}
+
+.modern-cart-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.modern-qty-selector {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 40px;
+  width: 40px;
+  min-width: 40px;
+  background: #1f3d2b;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box;
+  box-shadow: 0 4px 12px rgba(31, 61, 43, 0.2);
+}
+
+/* Active State: Cart -> Counter */
+.modern-product-actions.is-active .modern-atc-wrapper {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.8);
+}
+
+.modern-product-actions.is-active .modern-qty-selector {
+  width: auto;
+  min-width: 105px;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modern-qty-selector .qty__btn {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  padding: 0;
+  transition: background 0.2s ease;
+}
+.modern-qty-selector .qty__btn:hover {
+  background: rgba(255,255,255,0.25);
+}
+
+.modern-qty-selector .qty__current {
+  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1;
+  flex: 1;
+  text-align: center;
+  min-width: 24px;
+}
+
+.modern-qty-selector .qty__trash-icon { display: none; }
+.modern-product-actions[data-cart-quantity="1"] .qty__minus-icon { display: none; }
+.modern-product-actions[data-cart-quantity="1"] .qty__trash-icon { display: flex; }
+
+.modern-qty-selector .qty__btn svg { display: block; }
+
 
 .qty-btn{
   width: 28px;
