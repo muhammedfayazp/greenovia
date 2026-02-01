@@ -124,7 +124,6 @@
           </div>
           
           <div class="filter-options">
-          <div class="filter-options">
             {% assign menu_handle = section.settings.category_menu %}
             {% assign menu_links = linklists[menu_handle].links %}
             
@@ -230,7 +229,9 @@
                   </div>
                 {% endfor %}
               </div>
-            {% else %}
+            {% endif %}
+
+            <div class="category-blocks">
               {% for block in section.blocks %}
                 {% if block.type == 'category_filter' %}
                   {% assign filter_collection = collections[block.settings.collection] %}
@@ -242,7 +243,7 @@
                   {% endif %}
                 {% endif %}
               {% endfor %}
-            {% endif %}
+            </div>
           </div>
         </div>
       </div>
@@ -257,13 +258,13 @@
           
           <div class="price-inputs">
             <div class="price-range-inputs">
-              <input type="number" id="min-price" placeholder="Min" min="0" value="10">
+              <input type="number" id="min-price" placeholder="Min" min="0" value="0">
               <input type="number" id="max-price" placeholder="Max" min="0" value="600">
             </div>
             
             <div class="price-slider-container">
               <div class="price-slider-track" id="price-track"></div>
-              <input type="range" id="range-min" min="0" max="600" value="10" step="10">
+              <input type="range" id="range-min" min="0" max="600" value="0" step="10">
               <input type="range" id="range-max" min="0" max="600" value="600" step="10">
             </div>
           </div>
@@ -371,7 +372,9 @@
         <div class="collection-title-area">
           <h1>{{ collection.title }}</h1>
           <p class="product-count">
-            <span class="count-display">1-{{ collection.products.size | at_most: 94 }}</span> products
+            {% assign current_start = paginate.current_offset | plus: 1 %}
+            {% assign current_end = paginate.current_offset | plus: collection.products.size %}
+            <span class="count-display">{{ current_start }}-{{ current_end }}</span> of {{ collection.products_count }} products
           </p>
         </div>
         
@@ -390,8 +393,9 @@
       </div>
 
       {%- comment -%} Product Grid {%- endcomment -%}
+      {% paginate collection.products by 24 %}
       <div class="product-grid" id="product-grid">
-        {% for product in collection.products limit: 24 %}
+        {% for product in collection.products %}
         {%- assign type_lower = product.type | downcase -%}
         {%- assign tags_lower = product.tags | join: ',' | downcase -%}
         {%- assign clean_flower_color = product.options_by_name['Flower Color'].values | join: ',' | downcase -%}
@@ -600,6 +604,7 @@
           {% endif %}
         </div>
       {% endif %}
+    {% endpaginate %}
 
     </main>
 
