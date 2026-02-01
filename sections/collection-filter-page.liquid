@@ -128,6 +128,7 @@
             {% assign menu_links = linklists[menu_handle].links %}
             
             {% assign displayed_handles = "" %}
+            {% cache 'category-menu', menu_handle: menu_handle, collection_handle: collection.handle %}
             {% if menu_handle != blank and menu_links.size > 0 %}
               <div class="category-tree">
                 {% for link in menu_links %}
@@ -246,6 +247,7 @@
                 {% endfor %}
               </div>
             {% endif %}
+            {% endcache %}
 
             <div class="category-tree category-blocks">
               {% for block in section.blocks %}
@@ -1635,15 +1637,32 @@ document.addEventListener('DOMContentLoaded', function() {
   const productCards = document.querySelectorAll('.product-card');
   
   // Filter function
-  // Filter function
-  function filterProducts() {
+  // Performance: Memoize filter results and use debouncing
+  let filterTimeout;
+  const filterCache = new Map();
+
+  function filterProducts(force = false) {
     const selectedFlowerColors = Array.from(document.querySelectorAll('input[name="flower_color"]:checked')).map(cb => cb.value);
     const selectedPotColors = Array.from(document.querySelectorAll('input[name="pot_color"]:checked')).map(cb => cb.value);
     const selectedFlowering = Array.from(document.querySelectorAll('input[name="flowering"]:checked')).map(cb => cb.value);
     const min = parseFloat(minPrice.value) || 0;
     const max = parseFloat(maxPrice.value) || Infinity;
     
-    productCards.forEach(card => {
+    // Create a cache key from filter state
+    const cacheKey = JSON.stringify({
+      flower: selectedFlowerColors,
+      pot: selectedPotColors,
+      flowering: selectedFlowering,
+      min,
+      max
+    });
+
+    if (!force && filterCache.get('last') === cacheKey) return;
+    filterCache.set('last', cacheKey);
+
+    // Optimized DOM batching
+    requestAnimationFrame(() => {
+      productCards.forEach(card => {
       const price = parseFloat(card.dataset.price) / 100;
       const tags = card.dataset.tags.toLowerCase(); // Is already lowercase string
       const flowerColors = card.dataset.flowerColor.toLowerCase(); // Includes Color and Flower Color
@@ -1721,8 +1740,14 @@ document.addEventListener('DOMContentLoaded', function() {
     filterProducts();
   }
   
+  // Debounced input handlers
+  function debouncedFilter() {
+    clearTimeout(filterTimeout);
+    filterTimeout = setTimeout(() => filterProducts(), 150);
+  }
+
   // Event listeners
-  checkboxes.forEach(cb => cb.addEventListener('change', filterProducts));
+  checkboxes.forEach(cb => cb.addEventListener('change', debouncedFilter));
   
   if(rangeMin && rangeMax) {
       rangeMin.addEventListener('input', handleRangeInput);
@@ -1737,7 +1762,7 @@ document.addEventListener('DOMContentLoaded', function() {
           if(val < parseInt(rangeMax.value)) {
              rangeMin.value = val;
              updatePriceSlider();
-             filterProducts();
+             debouncedFilter();
           }
       });
       maxPrice.addEventListener('input', function() {
@@ -1745,7 +1770,7 @@ document.addEventListener('DOMContentLoaded', function() {
           if(val > parseInt(rangeMin.value)) {
              rangeMax.value = val;
              updatePriceSlider();
-             filterProducts();
+             debouncedFilter();
           }
       });
   }
