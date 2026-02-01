@@ -502,26 +502,98 @@
       </div>
 
       <script>
-      // Auto-submit form when quantity changes via +/- buttons
+      // Auto-update cart when quantity changes via +/- buttons
       document.addEventListener('DOMContentLoaded', function() {
         const productGrid = document.getElementById('product-grid');
         if (!productGrid) return;
 
         // Listen for quantity selector update events
-        productGrid.addEventListener('quantity-selector:update', function(event) {
+        productGrid.addEventListener('quantity-selector:update', async function(event) {
           const quantitySelector = event.target;
           const productForm = quantitySelector.closest('product-form-component');
           if (!productForm) return;
 
           const form = productForm.querySelector('form');
-          const cartQty = parseInt(quantitySelector.querySelector('[ref="quantityInput"]')?.getAttribute('data-cart-quantity') || '0');
-          const newQty = event.detail?.quantity || parseInt(quantitySelector.querySelector('[ref="quantityInput"]')?.value || '0');
+          const variantIdInput = form?.querySelector('input[name="id"]');
+          const variantId = variantIdInput?.value;
+          if (!variantId) return;
 
-          // If quantity changed from 0 to 1+, or from existing to different, submit form
-          if (newQty > 0 && newQty !== cartQty) {
-            // Trigger form submission which will add/update cart
-            if (form) {
-              form.requestSubmit();
+          const quantityInput = quantitySelector.querySelector('[ref="quantityInput"]');
+          const cartQty = parseInt(quantityInput?.getAttribute('data-cart-quantity') || '0');
+          const newQty = event.detail?.quantity || parseInt(quantityInput?.value || '0');
+
+          // Skip if quantity hasn't actually changed
+          if (newQty === cartQty) return;
+
+          try {
+            let cart;
+            
+            if (cartQty === 0) {
+              // Item not in cart - use cart/add.js
+              const formData = new FormData(form);
+              const response = await fetch(window.Shopify?.routes?.root + 'cart/add.js', {
+                method: 'POST',
+                body: formData
+              });
+              cart = await response.json();
+              
+              // Dispatch cart:update event to open drawer and update count
+              document.dispatchEvent(new CustomEvent('cart:update', {
+                bubbles: true,
+                detail: {
+                  resource: cart,
+                  data: {
+                    itemCount: cart.item_count || 1,
+                    source: 'collection-filter-page',
+                    variantId: variantId
+                  }
+                }
+              }));
+            } else {
+              // Item already in cart - use cart/change.js to update quantity
+              const response = await fetch('/cart/change.js', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                  id: variantId.toString(), 
+                  quantity: newQty,
+                  sections_url: window.location.pathname
+                })
+              });
+              cart = await response.json();
+              
+              // Update data-cart-quantity attribute
+              quantityInput.setAttribute('data-cart-quantity', newQty.toString());
+              
+              // Dispatch cart:update event
+              document.dispatchEvent(new CustomEvent('cart:update', {
+                bubbles: true,
+                detail: {
+                  resource: cart,
+                  data: {
+                    itemCount: cart.item_count,
+                    source: 'collection-filter-page'
+                  }
+                }
+              }));
+            }
+
+            // Update UI state for this product
+            const productActions = productForm.querySelector('.modern-product-actions');
+            if (productActions) {
+              productActions.setAttribute('data-cart-quantity', newQty.toString());
+              if (newQty > 0) {
+                productActions.classList.add('is-active');
+              } else {
+                productActions.classList.remove('is-active');
+              }
+            }
+
+          } catch (error) {
+            console.error('Cart update error:', error);
+            // Revert quantity on error
+            if (quantityInput) {
+              quantityInput.value = cartQty.toString();
             }
           }
         });
