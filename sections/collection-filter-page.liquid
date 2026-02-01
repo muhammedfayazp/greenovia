@@ -502,27 +502,75 @@
       </div>
 
       <script>
-      // Auto-submit form when quantity changes via +/- buttons
+      // Auto-update cart when quantity changes via +/- buttons
       document.addEventListener('DOMContentLoaded', function() {
         const productGrid = document.getElementById('product-grid');
         if (!productGrid) return;
 
         // Listen for quantity selector update events
-        productGrid.addEventListener('quantity-selector:update', function(event) {
+        productGrid.addEventListener('quantity-selector:update', async function(event) {
+          event.preventDefault();
+          event.stopPropagation();
+          
           const quantitySelector = event.target;
           const productForm = quantitySelector.closest('product-form-component');
           if (!productForm) return;
 
           const form = productForm.querySelector('form');
-          const cartQty = parseInt(quantitySelector.querySelector('[ref="quantityInput"]')?.getAttribute('data-cart-quantity') || '0');
-          const newQty = event.detail?.quantity || parseInt(quantitySelector.querySelector('[ref="quantityInput"]')?.value || '0');
+          const variantIdInput = form?.querySelector('input[name="id"]');
+          const variantId = variantIdInput?.value;
+          if (!variantId) return;
 
-          // If quantity changed from 0 to 1+, or from existing to different, submit form
-          if (newQty > 0 && newQty !== cartQty) {
-            // Trigger form submission which will add/update cart
-            if (form) {
-              form.requestSubmit();
+          const quantityInput = quantitySelector.querySelector('[ref="quantityInput"]');
+          const cartQty = parseInt(quantityInput?.getAttribute('data-cart-quantity') || '0');
+          const newQty = event.detail?.quantity || parseInt(quantityInput?.value || '0');
+
+          if (newQty === cartQty) return;
+
+          try {
+            let cart;
+            
+            if (cartQty === 0 && newQty > 0) {
+              // Add new item to cart
+              const formData = new FormData(form);
+              const response = await fetch('/cart/add.js', {
+                method: 'POST',
+                body: formData
+              });
+              cart = await response.json();
+            } else {
+              // Update existing item quantity
+              const response = await fetch('/cart/change.js', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: variantId.toString(), quantity: newQty })
+              });
+              cart = await response.json();
             }
+
+            // Update data attribute
+            quantityInput?.setAttribute('data-cart-quantity', newQty.toString());
+            
+            // Update UI state
+            const productActions = productForm.querySelector('.modern-product-actions');
+            if (productActions) {
+              productActions.setAttribute('data-cart-quantity', newQty.toString());
+              productActions.classList.toggle('is-active', newQty > 0);
+            }
+
+            // Dispatch cart:update event to update cart icon and open drawer
+            document.dispatchEvent(new CustomEvent('cart:update', {
+              bubbles: true,
+              detail: { resource: cart, data: { itemCount: cart.item_count, source: 'collection-filter-page' } }
+            }));
+
+            // Open cart drawer
+            const cartDrawer = document.querySelector('cart-drawer-component');
+            if (cartDrawer?.showDialog) cartDrawer.showDialog();
+
+          } catch (error) {
+            console.error('Cart update error:', error);
+            if (quantityInput) quantityInput.value = cartQty.toString();
           }
         });
       });
@@ -884,54 +932,6 @@ details[open] > .category-summary .category-link {
   box-sizing: border-box;
   box-shadow: 0 4px 12px rgba(31, 61, 43, 0.2);
 }
-
-/* Active State: Cart -> Counter */
-.modern-product-actions.is-active .modern-atc-wrapper {
-  opacity: 0;
-  pointer-events: none;
-  transform: scale(0.8);
-}
-
-.modern-product-actions.is-active .modern-qty-selector {
-  width: auto;
-  min-width: 105px;
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.modern-qty-selector .qty__btn {
-  width: 32px;
-  height: 32px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.15);
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  padding: 0;
-  transition: background 0.2s ease;
-}
-.modern-qty-selector .qty__btn:hover {
-  background: rgba(255,255,255,0.25);
-}
-
-.modern-qty-selector .qty__current {
-  color: #fff;
-  font-weight: 700;
-  font-size: 15px;
-  line-height: 1;
-  flex: 1;
-  text-align: center;
-  min-width: 24px;
-}
-
-.modern-qty-selector .qty__trash-icon { display: none; }
-.modern-product-actions[data-cart-quantity="1"] .qty__minus-icon { display: none; }
-.modern-product-actions[data-cart-quantity="1"] .qty__trash-icon { display: flex; }
 
 /* Active State: Cart -> Counter */
 .modern-product-actions.is-active .modern-atc-wrapper {
