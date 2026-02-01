@@ -231,14 +231,16 @@
               </div>
             {% endif %}
 
-            <div class="category-blocks">
+            <div class="category-tree category-blocks">
               {% for block in section.blocks %}
                 {% if block.type == 'category_filter' %}
                   {% assign filter_collection = collections[block.settings.collection] %}
                   {% if filter_collection %}
-                    <a href="{{ filter_collection.url }}" class="filter-link {% if collection.handle == filter_collection.handle %}active{% endif %}">
+                    <a href="{{ filter_collection.url }}" class="category-link {% if collection.handle == filter_collection.handle %}active{% endif %}">
                       <span>{{ filter_collection.title }}</span>
-                      <span class="filter-count">({{ filter_collection.products_count }})</span>
+                      {% if filter_collection.products_count > 0 %}
+                        <span class="filter-count">({{ filter_collection.products_count }})</span>
+                      {% endif %}
                     </a>
                   {% endif %}
                 {% endif %}
@@ -365,6 +367,7 @@
     </aside>
 
     {%- comment -%} Main Content Area {%- endcomment -%}
+    {% paginate collection.products by 24 %}
     <main class="collection-main">
       
       {%- comment -%} Header with title, count, and sort {%- endcomment -%}
@@ -372,9 +375,13 @@
         <div class="collection-title-area">
           <h1>{{ collection.title }}</h1>
           <p class="product-count">
-            {% assign current_start = paginate.current_offset | plus: 1 %}
-            {% assign current_end = paginate.current_offset | plus: collection.products.size %}
-            <span class="count-display">{{ current_start }}-{{ current_end }}</span> of {{ collection.products_count }} products
+            {% if collection.products_count > 0 %}
+               {% assign current_start = paginate.current_offset | plus: 1 %}
+               {% assign current_end = paginate.current_offset | plus: collection.products.size %}
+               <span class="count-display">{{ current_start }}-{{ current_end }}</span> of {{ collection.products_count }} products
+            {% else %}
+               0 products
+            {% endif %}
           </p>
         </div>
         
@@ -393,7 +400,6 @@
       </div>
 
       {%- comment -%} Product Grid {%- endcomment -%}
-      {% paginate collection.products by 24 %}
       <div class="product-grid" id="product-grid">
         {% for product in collection.products %}
         {%- assign type_lower = product.type | downcase -%}
