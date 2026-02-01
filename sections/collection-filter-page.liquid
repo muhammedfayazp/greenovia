@@ -641,6 +641,21 @@
 .collection-filter-page{
   background: #fff;
   min-height: 100vh;
+  opacity: 0; /* Start hidden to prevent FOUC */
+  transition: opacity 0.3s ease;
+}
+
+/* Logic to hide initially hidden products via CSS if possible */
+[data-price-hidden="true"],
+[data-color-hidden="true"] {
+  display: none !important;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 24px;
+  min-height: 400px; /* Prevent collapse */
 }
 
 .page-width{
@@ -1794,6 +1809,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Initial filter run
   filterProducts();
+  
+  // Show page after first filter
+  document.querySelector('.collection-filter-page').style.opacity = '1';
 });
 </script>
 
