@@ -501,6 +501,33 @@
         {% endfor %}
       </div>
 
+      <script>
+      // Auto-submit form when quantity changes via +/- buttons
+      document.addEventListener('DOMContentLoaded', function() {
+        const productGrid = document.getElementById('product-grid');
+        if (!productGrid) return;
+
+        // Listen for quantity selector update events
+        productGrid.addEventListener('quantity-selector:update', function(event) {
+          const quantitySelector = event.target;
+          const productForm = quantitySelector.closest('product-form-component');
+          if (!productForm) return;
+
+          const form = productForm.querySelector('form');
+          const cartQty = parseInt(quantitySelector.querySelector('[ref="quantityInput"]')?.getAttribute('data-cart-quantity') || '0');
+          const newQty = event.detail?.quantity || parseInt(quantitySelector.querySelector('[ref="quantityInput"]')?.value || '0');
+
+          // If quantity changed from 0 to 1+, or from existing to different, submit form
+          if (newQty > 0 && newQty !== cartQty) {
+            // Trigger form submission which will add/update cart
+            if (form) {
+              form.requestSubmit();
+            }
+          }
+        });
+      });
+      </script>
+
       {%- comment -%} Pagination {%- endcomment -%}
       {% if paginate.pages > 1 %}
         <div class="pagination">
