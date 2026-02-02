@@ -468,6 +468,7 @@
             </a>
             
             <div class="product-card__info">
+              <div class="product-vendor">{{ product.vendor }}</div>
               <a href="{{ product.url }}">
                 <h3 class="product-title">{{ product.title }}</h3>
               </a>
@@ -1270,6 +1271,14 @@ input[type="range"]::-moz-range-thumb{
 
 .product-card__info{
   padding: 12px;
+}
+
+.product-vendor {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: #777;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
 }
 
 .product-title{
