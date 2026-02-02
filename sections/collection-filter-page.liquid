@@ -1605,9 +1605,11 @@ input[type="range"]::-moz-range-thumb{
   }
   
   .product-card-bottom {
-    margin-top: 8px; /* Tighter spacing on mobile */
+    flex-direction: column; /* Stack price and counter vertically on mobile */
+    align-items: flex-start; /* Align items to the left */
+    margin-top: 8px;
     gap: 8px;
-    min-height: 40px;
+    min-height: auto;
   }
   
   .product-card-bottom .product-price {
@@ -1643,6 +1645,11 @@ input[type="range"]::-moz-range-thumb{
   .modern-product-actions {
     margin-top: 0;
     height: 40px;
+    width: 100%; /* Full width for better mobile layout */
+  }
+  
+  .product-card-bottom .modern-product-form-wrapper {
+    width: 100%; /* Full width container */
   }
   
   /* Optimize quantity selector expansion on mobile */
