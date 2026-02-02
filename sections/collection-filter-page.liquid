@@ -1592,7 +1592,65 @@ input[type="range"]::-moz-range-thumb{
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
   }
+  
+  /* Mobile-optimized product card styling to match home page */
+  .product-card__info {
+    padding: 12px; /* Reduced from default for mobile */
+  }
+  
+  .product-title {
+    font-size: 15px; /* Reduced for better mobile fit */
+    line-height: 1.3;
+    margin-bottom: 4px;
+  }
+  
+  .product-card-bottom {
+    margin-top: 8px; /* Tighter spacing on mobile */
+    gap: 8px;
+    min-height: 40px;
+  }
+  
+  .product-card-bottom .product-price {
+    font-size: 16px; /* Optimized for mobile readability */
+  }
+  
+  /* Cart button optimizations for mobile touch targets */
+  .modern-cart-btn {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .modern-cart-btn svg {
+    width: 18px; /* Slightly smaller on mobile */
+    height: 18px;
+  }
+  
+  .modern-qty-selector {
+    height: 40px;
+  }
+  
+  .modern-qty-selector .qty__btn {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .modern-qty-selector .qty__current {
+    font-size: 15px;
+    min-width: 24px;
+  }
+  
+  /* Ensure proper spacing in product actions on mobile */
+  .modern-product-actions {
+    margin-top: 0;
+    height: 40px;
+  }
+  
+  /* Optimize quantity selector expansion on mobile */
+  .modern-product-actions.is-active .modern-qty-selector {
+    min-width: 105px;
+  }
 }
+
 </style>
 
 <script>
