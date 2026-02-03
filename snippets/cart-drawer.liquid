@@ -86,7 +86,7 @@
             
             <button 
               class="empty-cart-btn"
-              on:click="cart-drawer-component/closeDialog"
+              on:click="/close"
             >
               Continue Shopping
             </button>
@@ -112,7 +112,7 @@
 
           <button
             ref="closeButton"
-            on:click="cart-drawer-component/closeDialog"
+            on:click="/close"
             class="button close-button cart-drawer__close-button button-unstyled"
             aria-label="{{ 'actions.close_dialog' | t }}"
           >
@@ -516,17 +516,28 @@
    ========================================== */
 
 .cart-drawer__dialog[open] {
-  animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: slideInRight 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cart-drawer__dialog.dialog-closing {
+  animation: slideOutRight 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 @keyframes slideInRight {
   from {
     transform: translateX(100%);
-    opacity: 0;
   }
   to {
     transform: translateX(0);
-    opacity: 1;
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
   }
 }
 
