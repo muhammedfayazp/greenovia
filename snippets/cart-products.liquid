@@ -81,75 +81,75 @@
 
             {%- comment -%} Product Details {%- endcomment -%}
             <div class="cart-item__details">
-              {%- comment -%} Title and Price Row {%- endcomment -%}
-              <div class="cart-item__row">
+              {%- comment -%} Top Row: Title, Variants, Unit Price {%- endcomment -%}
+              <div class="cart-item__top-row">
                 <div class="cart-item__info">
                   <a href="{{ item.url }}" class="cart-item__title">{{ item.product.title }}</a>
                   
-                  {%- comment -%} Variants {%- endcomment -%}
+                  {%- comment -%} Variants - ONLY ONCE {%- endcomment -%}
                   {% if item.product.has_only_default_variant == false %}
                     <div class="cart-item__variants">
-                      {% for option in item.options_with_values %}
-                        {{ option.value }}{% unless forloop.last %} • {% endunless %}
-                      {% endfor %}
+                      {% for option in item.options_with_values %}{{ option.value }}{% unless forloop.last %} • {% endunless %}{% endfor %}
                     </div>
                   {% endif %}
                 </div>
-                <div class="cart-item__price">{{ item.original_price | money }}</div>
+                <div class="cart-item__unit-price">{{ item.original_price | money }}</div>
               </div>
 
-              {%- comment -%} Controls Row {%- endcomment -%}
-              <div class="cart-item__controls">
-                <div class="cart-item__quantity">
+              {%- comment -%} Bottom Row: Line Total, Quantity Controls, Remove {%- endcomment -%}
+              <div class="cart-item__bottom-row">
+                <div class="cart-item__line-total">{{ item.final_line_price | money }}</div>
+
+                <div class="cart-item__controls-group">
+                  <div class="cart-item__quantity">
+                    <button
+                      type="button"
+                      class="qty-btn"
+                      data-action="decrease"
+                      data-line="{{ item.index | plus: 1 }}"
+                      aria-label="Decrease quantity"
+                    >
+                      <svg width="10" height="2" viewBox="0 0 10 2" fill="none">
+                        <path d="M0 1H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                      </svg>
+                    </button>
+
+                    <input
+                      type="number"
+                      class="qty-input"
+                      name="updates[]"
+                      value="{{ item.quantity }}"
+                      min="0"
+                      data-line="{{ item.index | plus: 1 }}"
+                      aria-label="Quantity"
+                      readonly
+                    />
+
+                    <button
+                      type="button"
+                      class="qty-btn"
+                      data-action="increase"
+                      data-line="{{ item.index | plus: 1 }}"
+                      aria-label="Increase quantity"
+                    >
+                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                        <path d="M5 0V10M0 5H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                      </svg>
+                    </button>
+                  </div>
+
                   <button
                     type="button"
-                    class="qty-btn qty-btn--minus"
-                    data-action="decrease"
+                    class="cart-item__remove"
+                    data-action="remove"
                     data-line="{{ item.index | plus: 1 }}"
-                    aria-label="Decrease quantity"
+                    aria-label="Remove {{ item.product.title | escape }}"
                   >
-                    <svg width="10" height="2" viewBox="0 0 10 2" fill="none">
-                      <path d="M0 1H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                    </svg>
-                  </button>
-
-                  <input
-                    type="number"
-                    class="qty-input"
-                    name="updates[]"
-                    value="{{ item.quantity }}"
-                    min="0"
-                    data-line="{{ item.index | plus: 1 }}"
-                    aria-label="Quantity"
-                    readonly
-                  />
-
-                  <button
-                    type="button"
-                    class="qty-btn qty-btn--plus"
-                    data-action="increase"
-                    data-line="{{ item.index | plus: 1 }}"
-                    aria-label="Increase quantity"
-                  >
-                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                      <path d="M5 0V10M0 5H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                      <path d="M2 4h12M6.5 7v4M9.5 7v4M3 4l1 9a1 1 0 001 1h6a1 1 0 001-1l1-9M6 4V2.5A.5.5 0 016.5 2h3a.5.5 0 01.5.5V4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                   </button>
                 </div>
-
-                <div class="cart-item__total">{{ item.final_line_price | money }}</div>
-
-                <button
-                  type="button"
-                  class="cart-item__remove"
-                  data-action="remove"
-                  data-line="{{ item.index | plus: 1 }}"
-                  aria-label="Remove {{ item.product.title | escape }}"
-                >
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                    <path d="M2 4h12M6.5 7v4M9.5 7v4M3 4l1 9a1 1 0 001 1h6a1 1 0 001-1l1-9M6 4V2.5A.5.5 0 016.5 2h3a.5.5 0 01.5.5V4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </button>
               </div>
 
               {%- comment -%} Error Message {%- endcomment -%}
@@ -166,7 +166,7 @@
 
 <style>
 /* ==========================================
-   MINIMALIST CART DESIGN
+   MINIMALIST CART DESIGN - FINAL
    ========================================== */
 
 :root {
@@ -175,7 +175,7 @@
   --cart-text-primary: #1a1a1a;
   --cart-text-secondary: #666666;
   --cart-text-tertiary: #999999;
-  --cart-border: #e5e5e5;
+  --cart-border: #e5e7eb;
   --cart-bg: #ffffff;
   --cart-bg-hover: #fafafa;
   --cart-red: #ef4444;
@@ -259,13 +259,13 @@
 }
 
 /* ==========================================
-   CART ITEM - MINIMAL DESIGN
+   CART ITEM - CLEAN TWO-ROW LAYOUT
    ========================================== */
 
 .cart-item {
   display: flex;
-  gap: 0.75rem;
-  padding: 0.875rem 0.75rem;
+  gap: 0.875rem;
+  padding: 1rem;
   background: var(--cart-bg);
   border-bottom: 1px solid var(--cart-border);
   transition: background 0.15s ease;
@@ -280,12 +280,12 @@
 }
 
 /* ==========================================
-   PRODUCT IMAGE - COMPACT
+   PRODUCT IMAGE
    ========================================== */
 
 .cart-item__image {
-  width: 56px;
-  height: 56px;
+  width: 64px;
+  height: 64px;
   flex-shrink: 0;
 }
 
@@ -293,7 +293,7 @@
   display: block;
   width: 100%;
   height: 100%;
-  border-radius: 6px;
+  border-radius: 8px;
   overflow: hidden;
   background: #f8f8f8;
   border: 1px solid rgba(0,0,0,0.04);
@@ -307,18 +307,19 @@
 }
 
 /* ==========================================
-   PRODUCT DETAILS - CLEAN LAYOUT
+   PRODUCT DETAILS - TWO ROWS
    ========================================== */
 
 .cart-item__details {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.625rem;
   min-width: 0;
 }
 
-.cart-item__row {
+/* TOP ROW: Title + Variants + Unit Price */
+.cart-item__top-row {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -331,13 +332,13 @@
 }
 
 .cart-item__title {
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   font-weight: 600;
   color: var(--cart-text-primary);
   text-decoration: none;
   line-height: 1.3;
   display: block;
-  margin-bottom: 0.125rem;
+  margin-bottom: 0.25rem;
   letter-spacing: -0.01em;
 }
 
@@ -346,13 +347,13 @@
 }
 
 .cart-item__variants {
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   color: var(--cart-text-secondary);
-  line-height: 1.4;
+  line-height: 1.3;
   margin: 0;
 }
 
-.cart-item__price {
+.cart-item__unit-price {
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--cart-text-primary);
@@ -361,15 +362,27 @@
   letter-spacing: -0.01em;
 }
 
-/* ==========================================
-   CONTROLS ROW - MINIMAL & FUNCTIONAL
-   ========================================== */
+/* BOTTOM ROW: Line Total + Quantity + Remove */
+.cart-item__bottom-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
 
-.cart-item__controls {
+.cart-item__line-total {
+  font-weight: 700;
+  color: var(--cart-primary);
+  font-size: 1rem;
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+}
+
+.cart-item__controls-group {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 0.625rem;
+  margin-left: auto;
 }
 
 .cart-item__quantity {
@@ -382,8 +395,8 @@
 }
 
 .qty-btn {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   background: transparent;
   border: none;
   color: var(--cart-text-secondary);
@@ -413,18 +426,9 @@
   text-align: center;
   font-weight: 600;
   color: var(--cart-text-primary);
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   padding: 0;
   margin: 0;
-  letter-spacing: -0.01em;
-}
-
-.cart-item__total {
-  font-weight: 700;
-  color: var(--cart-primary);
-  font-size: 0.9375rem;
-  white-space: nowrap;
-  margin-left: auto;
   letter-spacing: -0.01em;
 }
 
@@ -433,7 +437,7 @@
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 4px;
+  padding: 5px;
   transition: all 0.15s ease;
   line-height: 1;
   flex-shrink: 0;
@@ -474,13 +478,55 @@
 
 @media screen and (max-width: 749px) {
   .cart-item {
-    padding: 0.75rem 0.625rem;
-    gap: 0.625rem;
+    padding: 0.875rem;
+    gap: 0.75rem;
   }
 
   .cart-item__image {
-    width: 52px;
-    height: 52px;
+    width: 60px;
+    height: 60px;
+  }
+
+  .cart-item__title {
+    font-size: 0.875rem;
+  }
+
+  .cart-item__variants {
+    font-size: 0.75rem;
+  }
+
+  .cart-item__unit-price {
+    font-size: 0.8125rem;
+  }
+
+  .cart-item__line-total {
+    font-size: 0.9375rem;
+  }
+
+  .qty-btn {
+    width: 26px;
+    height: 26px;
+  }
+
+  .qty-input {
+    width: 28px;
+    font-size: 0.8125rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .cart-item {
+    gap: 0.625rem;
+    padding: 0.75rem;
+  }
+
+  .cart-item__image {
+    width: 56px;
+    height: 56px;
+  }
+
+  .cart-item__top-row {
+    gap: 0.5rem;
   }
 
   .cart-item__title {
@@ -491,51 +537,13 @@
     font-size: 0.6875rem;
   }
 
-  .cart-item__price {
+  .cart-item__unit-price,
+  .cart-item__line-total {
     font-size: 0.8125rem;
   }
 
-  .cart-item__total {
-    font-size: 0.875rem;
-  }
-
-  .qty-btn {
-    width: 24px;
-    height: 24px;
-  }
-
-  .qty-input {
-    width: 28px;
-    font-size: 0.75rem;
-  }
-}
-
-@media screen and (max-width: 480px) {
-  .cart-item {
+  .cart-item__controls-group {
     gap: 0.5rem;
-    padding: 0.65rem 0.5rem;
-  }
-
-  .cart-item__image {
-    width: 48px;
-    height: 48px;
-  }
-
-  .cart-item__row {
-    gap: 0.5rem;
-  }
-
-  .cart-item__title {
-    font-size: 0.75rem;
-  }
-
-  .cart-item__variants {
-    font-size: 0.65rem;
-  }
-
-  .cart-item__price,
-  .cart-item__total {
-    font-size: 0.8125rem;
   }
 }
 
@@ -612,7 +620,7 @@
             qtyInput.value = item.quantity;
           }
 
-          const lineTotal = cartItem.querySelector('.cart-item__total');
+          const lineTotal = cartItem.querySelector('.cart-item__line-total');
           if (lineTotal) {
             lineTotal.textContent = formatMoney(item.final_line_price);
           }
