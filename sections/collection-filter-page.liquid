@@ -1629,12 +1629,6 @@ document.addEventListener('DOMContentLoaded', function() {
       updateProductCardUI(wrapper, quantity);
       updateCartCount(cart.item_count);
       
-      // Open cart drawer if exists
-      const cartDrawer = document.querySelector('cart-drawer-component');
-      if (cartDrawer && typeof cartDrawer.showDialog === 'function') {
-        cartDrawer.showDialog();
-      }
-      
     } catch (error) {
       console.error('Add to cart failed:', error);
       alert('Failed to add item to cart. Please try again.');
