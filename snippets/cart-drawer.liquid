@@ -132,7 +132,7 @@
           <div
             class="cart-drawer__content"
             aria-label="{{ 'accessibility.cart' | t }}"
-            style="--header-height: 70px;"
+            style="--header-height: 64px;"
           >
             <scroll-hint class="cart-drawer__items">
               {% render 'cart-products', drawer_context: 'drawer' %}
@@ -197,8 +197,7 @@
   height: calc(100% - var(--header-height));
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden; /* Container itself shouldn't scroll */
 }
 
 /* ==========================================
@@ -206,16 +205,17 @@
    ========================================== */
 
 .cart-drawer__header {
-  background: #1a5c3a !important;
+  background: #ffffff !important;
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 1.25rem 1.5rem;
+  padding: 1rem 1.25rem;
   position: sticky;
   top: 0;
   z-index: 100;
-  color: #ffffff !important;
+  color: #1a1a1a !important;
+  border-bottom: 1px solid #e5e5e5;
 }
 
 @media screen and (min-width: 750px) {
@@ -227,68 +227,54 @@
 .cart-drawer__heading {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   margin: 0;
-  color: #ffffff;
-  font-family: inherit;
+  color: #1a1a1a;
+  font-family: 'Playfair Display', serif, system-ui; /* Serif as per screenshot */
 }
 
 .cart-icon-large {
-  color: #ffffff;
+  color: #1a1a1a;
   flex-shrink: 0;
 }
 
 .cart-heading-text {
-  font-weight: 700;
-  font-size: 1.5rem;
-  letter-spacing: -0.01em;
+  font-weight: 600;
+  font-size: 1.75rem;
+  letter-spacing: -0.02em;
 }
 
 .cart-count-bubble {
-  background: #2d6e47;
-  color: #ffffff;
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.85rem;
-  font-weight: 700;
-  opacity: 1;
+  color: #666;
+  font-size: 0.875rem;
+  font-weight: 400;
+  opacity: 0.8;
+  margin-left: -4px;
 }
 
 /* Close Button - Modern Style */
 .cart-drawer__close-button {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-  color: white;
+  background: transparent;
+  border: none;
+  color: #1a1a1a;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: opacity 0.2s ease;
   flex-shrink: 0;
   padding: 0;
 }
 
 .cart-drawer__close-button:hover {
-  background: rgba(255, 255, 255, 0.25);
-  transform: scale(1.05);
-  opacity: 1;
-}
-
-.cart-drawer__close-button:active {
-  transform: scale(0.95);
+  opacity: 0.6;
 }
 
 .cart-drawer__close-button svg {
-  color: white;
-  stroke-width: 2.5;
+  color: #1a1a1a;
+  stroke-width: 2;
 }
 
 /* ==========================================
@@ -369,7 +355,7 @@
    ========================================== */
 
 .cart-drawer__items {
-  flex: 1;
+  flex: 1 1 auto; /* Take up available space */
   overflow-y: auto;
   overflow-x: hidden;
   padding: 16px;
@@ -399,14 +385,14 @@
    ========================================== */
 
 .cart-drawer__summary {
+  flex: 0 0 auto; /* Don't grow or shrink */
   background: white;
   border-top: 1px solid rgba(0, 0, 0, 0.08);
-  position: sticky;
-  bottom: 0;
+  position: relative; /* No longer need sticky inside flex container */
   z-index: 10;
-  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
   padding: 20px;
-  padding-bottom: 30px; /* Extra space for bottom safe areas/comfort */
+  padding-bottom: clamp(20px, 4vh, 40px); /* Responsive bottom padding */
 }
 
 /* ==========================================

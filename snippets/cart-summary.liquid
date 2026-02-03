@@ -149,14 +149,14 @@
 
   /* Summary Totals Container */
   .cart__summary-totals {
-    padding: 0.75rem 0 2rem 0;
+    padding: 0.5rem 0 1rem 0; /* Reduced padding */
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   }
 
   .cart__summary-totals:not(:has(.cart-actions)) {
-    margin-top: 0.625rem;
+    margin-top: 0.5rem;
     border-top: 1px solid var(--cart-border);
-    padding-top: 0.875rem;
+    padding-top: 0.5rem;
   }
 
   /* Original Total (Subtotal) */
@@ -242,10 +242,10 @@
   .cart__total-container {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.25rem;
     width: 100%;
-    margin-top: 0.875rem;
-    margin-bottom: 0.625rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
   }
 
   .cart__total {
@@ -288,8 +288,8 @@
 
   /* CTAs Container */
   .cart__ctas {
-    margin-top: 1rem;
-    padding-bottom: 1.5rem;
+    margin-top: 0.75rem;
+    padding-bottom: 0.5rem;
   }
 
   /* Checkout Button - Minimalist */
@@ -337,15 +337,15 @@
   /* Mobile Responsive */
   @media screen and (max-width: 749px) {
     .cart__summary-totals {
-      padding-bottom: 2.5rem;
+      padding-bottom: 1rem;
     }
 
     .cart__ctas {
-      padding-bottom: 2rem;
+      padding-bottom: 1rem;
     }
 
     .cart__checkout-button {
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
       font-size: 0.9375rem;
     }
 
