@@ -338,11 +338,11 @@
           "type": "social-links",
           "settings": {
             "facebook_url": "",
-            "instagram_url": "https://www.instagram.com/shopify",
-            "youtube_url": "https://www.youtube.com/shopify",
-            "tiktok_url": "https://www.tiktok.com/@shopify",
-            "twitter_url": "https://www.twitter.com/shopify",
-            "threads_url": "https://www.threads.net/@shopify",
+            "instagram_url": "https://www.instagram.com/greenovia.ae/",
+            "youtube_url": "",
+            "tiktok_url": "",
+            "twitter_url": "",
+            "threads_url": "",
             "linkedin_url": "",
             "bluesky_url": "",
             "snapchat_url": "",
@@ -360,7 +360,7 @@
         "block_b099f0b21b25"
       ],
       "settings": {
-        "section_width": "page-width",
+        "section_width": "full-width",
         "gap": 24,
         "divider_thickness": 1,
         "color_scheme": "scheme-1",
