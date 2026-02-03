@@ -281,7 +281,7 @@
   }
 </script>
 
-{% stylesheet %}
+<style>
 /* ==========================================
    MODERN PRODUCT PAGE - COMPLETE STYLES
    ========================================== */
@@ -1432,7 +1432,7 @@
     transition-duration: 0.01ms !important;
   }
 }
-{% endstylesheet %}
+</style>
 
 <script>
 (function() {
@@ -1745,3 +1745,28 @@
   
 })();
 </script>
+
+{% schema %}
+{
+  "name": "Product Information",
+  "tag": "section",
+  "class": "section-product-information",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Gallery Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_thumbnails",
+      "label": "Show thumbnails",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Information"
+    }
+  ]
+}
+{% endschema %}
