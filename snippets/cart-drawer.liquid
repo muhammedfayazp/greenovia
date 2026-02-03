@@ -99,9 +99,11 @@
           {%- comment -%} Cart with Items {%- endcomment -%}
           <div class="cart-drawer__header" id="cart-drawer-header">
             <h2 class="cart-drawer__heading" id="cart-drawer-heading">
-              <svg class="cart-icon-large" width="22" height="22" viewBox="0 0 22 22" fill="none">
-                <path d="M7 2L5.17 4H1C0.45 4 0 4.45 0 5V17C0 17.55 0.45 18 1 18H19C19.55 18 20 17.55 20 17V5C20 4.45 19.55 4 19 4H14.83L13 2H7Z" fill="currentColor"/>
-              </svg>
+              <span class="cart-icon-wrapper">
+                <svg class="cart-icon-large" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>
+                </svg>
+              </span>
               <span class="cart-heading-text">{{ 'content.cart_title' | t }}</span>
               <div class="cart-count-bubble">
                 {%- if cart.item_count < 100 -%}
@@ -118,7 +120,7 @@
               aria-label="{{ 'actions.close_dialog' | t }}"
             >
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
               </svg>
             </button>
           </div>
@@ -200,7 +202,7 @@
    ========================================== */
 
 .cart-drawer__header {
-  background: linear-gradient(135deg, var(--cart-green) 0%, var(--cart-green-dark) 100%);
+  background: #1a5c3a !important; /* Force theme green */
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -208,8 +210,9 @@
   padding: var(--cart-drawer-padding);
   position: sticky;
   top: 0;
-  z-index: 10;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  color: white !important;
 }
 
 @media screen and (min-width: 750px) {
