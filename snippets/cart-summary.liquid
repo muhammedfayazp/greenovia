@@ -129,9 +129,9 @@
     margin: 0.25rem 0;
   }
 
-  /* Summary Totals Container */
+  /* Summary Totals Container - FIXED: Added bottom padding */
   .cart__summary-totals {
-    padding-bottom: 1rem;
+    padding-bottom: 2rem; /* Increased to ensure checkout button is fully visible */
   }
 
   .cart__summary-totals:not(:has(.cart-actions)) {
@@ -263,10 +263,10 @@
     line-height: 1.5;
   }
 
-  /* CTAs Container - Below Tax Note */
+  /* CTAs Container - FIXED: Added extra padding */
   .cart__ctas {
     margin-top: 1rem;
-    padding: 0;
+    padding: 0 0 1.5rem 0; /* Added bottom padding to prevent cut-off */
   }
 
   /* Checkout Button - MAXIMUM VISIBILITY */
@@ -284,6 +284,8 @@
     transition: all 0.2s ease;
     box-shadow: 0 4px 12px rgba(23, 79, 25, 0.4);
     text-transform: uppercase;
+    display: block; /* Ensure it's a block element */
+    margin-bottom: 0.5rem; /* Extra bottom margin */
   }
 
   .cart__checkout-button:hover:not(:disabled) {
@@ -304,6 +306,27 @@
     border-color: #d1d5db;
     cursor: not-allowed;
     box-shadow: none;
+  }
+
+  /* Additional checkout buttons spacing */
+  .additional-checkout-buttons {
+    margin-top: 0.75rem;
+    padding-bottom: 0.5rem;
+  }
+
+  /* Mobile adjustments */
+  @media screen and (max-width: 749px) {
+    .cart__summary-totals {
+      padding-bottom: 2.5rem; /* Even more padding on mobile */
+    }
+
+    .cart__ctas {
+      padding-bottom: 2rem;
+    }
+
+    .cart__checkout-button {
+      margin-bottom: 1rem;
+    }
   }
 </style>
 
