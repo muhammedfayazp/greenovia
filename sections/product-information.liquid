@@ -1439,7 +1439,12 @@
   'use strict';
   
   // Get product data
-  const productData = JSON.parse(document.getElementById('product-json').textContent);
+  const productJsonEl = document.getElementById('product-json');
+  if (!productJsonEl) {
+    console.error('Product JSON element not found');
+    throw new Error('Product data unavailable');
+  }
+  const productData = JSON.parse(productJsonEl.textContent);
   
   // ==========================================
   // IMAGE ZOOM MODAL
@@ -1454,6 +1459,10 @@
   const zoomCounter = document.getElementById('zoomCounter');
   const zoomIndicator = document.getElementById('zoomIndicator');
   const sliderImages = document.querySelectorAll('.slider-image');
+  
+  if (!zoomModal) {
+    console.warn('Zoom modal elements not found');
+  }
   
   let zoomCurrentIndex = 0;
   const zoomImages = Array.from(sliderImages).map(img => ({
@@ -1522,7 +1531,7 @@
   
   // Keyboard navigation for zoom
   document.addEventListener('keydown', (e) => {
-    if (!zoomModal.classList.contains('active')) return;
+    if (!zoomModal || !zoomModal.classList.contains('active')) return;
     
     if (e.key === 'Escape') closeZoom();
     if (e.key === 'ArrowLeft') zoomPrev();
@@ -1669,6 +1678,10 @@
   const addToCartBtn = document.getElementById('addToCartBtn');
   const addToCartText = document.getElementById('addToCartText');
   
+  if (!addToCartBtn) {
+    console.error('Add to cart button not found');
+  }
+  
   function getSelectedOptions() {
     const options = {};
     variantRadios.forEach(radio => {
@@ -1681,6 +1694,10 @@
   }
   
   function findVariant(options) {
+    if (!productData || !productData.variants) {
+      console.error('Product data or variants not available');
+      return null;
+    }
     return productData.variants.find(variant => {
       return Object.keys(options).every(key => variant[key] === options[key]);
     });
@@ -1690,40 +1707,53 @@
     const selectedOptions = getSelectedOptions();
     const variant = findVariant(selectedOptions);
     
-    if (!variant) return;
+    if (!variant) {
+      console.warn('Variant not found for selected options');
+      return;
+    }
     
     // Update hidden input
-    variantIdInput.value = variant.id;
+    if (variantIdInput) {
+      variantIdInput.value = variant.id;
+    }
     
     // Update price
-    const price = (variant.price / 100).toFixed(2);
-    priceElement.textContent = `Dhs. ${price} AED`;
+    if (priceElement) {
+      const price = (variant.price / 100).toFixed(2);
+      priceElement.textContent = `Dhs. ${price} AED`;
+    }
     
     if (variant.compare_at_price && variant.compare_at_price > variant.price) {
       const comparePrice = (variant.compare_at_price / 100).toFixed(2);
-      priceElement.classList.add('product-price--sale');
+      if (priceElement) {
+        priceElement.classList.add('product-price--sale');
+      }
       if (comparePriceElement) {
         comparePriceElement.textContent = `Dhs. ${comparePrice} AED`;
         comparePriceElement.style.display = 'inline';
       }
     } else {
-      priceElement.classList.remove('product-price--sale');
+      if (priceElement) {
+        priceElement.classList.remove('product-price--sale');
+      }
       if (comparePriceElement) {
         comparePriceElement.style.display = 'none';
       }
     }
     
     // Update button
-    if (variant.available) {
-      addToCartBtn.disabled = false;
-      addToCartText.textContent = 'Add to Cart';
-    } else {
-      addToCartBtn.disabled = true;
-      addToCartText.textContent = 'Sold Out';
+    if (addToCartBtn && addToCartText) {
+      if (variant.available) {
+        addToCartBtn.disabled = false;
+        addToCartText.textContent = 'Add to Cart';
+      } else {
+        addToCartBtn.disabled = true;
+        addToCartText.textContent = 'Sold Out';
+      }
     }
     
     // Update image based on variant
-    if (variant.featured_image) {
+    if (variant.featured_image && productData.images) {
       const imageIndex = productData.images.findIndex(img => 
         img.src.includes(variant.featured_image.src.split('?')[0].split('/').pop())
       );
