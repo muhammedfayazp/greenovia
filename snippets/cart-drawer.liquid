@@ -15,7 +15,6 @@
 ></script>
 
 <cart-drawer-component
-  id="cart-drawer"
   class="cart-drawer"
   {{ block.shopify_attributes }}
   {% if settings.auto_open_cart_drawer %}
@@ -42,32 +41,32 @@
     scroll-lock
   >
     <div class="cart-drawer__inner">
-      <cart-items-component
-        class="cart-items-component"
-        data-section-id="{{ section.id }}"
-      >
-        {%- if cart.empty? -%}
-          {%- comment -%} Empty Cart State {%- endcomment -%}
-          <div class="cart-drawer__header">
-            <h2 class="cart-drawer__heading" id="cart-drawer-heading-empty">
-              <svg class="cart-icon-large" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path d="M9 2L7.17 4H3C1.9 4 1 4.9 1 6V18C1 19.1 1.9 20 3 20H21C22.1 20 23 19.1 23 18V6C23 4.9 22.1 4 21 4H16.83L15 2H9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              {{ 'content.your_cart' | t }}
-            </h2>
-            <button
-              ref="closeButton"
-              on:click="#cart-drawer/closeDialog"
-              class="button close-button cart-drawer__close-button button-unstyled"
-              aria-label="{{ 'actions.close_dialog' | t }}"
-            >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-            </button>
-          </div>
+      {%- if cart.empty? -%}
+        {%- comment -%} Empty Cart State {%- endcomment -%}
+        <div class="cart-drawer__header">
+          <h2 class="cart-drawer__heading" id="cart-drawer-heading-empty">
+            <svg class="cart-icon-large" width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M9 2L7.17 4H3C1.9 4 1 4.9 1 6V18C1 19.1 1.9 20 3 20H21C22.1 20 23 19.1 23 18V6C23 4.9 22.1 4 21 4H16.83L15 2H9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            {{ 'content.your_cart' | t }}
+          </h2>
+          <button
+            ref="closeButton"
+            on:click="cart-drawer-component/closeDialog"
+            class="button close-button cart-drawer__close-button button-unstyled"
+            aria-label="{{ 'actions.close_dialog' | t }}"
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
 
-          <div class="cart-drawer__content cart-drawer__content--empty">
+        <div class="cart-drawer__content cart-drawer__content--empty">
+          <cart-items-component
+            class="cart-items-component"
+            data-section-id="{{ section.id }}"
+          >
             <div class="empty-cart-illustration">
               <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
                 <circle cx="60" cy="60" r="58" fill="#f0f7f4" stroke="#1a5c3a" stroke-width="2"/>
@@ -87,45 +86,46 @@
             
             <button 
               class="empty-cart-btn"
-              on:click="cart-drawer-component/close"
+              on:click="cart-drawer-component/closeDialog"
             >
               Continue Shopping
             </button>
-
-            <div class="cart-drawer__items">
-              {% render 'cart-products', drawer_context: 'drawer' %}
-            </div>
-          </div>
-        {%- else -%}
-          {%- comment -%} Cart with Items {%- endcomment -%}
-          <div class="cart-drawer__header" id="cart-drawer-header">
-            <h2 class="cart-drawer__heading" id="cart-drawer-heading">
-              <span class="cart-icon-wrapper">
-                <svg class="cart-icon-large" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>
-                </svg>
-              </span>
-              <span class="cart-heading-text">{{ 'content.cart_title' | t }}</span>
-              <span class="cart-count-bubble">
-                {%- if cart.item_count < 100 -%}
-                  <span aria-hidden="true">{{ cart.item_count }}</span>
-                {%- endif -%}
-                <span class="visually-hidden">{{ 'sections.header.cart_count' | t: count: cart.item_count }}</span>
-              </span>
-            </h2>
-
-            <button
-              ref="closeButton"
-              on:click="#cart-drawer/closeDialog"
-              class="button close-button cart-drawer__close-button button-unstyled"
-              aria-label="{{ 'actions.close_dialog' | t }}"
-            >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          </cart-items-component>
+        </div>
+      {%- else -%}
+        {%- comment -%} Cart with Items {%- endcomment -%}
+        <div class="cart-drawer__header" id="cart-drawer-header">
+          <h2 class="cart-drawer__heading" id="cart-drawer-heading">
+            <span class="cart-icon-wrapper">
+              <svg class="cart-icon-large" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>
               </svg>
-            </button>
-          </div>
+            </span>
+            <span class="cart-heading-text">{{ 'content.cart_title' | t }}</span>
+            <span class="cart-count-bubble">
+              {%- if cart.item_count < 100 -%}
+                <span aria-hidden="true">{{ cart.item_count }}</span>
+              {%- endif -%}
+              <span class="visually-hidden">{{ 'sections.header.cart_count' | t: count: cart.item_count }}</span>
+            </span>
+          </h2>
 
+          <button
+            ref="closeButton"
+            on:click="cart-drawer-component/closeDialog"
+            class="button close-button cart-drawer__close-button button-unstyled"
+            aria-label="{{ 'actions.close_dialog' | t }}"
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <cart-items-component
+          class="cart-items-component"
+          data-section-id="{{ section.id }}"
+        >
           <div
             class="cart-drawer__content"
             aria-label="{{ 'accessibility.cart' | t }}"
@@ -139,8 +139,8 @@
               {% render 'cart-summary' %}
             </div>
           </div>
-        {%- endif -%}
-      </cart-items-component>
+        </cart-items-component>
+      {%- endif -%}
     </div>
   </dialog>
 </cart-drawer-component>
