@@ -8,7 +8,7 @@
 </script>
 
 {%- comment -%} Image Zoom Modal {%- endcomment -%}
-<div class="image-zoom-modal" id="imageZoomModal">
+<div class="image-zoom-modal" id="imageZoomModal" style="display: none;">
   <div class="zoom-modal-overlay" id="zoomOverlay"></div>
   <button type="button" class="zoom-close-btn" id="zoomCloseBtn" aria-label="Close zoom">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -281,10 +281,7 @@
   }
 </script>
 
-{% stylesheet %}
-/* ==========================================
-   MODERN PRODUCT PAGE - COMPLETE STYLES
-   ========================================== */
+
 
 :root {
   --forest-dark: #0d3d26;
@@ -1432,7 +1429,7 @@
     transition-duration: 0.01ms !important;
   }
 }
-{% endstylesheet %}
+</style>
 
 <script>
 (function() {
@@ -1745,3 +1742,28 @@
   
 })();
 </script>
+
+{% schema %}
+{
+  "name": "Product Information",
+  "tag": "section",
+  "class": "section-product-information",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Gallery Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_thumbnails",
+      "label": "Show thumbnails",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Information"
+    }
+  ]
+}
+{% endschema %}
