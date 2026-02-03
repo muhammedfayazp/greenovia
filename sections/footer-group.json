@@ -18,8 +18,8 @@
           "type": "benefit",
           "settings": {
             "icon": "shipping",
-            "title": "Free Shipping",
-            "description": "On all orders over $50"
+            "title": "Free shipping",
+            "description": "on orders over AED 199"
           }
         },
         "benefit_jM7dfh": {
