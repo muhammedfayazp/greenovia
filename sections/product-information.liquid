@@ -6,9 +6,282 @@
 <script type="application/ld+json">
   {{ product | structured_data }}
 </script>
+
+{%- comment -%} Image Zoom Modal {%- endcomment -%}
+<div class="image-zoom-modal" id="imageZoomModal">
+  <div class="zoom-modal-overlay" id="zoomOverlay"></div>
+  <button type="button" class="zoom-close-btn" id="zoomCloseBtn" aria-label="Close zoom">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </button>
+  <div class="zoom-modal-content">
+    <div class="zoom-image-wrapper" id="zoomImageWrapper">
+      <img src="" alt="" class="zoom-image" id="zoomImage" />
+    </div>
+    <div class="zoom-controls">
+      <button type="button" class="zoom-nav-btn zoom-prev-btn" id="zoomPrevBtn" aria-label="Previous image">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="zoom-counter" id="zoomCounter">1 / 1</div>
+      <button type="button" class="zoom-nav-btn zoom-next-btn" id="zoomNextBtn" aria-label="Next image">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="product-page-wrapper" id="productPageWrapper">
+  <div class="product-container">
+    {%- comment -%} Product Gallery with Swipe Support {%- endcomment -%}
+    <div class="product-gallery">
+      {%- comment -%} Main Image with Swipe {%- endcomment -%}
+      <div class="product-image-slider" id="imageSlider">
+        <div class="slider-track" id="sliderTrack">
+          {% for media in product.media %}
+            {% if media.media_type == 'image' %}
+              <div class="slider-slide {% if forloop.first %}active{% endif %}" data-slide-index="{{ forloop.index0 }}">
+                <img 
+                  src="{{ media | image_url: width: 1000 }}" 
+                  alt="{{ media.alt | default: product.title | escape }}"
+                  class="slider-image"
+                  loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+                  data-zoom-src="{{ media | image_url: width: 2000 }}"
+                />
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+        
+        {%- comment -%} Zoom Icon Indicator {%- endcomment -%}
+        <button type="button" class="zoom-indicator" id="zoomIndicator" aria-label="Click to zoom">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="2"/>
+            <path d="M13 13L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M8 5V11M5 8H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+        
+        {%- comment -%} Navigation Dots {%- endcomment -%}
+        {% if product.media.size > 1 %}
+          <div class="slider-dots" id="sliderDots">
+            {% for media in product.media %}
+              {% if media.media_type == 'image' %}
+                <button 
+                  type="button"
+                  class="slider-dot {% if forloop.first %}active{% endif %}"
+                  data-slide="{{ forloop.index0 }}"
+                  aria-label="Go to slide {{ forloop.index }}"
+                ></button>
+              {% endif %}
+            {% endfor %}
+          </div>
+        {% endif %}
+        
+        {%- comment -%} Arrow Navigation {%- endcomment -%}
+        {% if product.media.size > 1 %}
+          <button type="button" class="slider-arrow slider-arrow-prev" id="prevSlide" aria-label="Previous image">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button type="button" class="slider-arrow slider-arrow-next" id="nextSlide" aria-label="Next image">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        {% endif %}
+      </div>
+
+      {%- comment -%} Thumbnail Gallery {%- endcomment -%}
+      {% if product.media.size > 1 %}
+        <div class="product-thumbnails" id="thumbnailGallery">
+          {% for media in product.media limit: 8 %}
+            {% if media.media_type == 'image' %}
+              <button 
+                type="button"
+                class="thumbnail-item {% if forloop.first %}active{% endif %}"
+                data-thumbnail-index="{{ forloop.index0 }}"
+                data-image-url="{{ media | image_url: width: 1000 }}"
+              >
+                <img 
+                  src="{{ media | image_url: width: 200 }}" 
+                  alt="{{ media.alt | default: product.title | escape }}"
+                  class="thumbnail-image"
+                  loading="lazy"
+                />
+              </button>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    {%- comment -%} Product Details {%- endcomment -%}
+    <div class="product-details">
+      <h1 class="product-title">{{ product.title | escape }}</h1>
+      
+      <div class="product-price-wrapper">
+        {% assign current_variant = product.selected_or_first_available_variant %}
+        <span class="product-price {% if current_variant.compare_at_price > current_variant.price %}product-price--sale{% endif %}" id="productPrice">
+          {{ current_variant.price | money }}
+        </span>
+        {% if current_variant.compare_at_price > current_variant.price %}
+          <span class="product-price-compare" id="productComparePrice">{{ current_variant.compare_at_price | money }}</span>
+        {% endif %}
+      </div>
+
+      {%- comment -%} Product Form {%- endcomment -%}
+      {% form 'product', product, id: 'product-form' %}
+        <input type="hidden" name="id" value="{{ current_variant.id }}" id="productVariantId">
+        
+        {%- comment -%} Variant Selectors {%- endcomment -%}
+        {% unless product.has_only_default_variant %}
+          <div class="product-variants">
+            {% for option in product.options_with_values %}
+              <div class="variant-selector">
+                <label class="variant-label">{{ option.name }}</label>
+                <div class="variant-options">
+                  {% for value in option.values %}
+                    <input 
+                      type="radio" 
+                      id="option-{{ option.position }}-{{ forloop.index }}"
+                      name="option{{ option.position }}"
+                      value="{{ value | escape }}"
+                      class="variant-radio"
+                      data-option-position="{{ option.position }}"
+                      {% if option.selected_value == value %}checked{% endif %}
+                    />
+                    <label 
+                      for="option-{{ option.position }}-{{ forloop.index }}"
+                      class="variant-label-button"
+                      {% if option.name contains 'olor' or option.name contains 'olour' %}
+                        data-color="{{ value | handleize }}"
+                      {% endif %}
+                    >
+                      {{ value }}
+                    </label>
+                  {% endfor %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% endunless %}
+
+        {%- comment -%} Quantity + Add to Cart {%- endcomment -%}
+        <div class="product-actions">
+          <div class="quantity-wrapper">
+            <button 
+              type="button" 
+              class="quantity-btn quantity-btn-minus"
+              id="quantityMinus"
+              aria-label="Decrease quantity"
+            >
+              <svg width="14" height="2" viewBox="0 0 14 2" fill="none">
+                <path d="M1 1H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+            
+            <input 
+              type="number" 
+              name="quantity" 
+              value="1" 
+              min="1" 
+              class="quantity-input"
+              id="quantityInput"
+              aria-label="Quantity"
+              readonly
+            />
+            
+            <button 
+              type="button" 
+              class="quantity-btn quantity-btn-plus"
+              id="quantityPlus"
+              aria-label="Increase quantity"
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M7 1V13M1 7H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+
+          <button 
+            type="submit" 
+            name="add"
+            class="add-to-cart-btn"
+            id="addToCartBtn"
+            {% unless current_variant.available %}disabled{% endunless %}
+          >
+            <span class="btn-icon">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M6 1L3 4M3 4L6 7M3 4H11C13.2091 4 15 5.79086 15 8V8C15 10.2091 13.2091 12 11 12H4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <circle cx="7" cy="17" r="1.5" stroke="currentColor" stroke-width="1.5"/>
+                <circle cx="14" cy="17" r="1.5" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+            </span>
+            <span class="btn-text" id="addToCartText">
+              {% if current_variant.available %}
+                Add to Cart
+              {% else %}
+                Sold Out
+              {% endif %}
+            </span>
+          </button>
+        </div>
+
+        {%- comment -%} Payment Icons {%- endcomment -%}
+        <div class="trust-badges">
+          <div class="payment-methods">
+            <svg width="40" height="26" viewBox="0 0 40 26" fill="none">
+              <rect width="40" height="26" rx="4" fill="#1A1F71"/>
+              <text x="20" y="16" fill="white" font-size="8" text-anchor="middle" font-weight="600">VISA</text>
+            </svg>
+            <svg width="40" height="26" viewBox="0 0 40 26" fill="none">
+              <rect width="40" height="26" rx="4" fill="#EB001B"/>
+              <circle cx="16" cy="13" r="7" fill="#EB001B"/>
+              <circle cx="24" cy="13" r="7" fill="#FF5F00"/>
+            </svg>
+            <svg width="40" height="26" viewBox="0 0 40 26" fill="none">
+              <rect width="40" height="26" rx="4" fill="#016FD0"/>
+              <text x="20" y="16" fill="white" font-size="7" text-anchor="middle" font-weight="700">AMEX</text>
+            </svg>
+            <svg width="40" height="26" viewBox="0 0 40 26" fill="none">
+              <rect width="40" height="26" rx="4" fill="#003087"/>
+              <text x="20" y="15" fill="white" font-size="6" text-anchor="middle" font-weight="700">PayPal</text>
+            </svg>
+          </div>
+        </div>
+
+      {% endform %}
+    </div>
+  </div>
+</div>
+
+{%- comment -%} Product Variants JSON for JavaScript {%- endcomment -%}
+<script id="product-json" type="application/json">
+  {
+    "product": {{ product | json }},
+    "variants": {{ product.variants | json }},
+    "images": [
+      {% for media in product.media %}
+        {% if media.media_type == 'image' %}
+          {
+            "id": {{ media.id }},
+            "src": "{{ media | image_url: width: 1000 }}",
+            "variant_ids": {{ media.variant_ids | json }},
+            "alt": {{ media.alt | default: product.title | json }}
+          }{% unless forloop.last %},{% endunless %}
+        {% endif %}
+      {% endfor %}
+    ]
+  }
 </script>
 
-<style>
+{% stylesheet %}
 /* ==========================================
    MODERN PRODUCT PAGE - COMPLETE STYLES
    ========================================== */
@@ -56,6 +329,231 @@
   grid-template-columns: 1.1fr 1fr;
   gap: var(--gap-lg);
   align-items: start;
+}
+
+/* ==========================================
+   IMAGE ZOOM MODAL
+   ========================================== */
+
+.image-zoom-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-zoom-modal.active {
+  display: flex;
+}
+
+.zoom-modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(10px);
+  animation: fadeIn 0.3s ease;
+}
+
+.zoom-modal-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--gap-xl) var(--gap-md);
+  z-index: 2;
+}
+
+.zoom-image-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  height: calc(100% - 80px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.zoom-image {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  animation: zoomIn 0.3s ease;
+  touch-action: pinch-zoom;
+}
+
+.zoom-close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 48px;
+  height: 48px;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  
+  color: white;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  z-index: 3;
+}
+
+.zoom-close-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.1);
+}
+
+.zoom-close-btn:active {
+  transform: scale(0.95);
+}
+
+.zoom-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gap-md);
+  margin-top: var(--gap-md);
+}
+
+.zoom-nav-btn {
+  width: 48px;
+  height: 48px;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  
+  color: white;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.zoom-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.1);
+}
+
+.zoom-nav-btn:active {
+  transform: scale(0.95);
+}
+
+.zoom-counter {
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0 var(--gap-md);
+  min-width: 80px;
+  text-align: center;
+}
+
+.zoom-indicator {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 44px;
+  height: 44px;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  border-radius: 50%;
+  
+  color: var(--text-dark);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  box-shadow: var(--shadow-md);
+  z-index: 10;
+  opacity: 0;
+}
+
+.product-image-slider:hover .zoom-indicator {
+  opacity: 1;
+}
+
+.zoom-indicator:hover {
+  background: white;
+  transform: scale(1.1);
+  box-shadow: var(--shadow-lg);
+}
+
+.zoom-indicator:active {
+  transform: scale(0.95);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes zoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Mobile zoom adjustments */
+@media screen and (max-width: 768px) {
+  .zoom-indicator {
+    opacity: 1;
+    width: 40px;
+    height: 40px;
+  }
+  
+  .zoom-indicator svg {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .zoom-modal-content {
+    padding: var(--gap-md);
+  }
+  
+  .zoom-close-btn {
+    top: 12px;
+    right: 12px;
+    width: 44px;
+    height: 44px;
+  }
+  
+  .zoom-nav-btn {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .zoom-counter {
+    font-size: 0.9rem;
+  }
 }
 
 /* ==========================================
@@ -585,45 +1083,219 @@
 }
 
 /* ==========================================
-   IMAGE ZOOM MODAL (OVERRIDE FOR LAYOUT)
+   TRUST BADGES
    ========================================== */
 
-.image-zoom-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  display: none;
-  align-items: center;
-  justify-content: center;
+.trust-badges {
+  padding-top: var(--gap-md);
+  border-top: 1px solid var(--border-color);
 }
 
-.image-zoom-modal.active {
-  display: flex !important;
+.payment-methods {
+  display: flex;
+  gap: var(--gap-xs);
+  flex-wrap: wrap;
+  opacity: 0.75;
+}
+
+.payment-methods svg {
+  transition: var(--transition-fast);
+  border-radius: 6px;
+  box-shadow: var(--shadow-sm);
+}
+
+.payment-methods svg:hover {
+  opacity: 1;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 /* ==========================================
-   MOBILE OPTIMIZATIONS
+   RESPONSIVE DESIGN
    ========================================== */
 
 @media screen and (max-width: 1024px) {
   .product-container {
     grid-template-columns: 1fr;
-    gap: var(--gap-lg);
+    gap: var(--gap-md);
   }
   
   .product-gallery {
     position: relative;
     top: 0;
   }
+  
+  .product-title {
+    font-size: 2rem;
+  }
 }
 
 @media screen and (max-width: 768px) {
+  :root {
+    --gap-xs: 6px;
+    --gap-sm: 10px;
+    --gap-md: 16px;
+    --gap-lg: 24px;
+    --gap-xl: 32px;
+  }
+  
   .product-page-wrapper {
     padding: var(--gap-md) var(--gap-sm);
   }
   
+  .product-container {
+    gap: var(--gap-md);
+  }
+  
+  .product-details {
+    gap: var(--gap-md);
+  }
+  
   .product-title {
     font-size: 1.5rem;
+    font-weight: 400;
+  }
+  
+  .product-price-wrapper {
+    gap: var(--gap-xs);
+  }
+  
+  .product-price {
+    font-size: 1.35rem;
+  }
+  
+  .product-price-compare {
+    font-size: 1.1rem;
+  }
+  
+  /* Variant selectors - mobile optimized */
+  .variant-label {
+    font-size: 0.8rem;
+  }
+  
+  .variant-label-button {
+    min-width: 70px;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    border-radius: var(--radius-sm);
+  }
+  
+  .variant-label-button[data-color] {
+    padding-left: 36px;
+  }
+  
+  .variant-label-button[data-color]::before {
+    width: 18px;
+    height: 18px;
+    left: 10px;
+  }
+  
+  /* Product actions - optimized for mobile */
+  .product-actions {
+    flex-direction: row;
+    gap: var(--gap-xs);
+    align-items: stretch;
+  }
+  
+  /* Smaller quantity counter for mobile */
+  .quantity-wrapper {
+    height: 48px;
+    min-width: 110px;
+    max-width: 110px;
+    padding: 0 4px;
+    flex-shrink: 0;
+  }
+  
+  .quantity-btn {
+    width: 34px;
+    height: 34px;
+  }
+  
+  .quantity-btn svg {
+    width: 12px;
+    height: 12px;
+  }
+  
+  .quantity-input {
+    width: 38px;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+  
+  /* Full width add to cart button */
+  .add-to-cart-btn {
+    flex: 1;
+    height: 48px;
+    padding: 0 var(--gap-sm);
+    font-size: 0.9rem;
+    min-width: 0;
+  }
+  
+  .btn-icon {
+    display: flex;
+  }
+  
+  .btn-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .btn-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  /* Image slider - mobile */
+  .slider-arrow {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .slider-arrow svg {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .slider-arrow-prev {
+    left: 10px;
+  }
+  
+  .slider-arrow-next {
+    right: 10px;
+  }
+  
+  .slider-dots {
+    bottom: 12px;
+    gap: 6px;
+  }
+  
+  .slider-dot {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .slider-dot.active {
+    width: 18px;
+  }
+  
+  .product-thumbnails {
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    gap: 6px;
+  }
+  
+  /* Trust badges */
+  .trust-badges {
+    padding-top: var(--gap-sm);
+  }
+  
+  .payment-methods {
+    gap: 6px;
+  }
+  
+  .payment-methods svg {
+    width: 36px;
+    height: 23px;
   }
 }
 
@@ -634,8 +1306,35 @@
   
   .product-title {
     font-size: 1.25rem;
+    line-height: 1.3;
   }
   
+  .product-price {
+    font-size: 1.2rem;
+  }
+  
+  .product-price-compare {
+    font-size: 1rem;
+  }
+  
+  /* Smaller variant buttons */
+  .variant-label-button {
+    min-width: 65px;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+  
+  .variant-label-button[data-color] {
+    padding-left: 32px;
+  }
+  
+  .variant-label-button[data-color]::before {
+    width: 16px;
+    height: 16px;
+    left: 8px;
+  }
+  
+  /* Stack on very small screens */
   .product-actions {
     flex-direction: column;
     gap: var(--gap-xs);
@@ -643,10 +1342,73 @@
   
   .quantity-wrapper {
     width: 100%;
+    max-width: 100%;
+    justify-content: center;
   }
   
   .add-to-cart-btn {
     width: 100%;
+  }
+  
+  .product-thumbnails {
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    gap: 5px;
+  }
+  
+  .payment-methods svg {
+    width: 32px;
+    height: 20px;
+  }
+}
+
+@media screen and (max-width: 360px) {
+  .product-title {
+    font-size: 1.1rem;
+  }
+  
+  .product-price {
+    font-size: 1.1rem;
+  }
+  
+  .variant-label-button {
+    min-width: 60px;
+    padding: 7px 10px;
+    font-size: 0.75rem;
+  }
+  
+  /* Even smaller counter for tiny screens */
+  .quantity-wrapper {
+    height: 44px;
+    min-width: 100px;
+  }
+  
+  .quantity-btn {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .quantity-btn svg {
+    width: 10px;
+    height: 10px;
+  }
+  
+  .quantity-input {
+    width: 36px;
+    font-size: 0.95rem;
+  }
+  
+  .add-to-cart-btn {
+    height: 44px;
+    font-size: 0.85rem;
+  }
+  
+  .btn-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .product-thumbnails {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
@@ -654,298 +1416,23 @@
    ACCESSIBILITY
    ========================================== */
 
+.quantity-btn:focus-visible,
+.add-to-cart-btn:focus-visible,
+.variant-label-button:focus-visible,
+.thumbnail-item:focus-visible,
+.slider-arrow:focus-visible,
+.slider-dot:focus-visible {
+  outline: 3px solid var(--forest-light);
+  outline-offset: 2px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
 }
-</style>
-
-{%- comment -%} Image Zoom Modal {%- endcomment -%}
-<div class="image-zoom-modal" id="imageZoomModal" style="display: none;">
-  <div class="zoom-modal-overlay" id="zoomOverlay"></div>
-  <button type="button" class="zoom-close-btn" id="zoomCloseBtn" aria-label="Close zoom">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-      <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-    </svg>
-  </button>
-  <div class="zoom-modal-content">
-    <div class="zoom-image-wrapper" id="zoomImageWrapper">
-      <img src="" alt="" class="zoom-image" id="zoomImage" />
-    </div>
-    <div class="zoom-controls">
-      <button type="button" class="zoom-nav-btn zoom-prev-btn" id="zoomPrevBtn" aria-label="Previous image">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-      <div class="zoom-counter" id="zoomCounter">1 / 1</div>
-      <button type="button" class="zoom-nav-btn zoom-next-btn" id="zoomNextBtn" aria-label="Next image">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-    </div>
-  </div>
-</div>
-
-<div class="product-page-wrapper" id="productPageWrapper">
-  <div class="product-container">
-    {%- comment -%} Product Gallery with Swipe Support {%- endcomment -%}
-    <div class="product-gallery">
-      {%- comment -%} Main Image with Swipe {%- endcomment -%}
-      <div class="product-image-slider" id="imageSlider">
-        <div class="slider-track" id="sliderTrack">
-          {% for media in product.media %}
-            {% if media.media_type == 'image' %}
-              <div class="slider-slide {% if forloop.first %}active{% endif %}" data-slide-index="{{ forloop.index0 }}">
-                <img 
-                  src="{{ media | image_url: width: 1000 }}" 
-                  alt="{{ media.alt | default: product.title | escape }}"
-                  class="slider-image"
-                  loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
-                  data-zoom-src="{{ media | image_url: width: 2000 }}"
-                />
-              </div>
-            {% endif %}
-          {% endfor %}
-        </div>
-        
-        {%- comment -%} Zoom Icon Indicator {%- endcomment -%}
-        <button type="button" class="zoom-indicator" id="zoomIndicator" aria-label="Click to zoom">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="2"/>
-            <path d="M13 13L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            <path d="M8 5V11M5 8H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          </svg>
-        </button>
-        
-        {%- comment -%} Navigation Dots {%- endcomment -%}
-        {% if product.media.size > 1 %}
-          <div class="slider-dots" id="sliderDots">
-            {% for media in product.media %}
-              {% if media.media_type == 'image' %}
-                <button 
-                  type="button"
-                  class="slider-dot {% if forloop.first %}active{% endif %}"
-                  data-slide="{{ forloop.index0 }}"
-                  aria-label="Go to slide {{ forloop.index }}"
-                ></button>
-              {% endif %}
-            {% endfor %}
-          </div>
-        {% endif %}
-        
-        {%- comment -%} Arrow Navigation {%- endcomment -%}
-        {% if product.media.size > 1 %}
-          <button type="button" class="slider-arrow slider-arrow-prev" id="prevSlide" aria-label="Previous image">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-          <button type="button" class="slider-arrow slider-arrow-next" id="nextSlide" aria-label="Next image">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-        {% endif %}
-      </div>
-
-      {%- comment -%} Thumbnail Gallery {%- endcomment -%}
-      {% if product.media.size > 1 %}
-        <div class="product-thumbnails" id="thumbnailGallery">
-          {% for media in product.media limit: 8 %}
-            {% if media.media_type == 'image' %}
-              <button 
-                type="button"
-                class="thumbnail-item {% if forloop.first %}active{% endif %}"
-                data-thumbnail-index="{{ forloop.index0 }}"
-                data-image-url="{{ media | image_url: width: 1000 }}"
-              >
-                <img 
-                  src="{{ media | image_url: width: 200 }}" 
-                  alt="{{ media.alt | default: product.title | escape }}"
-                  class="thumbnail-image"
-                  loading="lazy"
-                />
-              </button>
-            {% endif %}
-          {% endfor %}
-        </div>
-      {% endif %}
-    </div>
-
-    {%- comment -%} Product Details {%- endcomment -%}
-    <div class="product-details">
-      <h1 class="product-title">{{ product.title | escape }}</h1>
-      
-      <div class="product-price-wrapper">
-        {% assign current_variant = product.selected_or_first_available_variant %}
-        <span class="product-price {% if current_variant.compare_at_price > current_variant.price %}product-price--sale{% endif %}" id="productPrice">
-          {{ current_variant.price | money }}
-        </span>
-        {% if current_variant.compare_at_price > current_variant.price %}
-          <span class="product-price-compare" id="productComparePrice">{{ current_variant.compare_at_price | money }}</span>
-        {% endif %}
-      </div>
-
-      {%- comment -%} Product Form {%- endcomment -%}
-      {% form 'product', product, id: 'product-form' %}
-        <input type="hidden" name="id" value="{{ current_variant.id }}" id="productVariantId">
-        
-        {%- comment -%} Variant Selectors {%- endcomment -%}
-        {% unless product.has_only_default_variant %}
-          <div class="product-variants">
-            {% for option in product.options_with_values %}
-              <div class="variant-selector">
-                <label class="variant-label">{{ option.name }}</label>
-                <div class="variant-options">
-                  {% for value in option.values %}
-                    <input 
-                      type="radio" 
-                      id="option-{{ option.position }}-{{ forloop.index }}"
-                      name="option{{ option.position }}"
-                      value="{{ value | escape }}"
-                      class="variant-radio"
-                      data-option-position="{{ option.position }}"
-                      {% if option.selected_value == value %}checked{% endif %}
-                    />
-                    <label 
-                      for="option-{{ option.position }}-{{ forloop.index }}"
-                      class="variant-label-button"
-                      {% if option.name contains 'olor' or option.name contains 'olour' %}
-                        data-color="{{ value | handleize }}"
-                      {% endif %}
-                    >
-                      {{ value }}
-                    </label>
-                  {% endfor %}
-                </div>
-              </div>
-            {% endfor %}
-          </div>
-        {% endunless %}
-
-        {%- comment -%} Quantity + Add to Cart {%- endcomment -%}
-        <div class="product-actions">
-          <div class="quantity-wrapper">
-            <button 
-              type="button" 
-              class="quantity-btn quantity-btn-minus"
-              id="quantityMinus"
-              aria-label="Decrease quantity"
-            >
-              <svg width="14" height="2" viewBox="0 0 14 2" fill="none">
-                <path d="M1 1H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-            </button>
-            
-            <input 
-              type="number" 
-              name="quantity" 
-              value="1" 
-              min="1" 
-              class="quantity-input"
-              id="quantityInput"
-              aria-label="Quantity"
-              readonly
-            />
-            
-            <button 
-              type="button" 
-              class="quantity-btn quantity-btn-plus"
-              id="quantityPlus"
-              aria-label="Increase quantity"
-            >
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path d="M7 1V13M1 7H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-            </button>
-          </div>
-
-          <button 
-            type="submit" 
-            name="add"
-            class="add-to-cart-btn"
-            id="addToCartBtn"
-            {% unless current_variant.available %}disabled{% endunless %}
-          >
-            <span class="btn-icon">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path d="M6 1L3 4M3 4L6 7M3 4H11C13.2091 4 15 5.79086 15 8V8C15 10.2091 13.2091 12 11 12H4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                <circle cx="7" cy="17" r="1.5" stroke="currentColor" stroke-width="1.5"/>
-                <circle cx="14" cy="17" r="1.5" stroke="currentColor" stroke-width="1.5"/>
-              </svg>
-            </span>
-            <span class="btn-text" id="addToCartText">
-              {% if current_variant.available %}
-                Add to Cart
-              {% else %}
-                Sold Out
-              {% endif %}
-            </span>
-          </button>
-        </div>
-
-        {%- comment -%} Payment Icons {%- endcomment -%}
-        <div class="trust-badges">
-          <div class="payment-methods">
-            <svg width="40" height="26" viewBox="0 0 40 26" fill="none">
-              <rect width="40" height="26" rx="4" fill="#1A1F71"/>
-              <text x="20" y="16" fill="white" font-size="8" text-anchor="middle" font-weight="600">VISA</text>
-            </svg>
-            <svg width="40" height="26" viewBox="0 0 40 26" fill="none">
-              <rect width="40" height="26" rx="4" fill="#EB001B"/>
-              <circle cx="16" cy="13" r="7" fill="#EB001B"/>
-              <circle cx="24" cy="13" r="7" fill="#FF5F00"/>
-            </svg>
-            <svg width="40" height="26" viewBox="0 0 40 26" fill="none">
-              <rect width="40" height="26" rx="4" fill="#016FD0"/>
-              <text x="20" y="16" fill="white" font-size="7" text-anchor="middle" font-weight="700">AMEX</text>
-            </svg>
-            <svg width="40" height="26" viewBox="0 0 40 26" fill="none">
-              <rect width="40" height="26" rx="4" fill="#003087"/>
-              <text x="20" y="15" fill="white" font-size="6" text-anchor="middle" font-weight="700">PayPal</text>
-            </svg>
-          </div>
-        </div>
-
-      {% endform %}
-    </div>
-  </div>
-</div>
-
-{%- comment -%} Product Variants JSON for JavaScript {%- endcomment -%}
-<script id="product-json" type="application/json">
-  {
-    "product": {{ product | json }},
-    "variants": {{ product.variants | json }},
-    "images": [
-      {% for media in product.media %}
-        {% if media.media_type == 'image' %}
-          {
-            "id": {{ media.id }},
-            "src": "{{ media | image_url: width: 1000 }}",
-            "variant_ids": {{ media.variant_ids | json }},
-            "alt": {{ media.alt | default: product.title | json }}
-          }{% unless forloop.last %},{% endunless %}
-        {% endif %}
-      {% endfor %}
-    ]
-  }
-</script>
-
-
-
-
-
-
-
-
-
-  
-
+{% endstylesheet %}
 
 <script>
 (function() {
@@ -1258,28 +1745,3 @@
   
 })();
 </script>
-
-{% schema %}
-{
-  "name": "Product Information",
-  "tag": "section",
-  "class": "section-product-information",
-  "settings": [
-    {
-      "type": "header",
-      "content": "Gallery Settings"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_thumbnails",
-      "label": "Show thumbnails",
-      "default": true
-    }
-  ],
-  "presets": [
-    {
-      "name": "Product Information"
-    }
-  ]
-}
-{% endschema %}
