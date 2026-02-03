@@ -98,8 +98,10 @@
         <div class="cart-drawer__header" id="cart-drawer-header">
           <h2 class="cart-drawer__heading" id="cart-drawer-heading">
             <span class="cart-icon-wrapper">
-              <svg class="cart-icon-large" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>
+              <svg class="cart-icon-large" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                <path d="M3 6h18"></path>
+                <path d="M16 10a4 4 0 0 1-8 0"></path>
               </svg>
             </span>
             <span class="cart-heading-text">{{ 'content.cart_title' | t }}</span>
@@ -146,7 +148,7 @@
   </dialog>
 </cart-drawer-component>
 
-{% stylesheet %}
+<style>
 /* ==========================================
    MODERN CART DRAWER - GREEN GARDEN THEME
    ========================================== */
@@ -204,17 +206,16 @@
    ========================================== */
 
 .cart-drawer__header {
-  background: #1a5c3a !important; /* Force theme green */
+  background: white !important;
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: var(--cart-drawer-padding);
+  padding: 1.5rem 1.5rem 0.5rem;
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  color: white !important;
+  color: #1a5c3a !important;
 }
 
 @media screen and (min-width: 750px) {
@@ -228,59 +229,42 @@
   align-items: center;
   gap: 12px;
   margin: 0;
-  color: white;
-  font-size: 1.25rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  color: #1a5c3a;
+  font-family: inherit;
 }
 
 .cart-icon-large {
-  color: white;
+  color: #1a5c3a;
   flex-shrink: 0;
 }
 
 .cart-heading-text {
-  font-weight: 600;
+  font-family: serif; /* Better if I can use the theme's serif font */
+  font-size: 2.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
-/* Count Bubble - Modern Style */
 .cart-count-bubble {
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: white;
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.875rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-size: 2.25rem;
+  font-weight: 500;
+  color: #1a5c3a;
+  opacity: 1;
 }
 
 /* Close Button - Modern Style */
 .cart-drawer__close-button {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-  color: white;
+  background: none;
+  border: none;
+  color: #1a5c3a;
   cursor: pointer;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
+  transition: opacity 0.2s ease;
+  padding: 0;
 }
 
 .cart-drawer__close-button:hover {
-  background: rgba(255, 255, 255, 0.25);
-  transform: scale(1.05);
+  opacity: 0.7;
+  transform: none;
 }
 
 .cart-drawer__close-button:active {
@@ -288,7 +272,7 @@
 }
 
 .cart-drawer__close-button svg {
-  color: white;
+  color: #1a5c3a;
   stroke-width: 2.5;
 }
 
@@ -594,4 +578,4 @@
     transform: translate(-50%, -50%) rotate(360deg);
   }
 }
-{% endstylesheet %}
+</style>
