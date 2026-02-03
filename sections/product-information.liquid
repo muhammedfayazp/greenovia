@@ -1773,5 +1773,64 @@
     radio.addEventListener('change', updateVariant);
   });
   
+  // ==========================================
+  // FORM SUBMISSION & CART ADD EVENT
+  // ==========================================
+  
+  const productForm = document.getElementById('product-form');
+  
+  if (productForm) {
+    productForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const variantId = document.getElementById('productVariantId')?.value;
+      const quantity = parseInt(document.getElementById('quantityInput')?.value || 1);
+      
+      if (!variantId) {
+        console.error('No variant selected');
+        return;
+      }
+      
+      // Add to cart via Shopify API
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          items: [{
+            id: variantId,
+            quantity: quantity
+          }]
+        })
+      })
+      .then(response => {
+        if (!response.ok) throw new Error('Failed to add to cart');
+        return response.json();
+      })
+      .then(cart => {
+        // Dispatch custom event for cart drawer
+        const event = new CustomEvent('cart:add', {
+          bubbles: true,
+          detail: {
+            cart: cart,
+            variantId: variantId,
+            quantity: quantity
+          }
+        });
+        document.dispatchEvent(event);
+        
+        // Reset quantity
+        if (document.getElementById('quantityInput')) {
+          document.getElementById('quantityInput').value = 1;
+        }
+      })
+      .catch(error => {
+        console.error('Error adding to cart:', error);
+        alert('Unable to add item to cart. Please try again.');
+      });
+    });
+  }
+  
 })();
 </script>
