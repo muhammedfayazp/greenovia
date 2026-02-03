@@ -1576,7 +1576,8 @@ document.addEventListener('DOMContentLoaded', function() {
       });
       
       // Update cart count in header if exists
-      updateCartCount(cart.item_count);
+      // Skip dispatching new cart:update event as we are already responding to one
+      updateCartCount(cart.item_count, true);
       
     } catch (error) {
       console.error('Failed to sync cart:', error);
@@ -1584,7 +1585,9 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   // Update cart count in header
-  function updateCartCount(count) {
+  function updateCartCount(count, skipDispatch = false) {
+    if (skipDispatch) return;
+
     // Dispatch event for cart drawer/icon updates
     document.dispatchEvent(new CustomEvent('cart:update', {
       bubbles: true,
