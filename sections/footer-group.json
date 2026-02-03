@@ -18,16 +18,16 @@
           "type": "benefit",
           "settings": {
             "icon": "shipping",
-            "title": "Free Shipping",
-            "description": "On all orders over $50"
+            "title": "Free shipping",
+            "description": "on orders over AED 199"
           }
         },
         "benefit_jM7dfh": {
           "type": "benefit",
           "settings": {
             "icon": "discount",
-            "title": "25% Off First Order",
-            "description": "Use code GREENES at checkout"
+            "title": "10% Off First Order",
+            "description": "Use code FIRST at checkout"
           }
         },
         "benefit_nRmLcK": {
