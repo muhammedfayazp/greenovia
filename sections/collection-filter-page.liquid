@@ -510,7 +510,7 @@
                       </button>
                     </cart-quantity-selector-component>
 
-                    <add-to-cart-component class="modern-atc-wrapper" ref="addToCartButtonContainer">
+                    {% comment %} <add-to-cart-component class="modern-atc-wrapper" ref="addToCartButtonContainer">
                       <button type="submit" class="modern-cart-btn" ref="addToCartButton" aria-label="Add to cart" on:click="/handleClick">
                         <svg viewBox="0 0 24 24" fill="none">
                           <path d="M3 3h2l2.2 11.4a2 2 0 0 0 2 1.6h7.5a2 2 0 0 0 2-1.6L21 7H6"
@@ -519,7 +519,13 @@
                           <circle cx="18" cy="20" r="1.5" fill="currentColor"/>
                         </svg>
                       </button>
-                    </add-to-cart-component>
+                    </add-to-cart-component> {% endcomment %}
+
+                           <add-to-cart-component class="catprodrows__atc-wrapper">
+                            <button type="submit" class="catprodrows__atc-trigger" aria-label="Add to cart" ref="addToCartButton">
+                              {{ 'icon-add-to-cart.svg' | inline_asset_content }}
+                            </button>
+                          </add-to-cart-component>
                   </div>
                 {%- endform -%}
               </product-form-component>
