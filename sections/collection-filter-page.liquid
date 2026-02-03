@@ -484,47 +484,32 @@
                 
                 {%- comment -%} Quantity and Add to Cart {%- endcomment -%}
                 {%- assign cart_qty = cart | item_count_for_variant: product.selected_or_first_available_variant.id -%}
-                <product-form-component class="product-card__form-wrapper" data-section-id="{{ section.id }}" data-product-id="{{ product.id }}">
-                  {%- form 'product', product, id: nil, class: 'product-card__form' -%}
-                    <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
-                    
-                    <div class="product-card__actions {% if cart_qty > 0 %}is-active{% endif %}" data-cart-quantity="{{ cart_qty }}">
-                    
-                      <cart-quantity-selector-component class="product-card__qty-selector">
-                        <button type="button" class="qty__btn" ref="minusButton" on:click="/decreaseQuantity">
-                          <span class="qty__minus-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg></span>
-                          <span class="qty__trash-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></span>
-                        </button>
-                        <input 
-                          type="number" 
-                          name="quantity" 
-                          value="{{ cart_qty | at_least: 1 }}" 
-                          min="1" 
-                          class="visually-hidden" 
-                          ref="quantityInput"
-                          data-cart-quantity="{{ cart_qty }}"
-                          on:focus="/selectInputValue"
-                          on:blur="/setQuantity"
-                        >
-                        <span class="qty__current" ref="quantityDisplay">{{ cart_qty }}</span>
-                        <button type="button" class="qty__btn" ref="plusButton" on:click="/increaseQuantity">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                        </button>
-                      </cart-quantity-selector-component>
-
-                      <add-to-cart-component class="product-card__atc-wrapper" ref="addToCartButtonContainer">
-                        <button type="submit" class="product-card__atc-trigger" ref="addToCartButton" aria-label="Add to cart" on:click="/handleClick">
-                          <svg viewBox="0 0 24 24" fill="none">
-                            <path d="M3 3h2l2.2 11.4a2 2 0 0 0 2 1.6h7.5a2 2 0 0 0 2-1.6L21 7H6"
-                              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <circle cx="10" cy="20" r="1.5" fill="currentColor"/>
-                            <circle cx="18" cy="20" r="1.5" fill="currentColor"/>
-                          </svg>
-                        </button>
-                      </add-to-cart-component>
+                <div class="product-card__form-wrapper" data-variant-id="{{ product.selected_or_first_available_variant.id }}" data-product-id="{{ product.id }}">
+                  <div class="product-card__actions {% if cart_qty > 0 %}is-active{% endif %}" data-cart-quantity="{{ cart_qty }}">
+                  
+                    <div class="product-card__qty-selector">
+                      <button type="button" class="qty__btn qty__minus" data-action="decrease">
+                        <span class="qty__minus-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg></span>
+                        <span class="qty__trash-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></span>
+                      </button>
+                      <span class="qty__current">{{ cart_qty }}</span>
+                      <button type="button" class="qty__btn qty__plus" data-action="increase">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                      </button>
                     </div>
-                  {%- endform -%}
-                </product-form-component>
+
+                    <div class="product-card__atc-wrapper">
+                      <button type="button" class="product-card__atc-trigger" data-action="add-to-cart" aria-label="Add to cart">
+                        <svg viewBox="0 0 24 24" fill="none">
+                          <path d="M3 3h2l2.2 11.4a2 2 0 0 0 2 1.6h7.5a2 2 0 0 0 2-1.6L21 7H6"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          <circle cx="10" cy="20" r="1.5" fill="currentColor"/>
+                          <circle cx="18" cy="20" r="1.5" fill="currentColor"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -1555,102 +1540,193 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // Bridge Logic for syncing theme components with custom UI
-  const themeEvents = {
-    cartUpdate: 'cart:update',
-    qtyUpdate: 'quantity-selector:update'
-  };
-
-  // Sync all cards when cart is updated globally
-  document.addEventListener(themeEvents.cartUpdate, async (event) => {
-    let cart = event.detail.resource;
-    if (!cart || !cart.items) {
-      const res = await fetch('/cart.js');
-      cart = await res.json();
-    }
-    if (!cart || !cart.items) return;
-
-    document.querySelectorAll('.product-card__form-wrapper').forEach(wrapper => {
-      const variantId = wrapper.querySelector('input[name="id"]')?.value;
-      if (!variantId) return;
-
-      const item = cart.items.find(i => i.variant_id.toString() === variantId.toString());
-      const qty = item ? item.quantity : 0;
-      
-      const actions = wrapper.querySelector('.product-card__actions');
-      const display = wrapper.querySelector('.qty__current');
-      const input = wrapper.querySelector('cart-quantity-selector-component input');
-
-      if (actions) {
-        actions.dataset.cartQuantity = qty;
-        actions.classList.toggle('is-active', qty > 0);
-      }
-      if (display) display.textContent = qty;
-      if (input) {
-        input.dataset.cartQuantity = qty;
-        input.value = qty > 0 ? qty : 1;
-      }
-    });
-  });
-
-  // Handle immediate updates from quantity selectors
-  document.addEventListener(themeEvents.qtyUpdate, async (event) => {
-    const qtySelector = event.target.closest('cart-quantity-selector-component');
-    if (!qtySelector || !qtySelector.closest('.collection-filter-page')) return;
-
-    const wrapper = qtySelector.closest('.product-card__form-wrapper');
-    const variantId = wrapper.querySelector('input[name="id"]')?.value;
-    const quantity = event.detail.quantity;
-    const display = qtySelector.querySelector('[ref="quantityDisplay"]');
+  // ===== CUSTOM CART HANDLING - NO REDIRECTS =====
+  
+  // Update UI for a specific product card
+  function updateProductCardUI(wrapper, quantity) {
+    const actions = wrapper.querySelector('.product-card__actions');
+    const qtyDisplay = wrapper.querySelector('.qty__current');
     
-    if (display) display.textContent = quantity;
-
+    if (!actions || !qtyDisplay) return;
+    
+    actions.dataset.cartQuantity = quantity;
+    qtyDisplay.textContent = quantity;
+    
+    if (quantity > 0) {
+      actions.classList.add('is-active');
+    } else {
+      actions.classList.remove('is-active');
+    }
+  }
+  
+  // Sync all cards from cart data
+  async function syncAllCardsFromCart() {
     try {
-      const res = await fetch('/cart/change.js', {
+      const response = await fetch('/cart.js');
+      const cart = await response.json();
+      
+      document.querySelectorAll('.product-card__form-wrapper').forEach(wrapper => {
+        const variantId = wrapper.dataset.variantId;
+        if (!variantId) return;
+        
+        const cartItem = cart.items.find(item => item.variant_id.toString() === variantId.toString());
+        const quantity = cartItem ? cartItem.quantity : 0;
+        
+        updateProductCardUI(wrapper, quantity);
+      });
+      
+      // Update cart count in header if exists
+      updateCartCount(cart.item_count);
+      
+    } catch (error) {
+      console.error('Failed to sync cart:', error);
+    }
+  }
+  
+  // Update cart count in header
+  function updateCartCount(count) {
+    // Dispatch event for cart drawer/icon updates
+    document.dispatchEvent(new CustomEvent('cart:update', {
+      bubbles: true,
+      detail: {
+        data: { itemCount: count }
+      }
+    }));
+  }
+  
+  // Handle Add to Cart
+  async function handleAddToCart(wrapper, variantId) {
+    const actions = wrapper.querySelector('.product-card__actions');
+    if (!actions) return;
+    
+    // Add loading state
+    actions.classList.add('is-loading');
+    
+    try {
+      const formData = new FormData();
+      formData.append('id', variantId);
+      formData.append('quantity', 1);
+      
+      const response = await fetch('/cart/add.js', {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (!response.ok) throw new Error('Failed to add to cart');
+      
+      const result = await response.json();
+      
+      // Get current cart quantity for this variant
+      const cartResponse = await fetch('/cart.js');
+      const cart = await cartResponse.json();
+      const cartItem = cart.items.find(item => item.variant_id.toString() === variantId.toString());
+      const quantity = cartItem ? cartItem.quantity : 1;
+      
+      // Update UI
+      updateProductCardUI(wrapper, quantity);
+      updateCartCount(cart.item_count);
+      
+      // Open cart drawer if exists
+      const cartDrawer = document.querySelector('cart-drawer-component');
+      if (cartDrawer && typeof cartDrawer.showDialog === 'function') {
+        cartDrawer.showDialog();
+      }
+      
+    } catch (error) {
+      console.error('Add to cart failed:', error);
+      alert('Failed to add item to cart. Please try again.');
+    } finally {
+      actions.classList.remove('is-loading');
+    }
+  }
+  
+  // Handle Quantity Change
+  async function handleQuantityChange(wrapper, variantId, newQuantity) {
+    const actions = wrapper.querySelector('.product-card__actions');
+    if (!actions) return;
+    
+    // Optimistic UI update
+    updateProductCardUI(wrapper, newQuantity);
+    
+    try {
+      const response = await fetch('/cart/change.js', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          id: variantId.toString(), 
-          quantity: quantity,
-          sections_url: window.location.pathname
+        body: JSON.stringify({
+          id: variantId.toString(),
+          quantity: newQuantity
         })
       });
-      const cart = await res.json();
-
-      const updateEvent = new CustomEvent(themeEvents.cartUpdate, {
-        bubbles: true,
-        detail: {
-          resource: cart,
-          data: {
-            itemCount: cart.item_count,
-            source: 'collection-filter-page'
-          }
-        }
-      });
-      document.dispatchEvent(updateEvent);
-
-      // Sync all product cards
-      document.querySelectorAll('.product-card__actions').forEach(actions => {
-        const vIdInput = actions.closest('product-form-component')?.querySelector('[name="id"]');
-        const vId = vIdInput?.value;
-        if (!vId) return;
-        
-        const item = cart.items.find(i => i.variant_id.toString() === vId.toString());
-        const qty = item ? item.quantity : 0;
-        
-        actions.dataset.cartQuantity = qty;
-        const display = actions.querySelector('.qty__current');
-        if (display) display.textContent = qty;
-        
-        if (qty > 0) {
-          actions.classList.add('is-active');
-        } else {
-          actions.classList.remove('is-active');
-        }
-      });
-    } catch (e) {
-      console.error('Cart update failed', e);
+      
+      if (!response.ok) throw new Error('Failed to update cart');
+      
+      const cart = await response.json();
+      
+      // Verify the update
+      const cartItem = cart.items.find(item => item.variant_id.toString() === variantId.toString());
+      const actualQuantity = cartItem ? cartItem.quantity : 0;
+      
+      // Update UI with actual quantity
+      updateProductCardUI(wrapper, actualQuantity);
+      updateCartCount(cart.item_count);
+      
+    } catch (error) {
+      console.error('Quantity update failed:', error);
+      // Revert to cart state on error
+      syncAllCardsFromCart();
     }
+  }
+  
+  // Attach event listeners to all product cards
+  document.querySelectorAll('.product-card__form-wrapper').forEach(wrapper => {
+    const variantId = wrapper.dataset.variantId;
+    if (!variantId) return;
+    
+    const actions = wrapper.querySelector('.product-card__actions');
+    if (!actions) return;
+    
+    // Add to Cart button
+    const addBtn = wrapper.querySelector('[data-action="add-to-cart"]');
+    if (addBtn) {
+      addBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        handleAddToCart(wrapper, variantId);
+      });
+    }
+    
+    // Decrease quantity button
+    const decreaseBtn = wrapper.querySelector('[data-action="decrease"]');
+    if (decreaseBtn) {
+      decreaseBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const currentQty = parseInt(actions.dataset.cartQuantity) || 0;
+        const newQty = Math.max(0, currentQty - 1);
+        
+        handleQuantityChange(wrapper, variantId, newQty);
+      });
+    }
+    
+    // Increase quantity button
+    const increaseBtn = wrapper.querySelector('[data-action="increase"]');
+    if (increaseBtn) {
+      increaseBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const currentQty = parseInt(actions.dataset.cartQuantity) || 0;
+        const newQty = currentQty + 1;
+        
+        handleQuantityChange(wrapper, variantId, newQty);
+      });
+    }
+  });
+  
+  // Listen for external cart updates (from other sections)
+  document.addEventListener('cart:update', () => {
+    syncAllCardsFromCart();
   });
 
   // Initial filter run
