@@ -168,7 +168,7 @@
 
 <style>
 /* ==========================================
-   MINIMALIST CART DESIGN - FINAL
+   MINIMALIST CART DESIGN - PERFECT EMPTY STATE
    ========================================== */
 
 :root {
@@ -191,7 +191,7 @@
 }
 
 /* ==========================================
-   EMPTY STATE
+   PERFECT EMPTY STATE - WORKS FOR BOTH CASES
    ========================================== */
 
 .cart-empty-state {
@@ -199,11 +199,23 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 3.5rem 1.5rem;
+  padding: 4rem 2rem;
   text-align: center;
-  min-height: 480px;
+  min-height: 500px;
   background: transparent;
-  border-radius: 0;
+  opacity: 0;
+  animation: fadeInUp 0.5s ease forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .cart-empty-icon-wrapper {
@@ -214,57 +226,60 @@
 }
 
 .cart-empty-icon-circle {
-  width: 120px;
-  height: 120px;
+  width: 130px;
+  height: 130px;
   border-radius: 50%;
-  background: rgba(26, 92, 58, 0.08);
+  background: linear-gradient(135deg, rgba(26, 92, 58, 0.08) 0%, rgba(26, 92, 58, 0.04) 100%);
   border: 2px solid var(--cart-primary);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(26, 92, 58, 0.08);
+}
+
+.cart-empty-icon-circle::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(26, 92, 58, 0.04) 0%, transparent 100%);
+  z-index: -1;
 }
 
 .cart-empty-icon-svg {
   color: var(--cart-primary);
   display: block;
   animation: floatSmooth 4s ease-in-out infinite;
-  width: 60%;
-  height: 60%;
+  width: 55%;
+  height: 55%;
 }
 
 .cart-empty-heading {
-  font-size: 1.75rem;
+  font-size: 1.875rem;
   font-weight: 700;
   color: var(--cart-text-primary);
-  margin: 0 0 0.75rem 0;
-  letter-spacing: -0.02em;
-  line-height: 1.35;
+  margin: 0 0 0.875rem 0;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
 }
 
 .cart-empty-text {
-  font-size: 0.95rem;
+  font-size: 1rem;
   color: var(--cart-text-secondary);
-  margin: 0 0 2.5rem 0;
+  margin: 0 0 2.75rem 0;
   line-height: 1.6;
-  max-width: 360px;
+  max-width: 380px;
   margin-left: auto;
   margin-right: auto;
-}
-
-.cart-empty-suggestions {
-  display: none;
-}
-
-.cart-empty-suggestion-label {
-  display: none;
 }
 
 .cart-empty-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.95rem 3rem;
+  padding: 1rem 3.25rem;
   background: var(--cart-primary);
   color: white;
   font-size: 1rem;
@@ -273,9 +288,9 @@
   border-radius: 50px;
   text-decoration: none;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   letter-spacing: -0.01em;
-  box-shadow: 0 4px 14px rgba(26, 92, 58, 0.18);
+  box-shadow: 0 4px 16px rgba(26, 92, 58, 0.2);
   position: relative;
   overflow: hidden;
   min-width: 240px;
@@ -291,23 +306,24 @@
   background: rgba(255, 255, 255, 0.2);
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  transition: width 0.4s ease, height 0.4s ease;
+  transition: width 0.5s ease, height 0.5s ease;
   z-index: 0;
 }
 
 .cart-empty-button:hover::before {
-  width: 300px;
-  height: 300px;
+  width: 320px;
+  height: 320px;
 }
 
 .cart-empty-button:hover {
   background: var(--cart-primary-hover);
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(26, 92, 58, 0.22);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(26, 92, 58, 0.28);
 }
 
 .cart-empty-button:active {
-  transform: translateY(-1px);
+  transform: translateY(0);
+  box-shadow: 0 4px 16px rgba(26, 92, 58, 0.2);
 }
 
 /* Animations */
@@ -316,73 +332,100 @@
     transform: translateY(0px);
   }
   50% {
-    transform: translateY(-8px);
+    transform: translateY(-10px);
   }
 }
 
+/* ==========================================
+   RESPONSIVE EMPTY STATE
+   ========================================== */
+
 @media (max-width: 768px) {
   .cart-empty-state {
-    padding: 2.5rem 1.25rem;
-    min-height: 420px;
+    padding: 3.5rem 1.5rem;
+    min-height: 450px;
   }
   
   .cart-empty-icon-wrapper {
-    margin-bottom: 1.75rem;
+    margin-bottom: 1.875rem;
   }
   
   .cart-empty-icon-circle {
-    width: 110px;
-    height: 110px;
-    border-width: 1.8px;
+    width: 115px;
+    height: 115px;
+  }
+  
+  .cart-empty-icon-circle::before {
+    inset: -6px;
   }
   
   .cart-empty-heading {
-    font-size: 1.5rem;
+    font-size: 1.625rem;
   }
   
   .cart-empty-text {
-    font-size: 0.9rem;
-    margin-bottom: 2rem;
+    font-size: 0.9375rem;
+    margin-bottom: 2.25rem;
   }
   
   .cart-empty-button {
-    padding: 0.9rem 2.5rem;
-    font-size: 0.95rem;
+    padding: 0.9375rem 2.75rem;
+    font-size: 0.9375rem;
     min-width: 220px;
   }
 }
 
 @media (max-width: 640px) {
   .cart-empty-state {
-    padding: 2.25rem 1rem;
-    min-height: 380px;
+    padding: 3rem 1.25rem;
+    min-height: 400px;
   }
   
   .cart-empty-icon-wrapper {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.625rem;
   }
   
   .cart-empty-icon-circle {
-    width: 100px;
-    height: 100px;
-    border-width: 1.6px;
+    width: 105px;
+    height: 105px;
   }
   
   .cart-empty-heading {
-    font-size: 1.375rem;
-    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
   }
   
   .cart-empty-text {
     font-size: 0.875rem;
     margin-bottom: 2rem;
+    max-width: 320px;
   }
   
   .cart-empty-button {
-    width: 85%;
-    max-width: 260px;
-    padding: 0.8rem 2rem;
-    font-size: 0.9rem;
+    width: 90%;
+    max-width: 280px;
+    padding: 0.875rem 2.25rem;
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .cart-empty-state {
+    padding: 2.5rem 1rem;
+    min-height: 360px;
+  }
+  
+  .cart-empty-icon-circle {
+    width: 95px;
+    height: 95px;
+  }
+  
+  .cart-empty-heading {
+    font-size: 1.375rem;
+  }
+  
+  .cart-empty-text {
+    font-size: 0.8125rem;
   }
 }
 
@@ -707,22 +750,28 @@
 
 .qty-btn:focus-visible,
 .cart-item__remove:focus-visible,
-.cart-item__title:focus-visible {
+.cart-item__title:focus-visible,
+.cart-empty-button:focus-visible {
   outline: 2px solid var(--cart-primary);
   outline-offset: 2px;
   border-radius: 4px;
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .cart-empty-state,
+  .cart-empty-icon-svg,
+  .cart-empty-button::before {
+    animation: none !important;
+  }
+  
   * {
-    animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
 }
 </style>
 
 <script>
-  // Modern Cart Functionality
+  // Modern Cart Functionality - Improved
   document.addEventListener('DOMContentLoaded', function() {
     const cartForm = document.querySelector('.modern-cart-form');
     if (!cartForm) return;
@@ -772,8 +821,21 @@
       document.dispatchEvent(new CustomEvent('cart:updated', { detail: cart }));
       
       if (cart.item_count === 0) {
-        const cartWrapper = document.querySelector('.modern-cart-wrapper');
-        if (cartWrapper) {
+        showEmptyCart();
+      }
+    }
+
+    function showEmptyCart() {
+      const cartWrapper = document.querySelector('.modern-cart-wrapper');
+      if (!cartWrapper) return;
+      
+      // Fade out current content
+      const cartForm = cartWrapper.querySelector('.modern-cart-form');
+      if (cartForm) {
+        cartForm.style.opacity = '0';
+        cartForm.style.transform = 'translateY(-10px)';
+        
+        setTimeout(() => {
           cartWrapper.innerHTML = `
             <div class="cart-empty-state">
               <div class="cart-empty-icon-wrapper">
@@ -790,7 +852,7 @@
               <a class="cart-empty-button" href="/collections/all">Continue Shopping</a>
             </div>
           `;
-        }
+        }, 200);
       }
     }
 
@@ -842,6 +904,7 @@
       }
     }
 
+    // Event Listeners
     document.querySelectorAll('[data-action="decrease"]').forEach(btn => {
       btn.addEventListener('click', function(e) {
         e.preventDefault();
