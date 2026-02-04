@@ -899,7 +899,6 @@
     const CartManager = {
       init() {
         this.cartForm = document.querySelector('.modern-cart-form');
-        if (!this.cartForm) return;
 
         this.moneyFormat = window.theme?.moneyFormat || '{{amount}}';
         this.bindEvents();
@@ -907,51 +906,54 @@
       },
 
       bindEvents() {
-        // Quantity decrease buttons
-        document.querySelectorAll('[data-action="decrease"]').forEach(btn => {
-          btn.addEventListener('click', (e) => this.handleDecrease(e));
-        });
-
-        // Quantity increase buttons
-        document.querySelectorAll('[data-action="increase"]').forEach(btn => {
-          btn.addEventListener('click', (e) => this.handleIncrease(e));
-        });
-
-        // Remove buttons
-        document.querySelectorAll('[data-action="remove"]').forEach(btn => {
-          btn.addEventListener('click', (e) => this.handleRemove(e));
+        // Use event delegation so buttons work after DOM updates/replacement
+        document.addEventListener('click', (e) => {
+          const btn = e.target.closest('[data-action]');
+          if (!btn) return;
+          const action = btn.dataset.action;
+          if (action === 'decrease') {
+            e.preventDefault();
+            this.handleDecrease(btn);
+          } else if (action === 'increase') {
+            e.preventDefault();
+            this.handleIncrease(btn);
+          } else if (action === 'remove') {
+            e.preventDefault();
+            this.handleRemove(btn);
+          }
         });
       },
 
-      handleDecrease(e) {
-        e.preventDefault();
-        const button = e.currentTarget;
-        const line = parseInt(button.dataset.line);
-        const input = document.querySelector(`.qty-input[data-line="${line}"]`);
-        const currentValue = parseInt(input.value);
+      handleDecrease(button) {
+        const btn = button;
+        const line = parseInt(btn.dataset.line);
+        let input = null;
+        const cartItem = btn.closest('[data-line-index]');
+        if (cartItem) input = cartItem.querySelector('.qty-input');
+        if (!input) input = document.querySelector(`.qty-input[data-line="${line}"]`);
+        if (!input) return;
+        const currentValue = parseInt(input.value) || 0;
         const newValue = Math.max(0, currentValue - 1);
-        
-        if (newValue >= 0) {
-          this.updateQuantity(line, newValue, button);
-        }
+        if (newValue >= 0) this.updateQuantity(line, newValue, btn);
       },
 
-      handleIncrease(e) {
-        e.preventDefault();
-        const button = e.currentTarget;
-        const line = parseInt(button.dataset.line);
-        const input = document.querySelector(`.qty-input[data-line="${line}"]`);
-        const currentValue = parseInt(input.value);
+      handleIncrease(button) {
+        const btn = button;
+        const line = parseInt(btn.dataset.line);
+        let input = null;
+        const cartItem = btn.closest('[data-line-index]');
+        if (cartItem) input = cartItem.querySelector('.qty-input');
+        if (!input) input = document.querySelector(`.qty-input[data-line="${line}"]`);
+        if (!input) return;
+        const currentValue = parseInt(input.value) || 0;
         const newValue = currentValue + 1;
-        
-        this.updateQuantity(line, newValue, button);
+        this.updateQuantity(line, newValue, btn);
       },
 
-      handleRemove(e) {
-        e.preventDefault();
-        const button = e.currentTarget;
-        const line = parseInt(button.dataset.line);
-        this.updateQuantity(line, 0, button);
+      handleRemove(button) {
+        const btn = button;
+        const line = parseInt(btn.dataset.line);
+        this.updateQuantity(line, 0, btn);
       },
 
       updateQuantity(line, newQuantity, button) {
