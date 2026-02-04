@@ -1128,6 +1128,54 @@
             this.refreshCart();
           }
         });
+
+        // Additional listeners to catch add-to-cart actions across themes
+        // Catch form submits that post to /cart/add
+        document.addEventListener('submit', (e) => {
+          try {
+            const form = e.target;
+            if (form && form.action && form.action.indexOf('/cart/add') !== -1) {
+              // Give the theme's own handlers a chance to run, then refresh
+              setTimeout(() => this.refreshCart(), 400);
+            }
+          } catch (err) {
+            // ignore
+          }
+        }, true);
+
+        // Catch clicks on elements that may trigger AJAX add-to-cart
+        document.addEventListener('click', (e) => {
+          try {
+            const btn = e.target.closest('[data-add-to-cart], [data-action="add-to-cart"], .add-to-cart, button.add-to-cart');
+            if (btn) {
+              setTimeout(() => this.refreshCart(), 400);
+            }
+          } catch (err) {
+            // ignore
+          }
+        });
+
+        // Monkey-patch fetch to detect network calls to /cart/add.js and ensure a refresh
+        if (typeof window.fetch === 'function' && !window.__cart_manager_fetch_hooked) {
+          window.__cart_manager_fetch_hooked = true;
+          const _fetch = window.fetch.bind(window);
+          window.fetch = function(input, init) {
+            const url = (typeof input === 'string') ? input : (input && input.url) ? input.url : '';
+            const result = _fetch(input, init);
+            try {
+              if (url && (url.indexOf('/cart/add') !== -1 || url.indexOf('/cart.js') !== -1 || url.indexOf('/cart/change') !== -1)) {
+                result.then(() => {
+                  setTimeout(() => {
+                    try { CartManager.refreshCart(); } catch (e) {}
+                  }, 80);
+                }).catch(()=>{});
+              }
+            } catch (err) {
+              // ignore
+            }
+            return result;
+          };
+        }
       },
 
       // Refresh cart from server
