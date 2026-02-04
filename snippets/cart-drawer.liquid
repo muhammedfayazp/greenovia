@@ -287,13 +287,13 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 40px 24px;
-  min-height: 400px;
+  padding: 56px 28px 40px; /* extra top padding so content sits below header */
+  min-height: 420px;
 }
 
 .empty-cart-illustration {
-  margin-bottom: 24px;
-  animation: float 3s ease-in-out infinite;
+  margin-bottom: 22px;
+  animation: float 4s ease-in-out infinite;
 }
 
 @keyframes float {
@@ -306,8 +306,9 @@
 }
 
 .empty-cart-heading {
+  font-family: 'Playfair Display', serif, system-ui;
   font-size: 1.5rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--cart-green-dark);
   margin: 0 0 12px 0;
   letter-spacing: -0.02em;
@@ -321,29 +322,26 @@
 }
 
 .empty-cart-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 14px 32px;
-  background: linear-gradient(135deg, var(--cart-green) 0%, var(--cart-green-dark) 100%);
-  color: white;
+  display: block;
+  width: 320px;
+  max-width: calc(100% - 56px);
+  margin: 8px auto 0 auto;
+  padding: 14px 34px;
+  background: linear-gradient(180deg, var(--cart-green) 0%, var(--cart-green-dark) 100%);
+  color: #fff;
   font-size: 1rem;
   font-weight: 600;
   border: none;
-  border-radius: 50px;
+  border-radius: 999px;
   cursor: pointer;
-  transition: all 0.25s ease;
-  box-shadow: 
-    0 4px 12px rgba(26, 92, 58, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+  box-shadow: 0 10px 24px rgba(26, 92, 58, 0.16);
   letter-spacing: 0.02em;
 }
 
 .empty-cart-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 
-    0 6px 20px rgba(26, 92, 58, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transform: translateY(-3px);
+  box-shadow: 0 16px 36px rgba(26, 92, 58, 0.18);
 }
 
 .empty-cart-btn:active {
