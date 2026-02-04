@@ -25,10 +25,10 @@
     <div class="cart-empty-state">
       <div class="cart-empty-icon-wrapper">
         <div class="cart-empty-icon-circle">
-          <svg width="70" height="70" viewBox="0 0 24 24" fill="none" class="cart-empty-icon-svg">
-            <path d="M6 8L5 11V20C5 21.1 5.9 22 7 22H21C22.1 22 23 21.1 23 20V11L22 8H6Z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M9 8V5C9 3.3 10.3 2 12 2C13.7 2 15 3.3 15 5V8" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="12" cy="22" r="0.7" fill="currentColor" opacity="0.5"/>
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none" class="cart-empty-icon-svg">
+            <path d="M8 16L6 20V38C6 39.1 6.9 40 8 40H40C41.1 40 42 39.1 42 38V20L40 16H8Z" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M16 16V10C16 7.8 17.8 6 20 6H28C30.2 6 32 7.8 32 10V16" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="24" cy="28" r="1.2" fill="currentColor"/>
           </svg>
         </div>
       </div>
@@ -168,7 +168,7 @@
 
 <style>
 /* ==========================================
-   MINIMALIST CART DESIGN - FINAL
+   MINIMALIST CART DESIGN - PERFECT MATCH
    ========================================== */
 
 :root {
@@ -191,94 +191,99 @@
 }
 
 /* ==========================================
-   EMPTY STATE
+   PERFECT EMPTY STATE - EXACT MATCH
    ========================================== */
 
 .cart-empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 3.5rem 1.5rem;
+  justify-content: flex-start;
+  padding: 3rem 1.5rem 4rem;
   text-align: center;
-  min-height: 480px;
+  min-height: 400px;
   background: transparent;
-  border-radius: 0;
+  opacity: 0;
+  animation: fadeInUp 0.4s ease forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .cart-empty-icon-wrapper {
-  margin-bottom: 2rem;
+  margin-bottom: 2.25rem;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .cart-empty-icon-circle {
-  width: 120px;
-  height: 120px;
+  width: 140px;
+  height: 140px;
   border-radius: 50%;
-  background: rgba(26, 92, 58, 0.08);
-  border: 2px solid var(--cart-primary);
+  background: rgba(230, 242, 235, 0.5);
+  border: 2.5px solid #2d6e4d;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  position: relative;
 }
 
 .cart-empty-icon-svg {
-  color: var(--cart-primary);
+  color: #2d6e4d;
   display: block;
-  animation: floatSmooth 4s ease-in-out infinite;
-  width: 60%;
-  height: 60%;
+  width: 48px;
+  height: 48px;
 }
 
 .cart-empty-heading {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: var(--cart-text-primary);
+  font-size: 2rem;
+  font-weight: 400;
+  color: #1a1a1a;
   margin: 0 0 0.75rem 0;
-  letter-spacing: -0.02em;
-  line-height: 1.35;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  font-family: 'Times New Roman', Times, serif;
 }
 
 .cart-empty-text {
-  font-size: 0.95rem;
-  color: var(--cart-text-secondary);
+  font-size: 0.9375rem;
+  color: #4a4a4a;
   margin: 0 0 2.5rem 0;
-  line-height: 1.6;
-  max-width: 360px;
+  line-height: 1.5;
+  max-width: 400px;
   margin-left: auto;
   margin-right: auto;
-}
-
-.cart-empty-suggestions {
-  display: none;
-}
-
-.cart-empty-suggestion-label {
-  display: none;
+  font-weight: 400;
 }
 
 .cart-empty-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.95rem 3rem;
-  background: var(--cart-primary);
+  padding: 0.875rem 3rem;
+  background: #1a5c3a;
   color: white;
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 0.9375rem;
+  font-weight: 500;
   border: none;
-  border-radius: 50px;
+  border-radius: 25px;
   text-decoration: none;
   cursor: pointer;
   transition: all 0.25s ease;
-  letter-spacing: -0.01em;
-  box-shadow: 0 4px 14px rgba(26, 92, 58, 0.18);
+  letter-spacing: 0.01em;
   position: relative;
   overflow: hidden;
-  min-width: 240px;
+  min-width: 260px;
 }
 
 .cart-empty-button::before {
@@ -288,7 +293,7 @@
   left: 50%;
   width: 0;
   height: 0;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 50%;
   transform: translate(-50%, -50%);
   transition: width 0.4s ease, height 0.4s ease;
@@ -301,29 +306,59 @@
 }
 
 .cart-empty-button:hover {
-  background: var(--cart-primary-hover);
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(26, 92, 58, 0.22);
-}
-
-.cart-empty-button:active {
+  background: #174F19;
   transform: translateY(-1px);
 }
 
-/* Animations */
-@keyframes floatSmooth {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
+.cart-empty-button:active {
+  transform: translateY(0);
 }
+
+/* ==========================================
+   RESPONSIVE EMPTY STATE
+   ========================================== */
 
 @media (max-width: 768px) {
   .cart-empty-state {
-    padding: 2.5rem 1.25rem;
-    min-height: 420px;
+    padding: 2.5rem 1.25rem 3.5rem;
+    min-height: 380px;
+  }
+  
+  .cart-empty-icon-wrapper {
+    margin-bottom: 2rem;
+  }
+  
+  .cart-empty-icon-circle {
+    width: 120px;
+    height: 120px;
+    border-width: 2.5px;
+  }
+  
+  .cart-empty-icon-svg {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .cart-empty-heading {
+    font-size: 1.75rem;
+  }
+  
+  .cart-empty-text {
+    font-size: 0.875rem;
+    margin-bottom: 2.25rem;
+  }
+  
+  .cart-empty-button {
+    padding: 0.8125rem 2.75rem;
+    font-size: 0.875rem;
+    min-width: 240px;
+  }
+}
+
+@media (max-width: 640px) {
+  .cart-empty-state {
+    padding: 2.25rem 1rem 3.25rem;
+    min-height: 360px;
   }
   
   .cart-empty-icon-wrapper {
@@ -333,7 +368,47 @@
   .cart-empty-icon-circle {
     width: 110px;
     height: 110px;
-    border-width: 1.8px;
+    border-width: 2.5px;
+  }
+  
+  .cart-empty-icon-svg {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .cart-empty-heading {
+    font-size: 1.625rem;
+    margin-bottom: 0.625rem;
+  }
+  
+  .cart-empty-text {
+    font-size: 0.8125rem;
+    margin-bottom: 2rem;
+    max-width: 340px;
+  }
+  
+  .cart-empty-button {
+    width: 92%;
+    max-width: 280px;
+    padding: 0.75rem 2.5rem;
+    font-size: 0.8125rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .cart-empty-state {
+    padding: 2rem 0.875rem 3rem;
+    min-height: 340px;
+  }
+  
+  .cart-empty-icon-circle {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .cart-empty-icon-svg {
+    width: 36px;
+    height: 36px;
   }
   
   .cart-empty-heading {
@@ -341,48 +416,7 @@
   }
   
   .cart-empty-text {
-    font-size: 0.9rem;
-    margin-bottom: 2rem;
-  }
-  
-  .cart-empty-button {
-    padding: 0.9rem 2.5rem;
-    font-size: 0.95rem;
-    min-width: 220px;
-  }
-}
-
-@media (max-width: 640px) {
-  .cart-empty-state {
-    padding: 2.25rem 1rem;
-    min-height: 380px;
-  }
-  
-  .cart-empty-icon-wrapper {
-    margin-bottom: 1.5rem;
-  }
-  
-  .cart-empty-icon-circle {
-    width: 100px;
-    height: 100px;
-    border-width: 1.6px;
-  }
-  
-  .cart-empty-heading {
-    font-size: 1.375rem;
-    margin-bottom: 0.5rem;
-  }
-  
-  .cart-empty-text {
-    font-size: 0.875rem;
-    margin-bottom: 2rem;
-  }
-  
-  .cart-empty-button {
-    width: 85%;
-    max-width: 260px;
-    padding: 0.8rem 2rem;
-    font-size: 0.9rem;
+    font-size: 0.75rem;
   }
 }
 
@@ -707,22 +741,27 @@
 
 .qty-btn:focus-visible,
 .cart-item__remove:focus-visible,
-.cart-item__title:focus-visible {
+.cart-item__title:focus-visible,
+.cart-empty-button:focus-visible {
   outline: 2px solid var(--cart-primary);
   outline-offset: 2px;
   border-radius: 4px;
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .cart-empty-state,
+  .cart-empty-button::before {
+    animation: none !important;
+  }
+  
   * {
-    animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
 }
 </style>
 
 <script>
-  // Modern Cart Functionality
+  // Modern Cart Functionality - Improved
   document.addEventListener('DOMContentLoaded', function() {
     const cartForm = document.querySelector('.modern-cart-form');
     if (!cartForm) return;
@@ -772,16 +811,29 @@
       document.dispatchEvent(new CustomEvent('cart:updated', { detail: cart }));
       
       if (cart.item_count === 0) {
-        const cartWrapper = document.querySelector('.modern-cart-wrapper');
-        if (cartWrapper) {
+        showEmptyCart();
+      }
+    }
+
+    function showEmptyCart() {
+      const cartWrapper = document.querySelector('.modern-cart-wrapper');
+      if (!cartWrapper) return;
+      
+      // Fade out current content
+      const cartForm = cartWrapper.querySelector('.modern-cart-form');
+      if (cartForm) {
+        cartForm.style.opacity = '0';
+        cartForm.style.transform = 'translateY(-10px)';
+        
+        setTimeout(() => {
           cartWrapper.innerHTML = `
             <div class="cart-empty-state">
               <div class="cart-empty-icon-wrapper">
                 <div class="cart-empty-icon-circle">
-                  <svg width="70" height="70" viewBox="0 0 24 24" fill="none" class="cart-empty-icon-svg">
-                    <path d="M6 8L5 11V20C5 21.1 5.9 22 7 22H21C22.1 22 23 21.1 23 20V11L22 8H6Z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M9 8V5C9 3.3 10.3 2 12 2C13.7 2 15 3.3 15 5V8" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                    <circle cx="12" cy="22" r="0.7" fill="currentColor" opacity="0.5"/>
+                  <svg width="48" height="48" viewBox="0 0 48 48" fill="none" class="cart-empty-icon-svg">
+                    <path d="M8 16L6 20V38C6 39.1 6.9 40 8 40H40C41.1 40 42 39.1 42 38V20L40 16H8Z" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M16 16V10C16 7.8 17.8 6 20 6H28C30.2 6 32 10 32 10V16" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="24" cy="28" r="1.2" fill="currentColor"/>
                   </svg>
                 </div>
               </div>
@@ -790,7 +842,7 @@
               <a class="cart-empty-button" href="/collections/all">Continue Shopping</a>
             </div>
           `;
-        }
+        }, 200);
       }
     }
 
@@ -842,6 +894,7 @@
       }
     }
 
+    // Event Listeners
     document.querySelectorAll('[data-action="decrease"]').forEach(btn => {
       btn.addEventListener('click', function(e) {
         e.preventDefault();
