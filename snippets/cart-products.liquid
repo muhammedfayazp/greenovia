@@ -1129,6 +1129,23 @@
           }
         });
 
+        // Listen for theme cart update events (dispatched by ProductFormComponent and others)
+        document.addEventListener('cart:update', (event) => {
+          try {
+            const resource = event?.detail?.resource || event?.detail?.data || event?.detail || null;
+            if (resource && resource.items) {
+              this.updateCartDisplay(resource);
+            } else if (event?.detail?.resource) {
+              this.updateCartDisplay(event.detail.resource);
+            } else {
+              // fallback to fetching full cart when resource not provided
+              this.refreshCart();
+            }
+          } catch (err) {
+            this.refreshCart();
+          }
+        });
+
         // Additional listeners to catch add-to-cart actions across themes
         // Catch form submits that post to /cart/add
         document.addEventListener('submit', (e) => {
