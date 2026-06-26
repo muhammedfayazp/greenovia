@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 100" fill="currentColor">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 100" fill="#1f3d2b">
   <defs>
     <mask id="dm">
       <rect width="80" height="100" fill="white"/>
@@ -10,14 +10,14 @@
   <!-- D shape, with horizontal gaps cut by mask -->
   <g mask="url(#dm)">
     <!-- Left vertical stroke -->
-    <rect x="4" y="2" width="14" height="96" rx="2"/>
+    <rect x="4" y="2" width="14" height="96" rx="2" fill="#1f3d2b"/>
     <!-- Right curved part of D -->
     <path d="M18,2 C70,2 76,22 76,50 C76,78 70,98 18,98"
-          fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="square"/>
+          fill="none" stroke="#1f3d2b" stroke-width="14" stroke-linecap="square"/>
     <!-- Bridge between vertical and curve -->
-    <rect x="4" y="2" width="22" height="96"/>
+    <rect x="4" y="2" width="22" height="96" fill="#1f3d2b"/>
   </g>
   <!-- Horizontal bars (overlay on top) -->
-  <rect x="0" y="32" width="78" height="9" rx="4.5"/>
-  <rect x="0" y="60" width="78" height="9" rx="4.5"/>
+  <rect x="0" y="32" width="78" height="9" rx="4.5" fill="#1f3d2b"/>
+  <rect x="0" y="60" width="78" height="9" rx="4.5" fill="#1f3d2b"/>
 </svg>
