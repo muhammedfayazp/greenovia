@@ -224,9 +224,15 @@
 
   .header-actions__cart-icon {
     --cart-bubble-size: 16px;
-    --cart-bubble-top: -2px;
-    --cart-bubble-right: -2px;
+    --cart-bubble-top: -5px;
+    --cart-bubble-right: -5px;
 
+    /* cart-icon is a custom element; browsers default custom elements to
+       display:inline which breaks position:absolute on child elements.
+       inline-flex gives it a proper layout box so right/top offsets work. */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     position: relative;
   }
 
