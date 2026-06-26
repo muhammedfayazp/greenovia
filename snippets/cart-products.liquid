@@ -116,7 +116,7 @@
                     </div>
                   {% endif %}
                 </div>
-                <div class="cart-item__price-main">&#x20C3;{{ item.final_line_price | money_without_currency }}</div>
+                <div class="cart-item__price-main"><img src="{{ 'icon-dirham.svg' | asset_url }}" class="price-symbol" aria-hidden="true" alt="">{{ item.final_line_price | money_without_currency }}</div>
               </div>
 
               {%- comment -%} Controls Row {%- endcomment -%}
@@ -160,7 +160,7 @@
                   </div>
                 </div>
 
-                <div class="cart-item__line-total">&#x20C3;{{ item.final_line_price | money_without_currency }}</div>
+                <div class="cart-item__line-total"><img src="{{ 'icon-dirham.svg' | asset_url }}" class="price-symbol" aria-hidden="true" alt="">{{ item.final_line_price | money_without_currency }}</div>
 
                 <button
                   type="button"
@@ -1109,12 +1109,12 @@
 
       formatMoney(cents) {
         const amount = (cents / 100).toFixed(2);
+        const symbol = `<img src="${window.theme?.dirhamIconUrl || ''}" class="price-symbol" aria-hidden="true" alt="">`;
         if (typeof Shopify !== 'undefined' && Shopify.formatMoney) {
-          // Strip any legacy prefix (Dhs., AED, etc.) and replace with new symbol
           const raw = Shopify.formatMoney(cents, '{{amount}}');
-          return '⃃' + raw;
+          return symbol + raw;
         }
-        return '⃃' + amount;
+        return symbol + amount;
       },
 
       // Listen for cart changes from other sources (e.g., add to cart)
