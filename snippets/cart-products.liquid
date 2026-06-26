@@ -1034,12 +1034,12 @@
 
             const lineTotal = cartItem.querySelector('.cart-item__line-total');
             if (lineTotal) {
-              lineTotal.textContent = this.formatMoney(item.final_line_price);
+              lineTotal.innerHTML = this.formatMoney(item.final_line_price);
             }
 
             const price = cartItem.querySelector('.cart-item__price-main');
             if (price) {
-              price.textContent = this.formatMoney(item.final_line_price);
+              price.innerHTML = this.formatMoney(item.final_line_price);
             }
           }
         });
