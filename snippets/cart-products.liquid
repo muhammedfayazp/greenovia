@@ -1109,7 +1109,7 @@
 
       formatMoney(cents) {
         const amount = (cents / 100).toFixed(2);
-        const symbol = `<img src="${window.theme?.dirhamIconUrl || ''}" class="price-symbol" aria-hidden="true" alt="">`;
+        const symbol = `<img src="{{ 'icon-dirham.svg' | asset_url }}" class="price-symbol" aria-hidden="true" alt="">`;
         if (typeof Shopify !== 'undefined' && Shopify.formatMoney) {
           const raw = Shopify.formatMoney(cents, '{{amount}}');
           return symbol + raw;
