@@ -46,12 +46,12 @@
                       <div class="catprodrows__price">
                         {%- if product.price == 0 -%}
                           {%- if product.compare_at_price > 0 -%}
-                            <img src="{{ 'icon-dirham.svg' | asset_url }}" class="price-symbol" aria-hidden="true" alt="">{{ product.compare_at_price | money_without_currency }}
+                            <img src="{{ 'icon-dirham.svg' | asset_url }}" class="price-symbol" width="13" height="16" aria-hidden="true" alt="">{{ product.compare_at_price | money_without_currency }}
                           {%- else -%}
                             <span class="catprodrows__price--na">—</span>
                           {%- endif -%}
                         {%- else -%}
-                          <img src="{{ 'icon-dirham.svg' | asset_url }}" class="price-symbol" aria-hidden="true" alt="">{{ product.price | money_without_currency }}
+                          <img src="{{ 'icon-dirham.svg' | asset_url }}" class="price-symbol" width="13" height="16" aria-hidden="true" alt="">{{ product.price | money_without_currency }}
                         {%- endif -%}
                       </div>
 

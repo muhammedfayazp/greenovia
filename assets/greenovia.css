@@ -14,14 +14,15 @@
 }
 
 /* Dirham currency symbol icon */
-.price-symbol {
-  display: inline-block;
-  height: 0.8em;
-  width: auto;
+img.price-symbol {
+  display: inline !important;
+  width: 13px !important;
+  height: 16px !important;
   vertical-align: middle;
-  margin-right: 1px;
+  margin-right: 2px;
   position: relative;
-  top: -0.05em;
+  top: -1px;
+  flex-shrink: 0;
 }
 
 /* Base Utility Classes - Extremely robust to block leakage */
