@@ -54,10 +54,8 @@
     </div>
   {% endif %}
 
-  {%- liquid
-    assign total_price_value = cart.total_price | money_without_currency
-  -%}
-  {%- assign total_price = '&#x20C3;' | append: total_price_value -%}
+  {%- assign total_price_value = cart.total_price | money_without_currency -%}
+  {%- capture total_price -%}<img src="{{ 'icon-dirham.svg' | asset_url }}" class="price-symbol" aria-hidden="true" alt="">{{ total_price_value }}{%- endcapture -%}
 
   <div class="cart__total-container{% if settings.show_installments %} cart__total-container--has-installments{% endif %}">
     <span
@@ -375,11 +373,12 @@
     const moneyFormat = window.theme && window.theme.moneyFormat ? window.theme.moneyFormat : '{{amount}}';
     
     function formatMoney(cents) {
+      const symbol = `<img src="{{ 'icon-dirham.svg' | asset_url }}" class="price-symbol" aria-hidden="true" alt="">`;
       if (typeof Shopify !== 'undefined' && Shopify.formatMoney) {
         const raw = Shopify.formatMoney(cents, '{{amount}}');
-        return '⃃' + raw;
+        return symbol + raw;
       }
-      return '⃃' + (cents / 100).toFixed(2);
+      return symbol + (cents / 100).toFixed(2);
     }
     
     // Update estimated total
