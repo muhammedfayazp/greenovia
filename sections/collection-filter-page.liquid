@@ -1,11 +1,94 @@
+<script src="{{ 'component-cart-quantity-selector.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'component-add-to-cart.js' | asset_url }}" type="module" fetchpriority="low"></script>
+<script src="{{ 'product-form.js' | asset_url }}" type="module" fetchpriority="low"></script>
+
 <div class="collection-filter-page">
   
   {%- comment -%} Breadcrumb {%- endcomment -%}
   <div class="page-width breadcrumb-section">
     <nav class="breadcrumb">
       <a href="/">Home</a>
-      <span>/</span>
-      <span>{{ collection.title }}</span>
+      
+      {% assign menu_handle = section.settings.category_menu %}
+      {% assign menu_links = linklists[menu_handle].links %}
+      
+      {% if menu_handle != blank %}
+        {% assign found_breadcrumb = false %}
+        {% for link in menu_links %}
+          {% comment %} Ancestor check {% endcomment %}
+          {% assign is_ancestor = false %}
+          {% if link.active or link.child_active %}{% assign is_ancestor = true %}{% endif %}
+          {% if is_ancestor == false and link.links != blank %}
+             {% for child in link.links %}
+               {% if child.active or child.child_active %}{% assign is_ancestor = true %}{% endif %}
+               {% for grand in child.links %}
+                 {% if grand.active %}{% assign is_ancestor = true %}{% endif %}
+               {% endfor %}
+             {% endfor %}
+          {% endif %}
+
+          {% if is_ancestor %}
+            {% comment %} Show all ancestor links except utility pages {% endcomment %}
+            {% assign link_title_dc = link.title | downcase | strip %}
+            {% if link_title_dc != 'home' %}
+                <span>/</span>
+                <a href="{{ link.url }}">{{ link.title }}</a>
+                {% assign found_breadcrumb = true %}
+            {% endif %}
+            
+            {% for child_link in link.links %}
+               {% assign is_child_ancestor = false %}
+               {% if child_link.active or child_link.child_active %}{% assign is_child_ancestor = true %}{% endif %}
+               {% if is_child_ancestor == false and child_link.links != blank %}
+                 {% for grand in child_link.links %}
+                   {% if grand.active %}{% assign is_child_ancestor = true %}{% endif %}
+                 {% endfor %}
+               {% endif %}
+
+              {% if is_child_ancestor %}
+                <span>/</span>
+                {% if child_link.active and child_link.child_active == false %}
+                    <span>{{ child_link.title }}</span>
+                {% else %}
+                    <a href="{{ child_link.url }}">{{ child_link.title }}</a>
+                {% endif %}
+                {% assign found_breadcrumb = true %}
+                
+                {% for grandchild_link in child_link.links %}
+                  {% if grandchild_link.active %}
+                    <span>/</span>
+                    <span>{{ grandchild_link.title }}</span>
+                    {% assign found_breadcrumb = true %}
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        {% endfor %}
+        
+        {% comment %} Fallback if collection isn't in menu or we are at top level {% endcomment %}
+        {% if collection.handle != blank %}
+           {% assign current_in_breadcrumb = false %}
+           {% for link in menu_links %}
+             {% if link.active %}{% assign current_in_breadcrumb = true %}{% endif %}
+             {% for child in link.links %}
+               {% if child.active %}{% assign current_in_breadcrumb = true %}{% endif %}
+               {% for grand in child.links %}
+                 {% if grand.active %}{% assign current_in_breadcrumb = true %}{% endif %}
+               {% endfor %}
+             {% endfor %}
+           {% endfor %}
+           
+           {% if current_in_breadcrumb == false %}
+             <span>/</span>
+             <span>{{ collection.title }}</span>
+           {% endif %}
+        {% endif %}
+
+      {% else %}
+        <span>/</span>
+        <span>{{ collection.title }}</span>
+      {% endif %}
     </nav>
   </div>
 
@@ -42,17 +125,147 @@
           </div>
           
           <div class="filter-options">
-            {% for block in section.blocks %}
-              {% if block.type == 'category_filter' %}
-                {% assign filter_collection = collections[block.settings.collection] %}
-                {% if filter_collection %}
-                  <a href="{{ filter_collection.url }}" class="filter-link {% if collection.handle == filter_collection.handle %}active{% endif %}">
-                    <span>{{ filter_collection.title }}</span>
-                    <span class="filter-count">({{ filter_collection.products_count }})</span>
-                  </a>
+            {% assign menu_handle = section.settings.category_menu %}
+            {% assign menu_links = linklists[menu_handle].links %}
+            
+            {% assign displayed_handles = "" %}
+            {% if menu_handle != blank and menu_links.size > 0 %}
+              <div class="category-tree">
+                {% for link in menu_links %}
+                  {% comment %} Skip utility links (Home, Contact, etc.) {% endcomment %}
+                  {% assign link_title_dc = link.title | downcase | strip %}
+                  {% assign link_url = link.url | remove: shop.url | remove: 'https://' | remove: 'http://' %}
+                  {% if link_title_dc == 'home' or link_title_dc == 'contact' or link_title_dc == 'contact us' or link_url == '/' or link_url == '' or link_url contains 'pages/contact' %}
+                    {% continue %}
+                  {% endif %}
+
+                  {% assign has_sub = false %}
+                  {% if link.links != blank %}{% assign has_sub = true %}{% endif %}
+                  
+                  {% assign is_open = false %}
+                  {% if link.active or link.child_active %}{% assign is_open = true %}{% endif %}
+                  
+                  {% comment %} robust check for open state {% endcomment %}
+                  {% if has_sub and is_open == false %}
+                    {% for child in link.links %}
+                      {% if child.active or child.child_active %}{% assign is_open = true %}{% endif %}
+                      {% for grand in child.links %}
+                        {% if grand.active %}{% assign is_open = true %}{% endif %}
+                      {% endfor %}
+                    {% endfor %}
+                  {% endif %}
+
+                  <div class="category-item">
+                    {% if has_sub %}
+                      <details class="category-details" {% if is_open %}open{% endif %}>
+                        <summary class="category-summary">
+                          <a href="{{ link.url }}" class="category-link {% if link.active %}active{% endif %}">
+                            <span>{{ link.title }}</span>
+                            {% if link.type == 'collection_link' and link.object.handle != blank %}
+                              {% assign displayed_handles = displayed_handles | append: link.object.handle | append: "," %}
+                              {% if link.object.products_count > 0 %}
+                                <span class="filter-count">({{ link.object.products_count }})</span>
+                              {% endif %}
+                            {% endif %}
+                          </a>
+                          <span class="category-toggle">
+                            <svg class="icon-caret" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+                          </span>
+                        </summary>
+                        <div class="category-submenu">
+                          {% for child_link in link.links %}
+                            {% assign has_sub_sub = false %}
+                            {% if child_link.links != blank %}{% assign has_sub_sub = true %}{% endif %}
+                            
+                            {% assign child_is_open = false %}
+                            {% if child_link.active or child_link.child_active %}{% assign child_is_open = true %}{% endif %}
+
+                            {% if has_sub_sub and child_is_open == false %}
+                                {% for grand in child_link.links %}
+                                    {% if grand.active %}{% assign child_is_open = true %}{% endif %}
+                                {% endfor %}
+                            {% endif %}
+
+                            <div class="category-item">
+                              {% if has_sub_sub %}
+                                <details class="category-details" {% if child_is_open %}open{% endif %}>
+                                  <summary class="category-summary">
+                                    <a href="{{ child_link.url }}" class="category-link {% if child_link.active %}active{% endif %}">
+                                      <span>{{ child_link.title }}</span>
+                                      {% if child_link.type == 'collection_link' and child_link.object.handle != blank %}
+                                        {% assign displayed_handles = displayed_handles | append: child_link.object.handle | append: "," %}
+                                        {% if child_link.object.products_count > 0 %}
+                                          <span class="filter-count">({{ child_link.object.products_count }})</span>
+                                        {% endif %}
+                                      {% endif %}
+                                    </a>
+                                    <span class="category-toggle">
+                                      <svg class="icon-caret" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+                                    </span>
+                                  </summary>
+                                  <div class="category-submenu">
+                                    {% for grandchild_link in child_link.links %}
+                                       <a href="{{ grandchild_link.url }}" class="category-link nested {% if grandchild_link.active %}active{% endif %}">
+                                         <span>{{ grandchild_link.title }}</span>
+                                         {% if grandchild_link.type == 'collection_link' and grandchild_link.object.handle != blank %}
+                                           {% assign displayed_handles = displayed_handles | append: grandchild_link.object.handle | append: "," %}
+                                           {% if grandchild_link.object.products_count > 0 %}
+                                             <span class="filter-count">({{ grandchild_link.object.products_count }})</span>
+                                           {% endif %}
+                                         {% endif %}
+                                       </a>
+                                    {% endfor %}
+                                  </div>
+                                </details>
+                              {% else %}
+                                 <a href="{{ child_link.url }}" class="category-link {% if child_link.active %}active{% endif %}">
+                                   <span>{{ child_link.title }}</span>
+                                   {% if child_link.type == 'collection_link' and child_link.object.handle != blank %}
+                                      {% assign displayed_handles = displayed_handles | append: child_link.object.handle | append: "," %}
+                                      {% if child_link.object.products_count > 0 %}
+                                        <span class="filter-count">({{ child_link.object.products_count }})</span>
+                                      {% endif %}
+                                   {% endif %}
+                                 </a>
+                              {% endif %}
+                            </div>
+                          {% endfor %}
+                        </div>
+                      </details>
+                    {% else %}
+                      <a href="{{ link.url }}" class="category-link {% if link.active %}active{% endif %}">
+                        <span>{{ link.title }}</span>
+                        {% if link.type == 'collection_link' and link.object.handle != blank %}
+                          {% assign displayed_handles = displayed_handles | append: link.object.handle | append: "," %}
+                          {% if link.object.products_count > 0 %}
+                            <span class="filter-count">({{ link.object.products_count }})</span>
+                          {% endif %}
+                        {% endif %}
+                      </a>
+                    {% endif %}
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+
+            <div class="category-tree category-blocks">
+              {% for block in section.blocks %}
+                {% if block.type == 'category_filter' %}
+                  {% assign filter_collection = collections[block.settings.collection] %}
+                  {% if filter_collection and filter_collection.handle != blank %}
+                    {% assign handle_check = filter_collection.handle | append: "," %}
+                    {% if displayed_handles contains handle_check %}{% continue %}{% endif %}
+                    
+                    <a href="{{ filter_collection.url }}" class="category-link {% if collection.handle == filter_collection.handle %}active{% endif %}">
+                      <span>{{ filter_collection.title }}</span>
+                      {% if filter_collection.products_count > 0 %}
+                        <span class="filter-count">({{ filter_collection.products_count }})</span>
+                      {% endif %}
+                    </a>
+                  {% endif %}
                 {% endif %}
-              {% endif %}
-            {% endfor %}
+              {% endfor %}
+            </div>
           </div>
         </div>
       </div>
@@ -67,42 +280,75 @@
           
           <div class="price-inputs">
             <div class="price-range-inputs">
-              <input type="number" id="min-price" placeholder="Min" min="0" value="10">
+              <input type="number" id="min-price" placeholder="Min" min="0" value="0">
               <input type="number" id="max-price" placeholder="Max" min="0" value="600">
             </div>
             
             <div class="price-slider-container">
               <div class="price-slider-track" id="price-track"></div>
-              <input type="range" id="range-min" min="0" max="600" value="10" step="10">
+              <input type="range" id="range-min" min="0" max="600" value="0" step="10">
               <input type="range" id="range-max" min="0" max="600" value="600" step="10">
             </div>
           </div>
         </div>
       </div>
 
-      {%- comment -%} Light Requirement Filter {%- endcomment -%}
+      {%- comment -%} Flower Color Filter {%- endcomment -%}
       <div class="filter-group">
         <div class="filter-section">
           <div class="filter-section__header">
-            <h4>Light Requirement</h4>
+            <h4>Flower Color</h4>
+            <button class="filter-reset">Reset</button>
+          </div>
+          
+          <div class="filter-options">
+            {% assign flower_colors = 'Red,Pink,White,Yellow,Purple,Orange' | split: ',' %}
+            {% for color in flower_colors %}
+              <label class="filter-checkbox">
+                <input type="checkbox" name="flower_color" value="{{ color | downcase }}" data-filter="flower-color">
+                <span>{{ color }}</span>
+              </label>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      {%- comment -%} Pot Color Filter {%- endcomment -%}
+      <div class="filter-group">
+        <div class="filter-section">
+          <div class="filter-section__header">
+            <h4>Pot Color</h4>
+            <button class="filter-reset">Reset</button>
+          </div>
+          
+          <div class="filter-options">
+            {% assign pot_colors = 'White,Black,Grey,Terracotta,Brown' | split: ',' %}
+            {% for color in pot_colors %}
+              <label class="filter-checkbox">
+                <input type="checkbox" name="pot_color" value="{{ color | downcase }}" data-filter="pot-color">
+                <span>{{ color }}</span>
+              </label>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      {%- comment -%} Flowering Status Filter {%- endcomment -%}
+      <div class="filter-group">
+        <div class="filter-section">
+          <div class="filter-section__header">
+            <h4>Flowering</h4>
             <button class="filter-reset">Reset</button>
           </div>
           
           <div class="filter-options">
             <label class="filter-checkbox">
-              <input type="checkbox" name="light" value="low" data-filter="tag" data-tag="low-light">
-              <span>Low Light</span>
-              <span class="filter-count">(25)</span>
+              <input type="checkbox" name="flowering" value="with-flower">
+              <span>With Flower</span>
             </label>
             <label class="filter-checkbox">
-              <input type="checkbox" name="light" value="medium" data-filter="tag" data-tag="medium-light">
-              <span>Medium Light</span>
-              <span class="filter-count">(32)</span>
-            </label>
-            <label class="filter-checkbox">
-              <input type="checkbox" name="light" value="bright" data-filter="tag" data-tag="bright-light">
-              <span>Bright Light</span>
-              <span class="filter-count">(48)</span>
+              <input type="checkbox" name="flowering" value="without-flower">
+              <span>Without Flower</span>
             </label>
           </div>
         </div>
@@ -141,6 +387,7 @@
     </aside>
 
     {%- comment -%} Main Content Area {%- endcomment -%}
+    {% paginate collection.products by 24 %}
     <main class="collection-main">
       
       {%- comment -%} Header with title, count, and sort {%- endcomment -%}
@@ -148,7 +395,13 @@
         <div class="collection-title-area">
           <h1>{{ collection.title }}</h1>
           <p class="product-count">
-            <span class="count-display">1-{{ collection.products.size | at_most: 94 }}</span> products
+            {% if collection.products_count > 0 %}
+               {% assign current_start = paginate.current_offset | plus: 1 %}
+               {% assign current_end = paginate.current_offset | plus: collection.products.size %}
+               <span class="count-display">{{ current_start }}-{{ current_end }}</span> of {{ collection.products_count }} products
+            {% else %}
+               0 products
+            {% endif %}
           </p>
         </div>
         
@@ -168,70 +421,91 @@
 
       {%- comment -%} Product Grid {%- endcomment -%}
       <div class="product-grid" id="product-grid">
-        {% for product in collection.products limit: 24 %}
+        {% for product in collection.products %}
+        {%- assign type_lower = product.type | downcase -%}
+        {%- assign tags_lower = product.tags | join: ',' | downcase -%}
+        {%- assign clean_flower_color = product.options_by_name['Flower Color'].values | join: ',' | downcase -%}
+        {%- assign clean_pot_color = product.options_by_name['Pot Color'].values | join: ',' | downcase -%}
+        {%- assign generic_color = product.options_by_name['Color'].values | join: ',' | downcase -%}
+        
+        {%- assign is_pot = false -%}
+        {%- if type_lower contains 'pot' or type_lower contains 'planter' or type_lower contains 'vase' or type_lower contains 'basket' or type_lower contains 'accessory' -%}
+          {%- assign is_pot = true -%}
+        {%- endif -%}
+        {%- if tags_lower contains 'pot' or tags_lower contains 'planter' -%}
+          {%- assign is_pot = true -%}
+        {%- endif -%}
+        {%- if clean_pot_color != blank -%}
+          {%- assign is_pot = true -%}
+        {%- endif -%}
+
+        {%- if is_pot -%}
+          {%- assign final_pot_color = clean_pot_color | append: ' ' | append: generic_color -%}
+          {%- assign final_flower_color = clean_flower_color -%}
+        {%- else -%}
+          {%- assign final_flower_color = clean_flower_color | append: ' ' | append: generic_color -%}
+          {%- assign final_pot_color = clean_pot_color -%}
+        {%- endif -%}
+
           <div class="product-card" 
                data-price="{{ product.price }}" 
-               data-tags="{{ product.tags | join: ',' }}">
+               data-tags="{{ product.tags | join: ',' | downcase }}"
+               data-flower-color="{{ final_flower_color }}"
+               data-pot-color="{{ final_pot_color }}">
             
-            <a href="{{ product.url }}" class="product-card__image">
-              {% if product.featured_image %}
-                <img src="{{ product.featured_image | image_url: width: 600 }}" 
-                     alt="{{ product.title | escape }}"
-                     loading="lazy">
-              {% endif %}
-              
-              {%- comment -%} HOT badge {%- endcomment -%}
-              {% if product.tags contains 'hot' or product.tags contains 'trending' %}
-                <span class="product-badge">HOT</span>
-              {% endif %}
-            </a>
+            <div class="product-card__image-container">
+              <a href="{{ product.url }}" class="product-card__image">
+                {% if product.featured_image %}
+                  <img src="{{ product.featured_image | image_url: width: 600 }}" 
+                       alt="{{ product.title | escape }}"
+                       loading="lazy">
+                {% endif %}
+                
+                {%- comment -%} HOT badge {%- endcomment -%}
+                {% if product.tags contains 'hot' or product.tags contains 'trending' %}
+                  <span class="product-badge">HOT</span>
+                {% endif %}
+              </a>
+            </div>
             
             <div class="product-card__info">
-              <a href="{{ product.url }}">
-                <h3 class="product-title">{{ product.title }}</h3>
+              <div class="product-card__vendor">{{ product.vendor }}</div>
+              <a href="{{ product.url }}" class="product-card__name">
+                {{ product.title }}
               </a>
               
-              <div class="product-price">
-                {% if product.compare_at_price > product.price %}
-                  <span class="price-compare">{{ product.compare_at_price | money }}</span>
-                {% endif %}
-                <span class="price-current">{{ product.price | money }}</span>
-              </div>
-              
-              {%- comment -%} Star Rating {%- endcomment -%}
-              <div class="product-rating">
-                <div class="stars">
-                  {% assign rating = 5 %}
-                  {% for i in (1..5) %}
-                    <svg class="star {% if i <= rating %}filled{% endif %}" viewBox="0 0 24 24">
-                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                    </svg>
-                  {% endfor %}
+              <div class="product-card__bottom">
+                <div class="product-card__price">
+                  {% if product.compare_at_price > product.price %}
+                    <span class="price-compare">{{ product.compare_at_price | money }}</span>
+                  {% endif %}
+                  <span class="price-current">{{ product.price | money }}</span>
                 </div>
-                <span class="review-count">228</span>
-              </div>
-
-              {%- comment -%} Quantity and Add to Cart {%- endcomment -%}
-              <form method="post" action="/cart/add" class="product-form">
-                <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
                 
-                <div class="product-actions">
-                  <div class="qty-counter">
-                    <button type="button" class="qty-btn" onclick="updateQty(this, -1)">−</button>
-                    <input type="number" name="quantity" value="1" min="1" class="qty-input">
-                    <button type="button" class="qty-btn" onclick="updateQty(this, 1)">+</button>
-                  </div>
+                {%- comment -%} Quantity and Add to Cart {%- endcomment -%}
+                {%- assign cart_qty = cart | item_count_for_variant: product.selected_or_first_available_variant.id -%}
+                <div class="product-card__form-wrapper" data-variant-id="{{ product.selected_or_first_available_variant.id }}" data-product-id="{{ product.id }}">
+                  <div class="product-card__actions {% if cart_qty > 0 %}is-active{% endif %}" data-cart-quantity="{{ cart_qty }}">
                   
-                  <button type="submit" class="cart-btn">
-                    <svg viewBox="0 0 24 24" fill="none">
-                      <path d="M3 3h2l2.2 11.4a2 2 0 0 0 2 1.6h7.5a2 2 0 0 0 2-1.6L21 7H6"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      <circle cx="10" cy="20" r="1.5" fill="currentColor"/>
-                      <circle cx="18" cy="20" r="1.5" fill="currentColor"/>
-                    </svg>
-                  </button>
+                    <div class="product-card__qty-selector">
+                      <button type="button" class="qty__btn qty__minus" data-action="decrease">
+                        <span class="qty__minus-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg></span>
+                        <span class="qty__trash-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></span>
+                      </button>
+                      <span class="qty__current">{{ cart_qty }}</span>
+                      <button type="button" class="qty__btn qty__plus" data-action="increase">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                      </button>
+                    </div>
+
+                    <div class="product-card__atc-wrapper">
+                      <button type="button" class="product-card__atc-trigger" data-action="add-to-cart" aria-label="Add to cart">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="var(--icon-stroke-width)" d="M16.608 9.421V6.906H3.392v8.016c0 .567.224 1.112.624 1.513.4.402.941.627 1.506.627H8.63M8.818 3h2.333c.618 0 1.212.247 1.649.686a2.35 2.35 0 0 1 .683 1.658v1.562H6.486V5.344c0-.622.246-1.218.683-1.658A2.33 2.33 0 0 1 8.82 3"></path><path stroke="currentColor" stroke-linecap="round" stroke-width="var(--icon-stroke-width)" d="M14.608 12.563v5m2.5-2.5h-5"></path></svg>
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </form>
+              </div>
             </div>
           </div>
         {% endfor %}
@@ -261,6 +535,7 @@
           {% endif %}
         </div>
       {% endif %}
+    {% endpaginate %}
 
     </main>
 
@@ -269,43 +544,46 @@
 
 <style>
 /* Base Styles */
-.collection-filter-page{
-  background: #fff;
+.collection-filter-page {
+  background: #f6f7f2;
   min-height: 100vh;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
-.page-width{
+.page-width {
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 24px;
 }
 
 /* Breadcrumb */
-.breadcrumb-section{
+.breadcrumb-section {
   padding: 16px 24px;
+  background: #fff;
   border-bottom: 1px solid #e5e5e5;
 }
 
-.breadcrumb{
+.breadcrumb {
   font-size: 14px;
   color: #666;
 }
 
-.breadcrumb a{
+.breadcrumb a {
   color: #666;
   text-decoration: none;
 }
 
-.breadcrumb a:hover{
+.breadcrumb a:hover {
   color: #1f3d2b;
 }
 
-.breadcrumb span{
+.breadcrumb span {
   margin: 0 8px;
 }
 
 /* Container Layout */
-.collection-container{
+.collection-container {
   display: grid;
   grid-template-columns: 250px 1fr;
   gap: 40px;
@@ -313,42 +591,46 @@
 }
 
 /* Sidebar Filters */
-.filter-sidebar{
+.filter-sidebar {
   position: sticky;
   top: 20px;
   height: fit-content;
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.05);
 }
 
-.filter-group{
+.filter-group {
   margin-bottom: 32px;
 }
 
-.filter-group__header h3{
+.filter-group__header h3 {
   font-size: 20px;
   font-weight: 600;
   color: #1f3d2b;
   margin: 0 0 16px;
 }
 
-.filter-section{
+.filter-section {
   margin-bottom: 24px;
 }
 
-.filter-section__header{
+.filter-section__header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
 }
 
-.filter-section__header h4{
+.filter-section__header h4 {
   font-size: 16px;
   font-weight: 600;
   color: #1f3d2b;
   margin: 0;
 }
 
-.filter-reset{
+.filter-reset {
   background: none;
   border: none;
   color: #666;
@@ -357,46 +639,19 @@
   padding: 0;
 }
 
-.filter-reset:hover{
+.filter-reset:hover {
   color: #1f3d2b;
   text-decoration: underline;
 }
 
 /* Filter Options */
-.filter-options{
+.filter-options {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.filter-link{
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px;
-  border-radius: 6px;
-  text-decoration: none;
-  color: #333;
-  font-size: 14px;
-  transition: all 0.2s ease;
-  background: transparent;
-}
-
-.filter-link:hover{
-  background: #f6f7f2;
-  color: #1f3d2b;
-}
-
-.filter-link.active{
-  background: #1f3d2b;
-  color: #fff;
-}
-
-.filter-link.active .filter-count{
-  color: rgba(255,255,255,0.8);
-}
-
-.filter-checkbox{
+.filter-checkbox {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -405,110 +660,144 @@
   cursor: pointer;
 }
 
-.filter-checkbox input[type="checkbox"]{
+.filter-checkbox input[type="checkbox"] {
   width: 16px;
   height: 16px;
   cursor: pointer;
 }
 
-.filter-count{
+.filter-count {
   color: #999;
   font-size: 13px;
 }
 
+/* Category Tree Styles */
+.category-tree {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.category-item {
+  position: relative;
+}
+
+.category-details > summary {
+  list-style: none;
+}
+
+.category-details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.category-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  padding: 4px 0;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.category-summary:hover {
+  background: #fcfcfc;
+}
+
+.category-link {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 8px 8px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  color: #555;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.category-link:hover {
+  background: #f6f7f2;
+  color: #1f3d2b;
+}
+
+.category-link.active {
+  color: #1f3d2b;
+  font-weight: 700;
+  background: #f0f2eb;
+}
+
+.category-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: #999;
+  transition: color 0.2s;
+}
+
+.category-toggle:hover {
+  color: #1f3d2b;
+}
+
+.icon-caret {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+  transition: transform 0.2s ease;
+}
+
+details[open] > .category-summary .icon-caret {
+  transform: rotate(180deg);
+}
+
+.category-submenu {
+  padding-left: 0;
+  margin-top: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  position: relative;
+  margin-left: 20px;
+  border-left: 1px solid #e5e5e5;
+}
+
+.category-link.nested {
+  padding-left: 12px;
+  font-size: 13.5px;
+}
+
+details[open] > .category-summary .category-link {
+  color: #1f3d2b;
+}
+
 /* Price Inputs */
-.price-inputs{
+.price-inputs {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.price-range-inputs{
+.price-range-inputs {
   display: flex;
-  gap: 8px; /* Reduced gap */
+  gap: 8px;
 }
 
-.price-inputs input[type="number"]{
+.price-inputs input[type="number"] {
   flex: 1;
-  min-width: 0; /* Allows input to shrink below default width */
-  width: 100%;  /* Ensures it tries to fill flex space */
-  padding: 8px; /* Reduced padding slightly */
+  min-width: 0;
+  width: 100%;
+  padding: 8px;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 14px;
 }
 
-/* ... (slider styles remain same) ... */
-
-/* Product Actions */
-.product-actions{
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px; /* Reduced gap */
-  margin-top: 10px;
-  flex-wrap: wrap; /* Allow wrapping if very tight */
-}
-
-.qty-counter{
-  display: flex;
-  align-items: center;
-  background: #f6f7f2;
-  border-radius: 999px;
-  padding: 2px; /* Reduced padding */
-  gap: 0;
-  box-shadow: inset 0 0 0 1px #e3e6de;
-  flex: 1; /* Take available space */
-  justify-content: space-between;
-  min-width: 90px; /* Minimum width for usability */
-}
-
-.qty-btn{
-  width: 28px;
-  height: 28px;
-  border: none;
-  border-radius: 50%;
-  background: #fff;
-  color: #1f3d2b;
-  font-size: 16px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 1px 3px rgba(0,0,0,.1);
-  flex-shrink: 0;
-}
-
-.qty-input{
-  width: 100%; /* Fill space between buttons */
-  min-width: 20px;
-  text-align: center;
-  border: none;
-  background: transparent;
-  font-size: 14px;
-  font-weight: 600;
-  color: #1f3d2b;
-  outline: none;
-  padding: 0;
-}
-
-.cart-btn{
-  width: 36px; /* Slightly smaller to fit better */
-  height: 36px;
-  border-radius: 50%;
-  border: none;
-  background: #1f3d2b;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background .2s ease;
-  flex-shrink: 0; /* Prevent button from squishing */
-}
-
 /* Price Range Slider */
-.price-slider-container{
+.price-slider-container {
   position: relative;
   height: 6px;
   background: #e5e5e5;
@@ -516,14 +805,14 @@
   margin: 20px 0;
 }
 
-.price-slider-track{
+.price-slider-track {
   position: absolute;
   height: 100%;
   background: #1f3d2b;
   border-radius: 3px;
 }
 
-input[type="range"]{
+input[type="range"] {
   position: absolute;
   width: 100%;
   height: 6px;
@@ -533,7 +822,7 @@ input[type="range"]{
   top: -7px;
 }
 
-input[type="range"]::-webkit-slider-thumb{
+input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 20px;
@@ -545,7 +834,7 @@ input[type="range"]::-webkit-slider-thumb{
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 
-input[type="range"]::-moz-range-thumb{
+input[type="range"]::-moz-range-thumb {
   width: 20px;
   height: 20px;
   border-radius: 50%;
@@ -557,14 +846,14 @@ input[type="range"]::-moz-range-thumb{
 }
 
 /* Style Cards */
-.style-cards{
+.style-cards {
   display: flex;
   flex-direction: column;
   gap: 12px;
   margin-top: 12px;
 }
 
-.style-card{
+.style-card {
   position: relative;
   display: block;
   border-radius: 8px;
@@ -572,14 +861,14 @@ input[type="range"]::-moz-range-thumb{
   text-decoration: none;
 }
 
-.style-card img{
+.style-card img {
   width: 100%;
   aspect-ratio: 16/9;
   object-fit: cover;
   display: block;
 }
 
-.style-card span{
+.style-card span {
   position: absolute;
   bottom: 12px;
   left: 12px;
@@ -591,7 +880,7 @@ input[type="range"]::-moz-range-thumb{
   border-radius: 4px;
 }
 
-.style-card svg{
+.style-card svg {
   position: absolute;
   right: 12px;
   bottom: 12px;
@@ -601,7 +890,7 @@ input[type="range"]::-moz-range-thumb{
 }
 
 /* Collection Header */
-.collection-header{
+.collection-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -610,20 +899,20 @@ input[type="range"]::-moz-range-thumb{
   border-bottom: 1px solid #e5e5e5;
 }
 
-.collection-title-area h1{
+.collection-title-area h1 {
   font-size: 32px;
   font-weight: 600;
   color: #1f3d2b;
   margin: 0 0 4px;
 }
 
-.product-count{
+.product-count {
   font-size: 14px;
   color: #666;
   margin: 0;
 }
 
-.sort-select{
+.sort-select {
   padding: 8px 32px 8px 12px;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -634,38 +923,47 @@ input[type="range"]::-moz-range-thumb{
 }
 
 /* Product Grid */
-.product-grid{
+.product-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 24px;
+  min-height: 400px;
 }
 
-/* Product Card */
-.product-card{
+/* Product Card - Matching category-product-rows design */
+.product-card {
+  display: flex;
+  flex-direction: column;
   background: #fff;
-  border-radius: 8px;
+  border-radius: 18px;
   overflow: hidden;
-  transition: box-shadow .3s ease;
+  box-shadow: 0 6px 18px rgba(0,0,0,.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.product-card:hover{
-  box-shadow: 0 4px 16px rgba(0,0,0,.1);
+.product-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.12);
 }
 
-.product-card__image{
+.product-card__image-container {
   position: relative;
+  overflow: hidden;
+}
+
+.product-card__image {
   display: block;
   aspect-ratio: 1/1;
   background: #f5f5f5;
 }
 
-.product-card__image img{
+.product-card__image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.product-badge{
+.product-badge {
   position: absolute;
   top: 12px;
   right: 12px;
@@ -677,137 +975,191 @@ input[type="range"]::-moz-range-thumb{
   font-weight: 700;
 }
 
-.product-card__info{
+.product-card__info {
   padding: 12px;
-}
-
-.product-title{
-  font-size: 15px;
-  font-weight: 500;
-  color: #1f3d2b;
-  margin: 0 0 8px;
-}
-
-.product-card__info a{
-  text-decoration: none;
-}
-
-.product-price{
   display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
+  flex-direction: column;
+  gap: 0;
 }
 
-.price-compare{
-  font-size: 14px;
+.product-card__vendor {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: #777;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.product-card__name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f3d2b;
+  text-decoration: none;
+  line-height: 1.3;
+  height: auto;
+  margin-bottom: 0;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.product-card__name:hover {
+  color: #2a523a;
+}
+
+.product-card__bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+  gap: 8px;
+  min-height: 40px;
+}
+
+.product-card__price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 0 0 auto;
+}
+
+.price-compare {
+  font-size: 12px;
   color: #999;
   text-decoration: line-through;
 }
 
-.price-current{
+.price-current {
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 700;
   color: #1f3d2b;
+  white-space: nowrap;
 }
 
-/* Rating */
-.product-rating{
+/* Product Actions - Matching category-product-rows */
+.product-card__actions {
+  position: relative;
   display: flex;
-  align-items: center;
-  gap: 6px;
+  justify-content: flex-end;
+  height: 40px;
+  flex: 0 0 auto;
 }
 
-.stars{
-  display: flex;
-  gap: 2px;
-}
-
-.star{
-  width: 14px;
-  height: 14px;
-  fill: #e5e5e5;
-}
-
-.star.filled{
-  fill: #ffc107;
-}
-
-.review-count{
-  font-size: 13px;
-  color: #666;
-}
-
-/* Product Actions */
-.product-actions{
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.qty-counter{
-  display: flex;
-  align-items: center;
-  background: #f6f7f2;
-  border-radius: 999px;
-  padding: 4px;
-  gap: 4px;
-  box-shadow: inset 0 0 0 1px #e3e6de;
-}
-
-.qty-btn{
-  width: 28px;
-  height: 28px;
-  border: none;
-  border-radius: 50%;
-  background: #fff;
-  color: #1f3d2b;
-  font-size: 18px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,.08);
-}
-
-.qty-input{
-  width: 36px;
-  text-align: center;
-  border: none;
-  background: transparent;
-  font-size: 14px;
-  font-weight: 600;
-  color: #1f3d2b;
-  outline: none;
-}
-
-.cart-btn{
+.product-card__atc-trigger {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: none;
   background: #1f3d2b;
   color: #fff;
+  border: none;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: background .2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
 }
 
-.cart-btn:hover{
-  background: #2d5940;
+.product-card__atc-trigger:hover {
+  background: #2a523a;
+  transform: scale(1.05);
 }
 
-.cart-btn svg{
+.product-card__atc-trigger svg {
   width: 20px;
   height: 20px;
 }
 
+.product-card__qty-selector {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 40px;
+  width: 40px;
+  min-width: 40px;
+  background: #1f3d2b;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box;
+  box-shadow: 0 4px 12px rgba(31, 61, 43, 0.2);
+}
+
+.product-card__actions.is-active .product-card__atc-wrapper {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.8);
+}
+
+.product-card__actions.is-active .product-card__qty-selector {
+  width: auto;
+  min-width: 105px;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.product-card__qty-selector .qty__btn {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  padding: 0;
+  transition: background 0.2s ease;
+}
+
+.product-card__qty-selector .qty__btn:hover {
+  background: rgba(255,255,255,0.25);
+}
+
+.product-card__qty-selector .qty__trash-icon {
+  display: none;
+}
+
+.product-card__actions[data-cart-quantity="1"] .qty__minus-icon {
+  display: none;
+}
+
+.product-card__actions[data-cart-quantity="1"] .qty__trash-icon {
+  display: flex;
+}
+
+.product-card__qty-selector .qty__btn svg {
+  width: 14px;
+  height: 14px;
+  display: block;
+}
+
+.product-card__qty-selector .qty__current {
+  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1;
+  flex: 1;
+  text-align: center;
+  min-width: 24px;
+}
+
+.product-card__form-wrapper {
+  flex: 0 0 auto;
+}
+
 /* Pagination */
-.pagination{
+.pagination {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -818,7 +1170,7 @@ input[type="range"]::-moz-range-thumb{
 }
 
 .pagination a,
-.pagination span{
+.pagination span {
   padding: 8px 12px;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -827,11 +1179,11 @@ input[type="range"]::-moz-range-thumb{
   font-size: 14px;
 }
 
-.pagination a:hover{
+.pagination a:hover {
   background: #f5f5f5;
 }
 
-.pagination .current{
+.pagination .current {
   background: #1f3d2b;
   color: #fff;
   border-color: #1f3d2b;
@@ -867,8 +1219,8 @@ input[type="range"]::-moz-range-thumb{
 }
 
 /* Responsive */
-@media (max-width: 990px){
-  .collection-container{
+@media (max-width: 990px) {
+  .collection-container {
     grid-template-columns: 1fr;
   }
   
@@ -879,7 +1231,7 @@ input[type="range"]::-moz-range-thumb{
   .filter-sidebar {
     position: fixed;
     top: 0;
-    left: -100%; /* Hidden by default */
+    left: -100%;
     width: 300px;
     height: 100vh;
     background: #fff;
@@ -890,6 +1242,7 @@ input[type="range"]::-moz-range-thumb{
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    border-radius: 0;
   }
 
   .filter-sidebar.active {
@@ -940,15 +1293,14 @@ input[type="range"]::-moz-range-thumb{
     cursor: pointer;
   }
 
-  /* Style Cards as Swiper/Scroll on Mobile */
   .style-cards.swiper-container {
     overflow: hidden;
-    margin-right: -20px; /* Offset parent padding */
+    margin-right: -20px;
   }
 
   .style-cards .swiper-wrapper {
     display: flex;
-    flex-wrap: nowrap; /* Force horizontal */
+    flex-wrap: nowrap;
     gap: 12px;
     overflow-x: auto;
     padding-bottom: 10px;
@@ -958,20 +1310,19 @@ input[type="range"]::-moz-range-thumb{
   }
 
   .style-card.swiper-slide {
-    flex: 0 0 140px; /* Fixed width for slides */
+    flex: 0 0 140px;
     margin: 0;
   }
 
   .style-card img {
-    height: 80px; /* Smaller images */
+    height: 80px;
   }
   
-  .product-grid{
+  .product-grid {
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 16px;
   }
   
-  /* Backdrop when filter is open */
   body.filter-open::after {
     content: '';
     position: fixed;
@@ -984,14 +1335,14 @@ input[type="range"]::-moz-range-thumb{
   }
 }
 
-@media (max-width: 640px){
-  .collection-header{
+@media (max-width: 640px) {
+  .collection-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
   }
   
-  .product-grid{
+  .product-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
   }
@@ -999,38 +1350,6 @@ input[type="range"]::-moz-range-thumb{
 </style>
 
 <script>
-// Quantity update function
-function updateQty(btn, change) {
-  const input = btn.parentElement.querySelector('.qty-input');
-  let value = parseInt(input.value) || 1;
-  value = Math.max(1, value + change);
-  input.value = value;
-}
-
-// Price slider update function
-function updatePriceSlider() {
-  const rangeMin = document.getElementById('range-min');
-  const rangeMax = document.getElementById('range-max');
-  const minPrice = document.getElementById('min-price');
-  const maxPrice = document.getElementById('max-price');
-  const priceTrack = document.getElementById('price-track');
-  
-  if (!rangeMin || !rangeMax) return;
-  
-  const minVal = parseInt(rangeMin.value);
-  const maxVal = parseInt(rangeMax.value);
-  
-  // Update number inputs
-  minPrice.value = minVal;
-  maxPrice.value = maxVal;
-  
-  // Update track visual
-  const percentMin = (minVal / 600) * 100;
-  const percentMax = (maxVal / 600) * 100;
-  priceTrack.style.left = percentMin + '%';
-  priceTrack.style.width = (percentMax - percentMin) + '%';
-}
-
 document.addEventListener('DOMContentLoaded', function() {
   const checkboxes = document.querySelectorAll('.filter-checkbox input[type="checkbox"]');
   const minPrice = document.getElementById('min-price');
@@ -1039,16 +1358,38 @@ document.addEventListener('DOMContentLoaded', function() {
   const rangeMax = document.getElementById('range-max');
   const productCards = document.querySelectorAll('.product-card');
   
+  // Price slider update function
+  function updatePriceSlider() {
+    if (!rangeMin || !rangeMax) return;
+    
+    const minVal = parseInt(rangeMin.value);
+    const maxVal = parseInt(rangeMax.value);
+    
+    minPrice.value = minVal;
+    maxPrice.value = maxVal;
+    
+    const priceTrack = document.getElementById('price-track');
+    const percentMin = (minVal / 600) * 100;
+    const percentMax = (maxVal / 600) * 100;
+    priceTrack.style.left = percentMin + '%';
+    priceTrack.style.width = (percentMax - percentMin) + '%';
+  }
+  
   // Filter function
   function filterProducts() {
-    const selectedCategories = Array.from(document.querySelectorAll('input[name="category"]:checked')).map(cb => cb.value);
-    const selectedLights = Array.from(document.querySelectorAll('input[name="light"]:checked')).map(cb => cb.dataset.tag);
+    const selectedFlowerColors = Array.from(document.querySelectorAll('input[name="flower_color"]:checked')).map(cb => cb.value);
+    const selectedPotColors = Array.from(document.querySelectorAll('input[name="pot_color"]:checked')).map(cb => cb.value);
+    const selectedFlowering = Array.from(document.querySelectorAll('input[name="flowering"]:checked')).map(cb => cb.value);
     const min = parseFloat(minPrice.value) || 0;
     const max = parseFloat(maxPrice.value) || Infinity;
     
+    let visibleCount = 0;
+    
     productCards.forEach(card => {
       const price = parseFloat(card.dataset.price) / 100;
-      const tags = card.dataset.tags.split(',');
+      const tags = card.dataset.tags.toLowerCase();
+      const flowerColors = card.dataset.flowerColor.toLowerCase();
+      const potColors = card.dataset.potColor.toLowerCase();
       
       let showCard = true;
       
@@ -1057,20 +1398,40 @@ document.addEventListener('DOMContentLoaded', function() {
         showCard = false;
       }
       
-      // Light filter
-      if (selectedLights.length > 0) {
-        const hasMatchingLight = selectedLights.some(light => tags.includes(light));
-        if (!hasMatchingLight) showCard = false;
+      // Flower Color Filter
+      if (selectedFlowerColors.length > 0) {
+        const productFlowerTokens = flowerColors.split(/[ ,]+/).filter(Boolean);
+        const hasMatchingColor = selectedFlowerColors.some(color => productFlowerTokens.includes(color));
+        if (!hasMatchingColor) showCard = false;
+      }
+
+      // Pot Color Filter
+      if (selectedPotColors.length > 0) {
+        const productPotTokens = potColors.split(/[ ,]+/).filter(Boolean);
+        const hasMatchingPot = selectedPotColors.some(color => productPotTokens.includes(color));
+        if (!hasMatchingPot) showCard = false;
+      }
+
+      // Flowering Status Filter
+      if (selectedFlowering.length > 0) {
+        const isWithFlower = tags.includes('with-flower') || flowerColors.trim().length > 0;
+        const isWithoutFlower = tags.includes('without-flower') || (flowerColors.trim().length === 0 && !tags.includes('with-flower'));
+
+        const wantsWithFlower = selectedFlowering.includes('with-flower');
+        const wantsWithoutFlower = selectedFlowering.includes('without-flower');
+
+        if (wantsWithFlower && !wantsWithoutFlower && !isWithFlower) showCard = false;
+        if (wantsWithoutFlower && !wantsWithFlower && !isWithoutFlower) showCard = false;
       }
       
       card.style.display = showCard ? 'block' : 'none';
+      if (showCard) visibleCount++;
     });
     
     // Update count
-    const visibleCount = document.querySelectorAll('.product-card[style="display: block;"]').length;
     const countDisplay = document.querySelector('.count-display');
-    if(countDisplay) {
-        countDisplay.textContent = `1-${visibleCount}`;
+    if (countDisplay) {
+      countDisplay.textContent = `1-${visibleCount}`;
     }
   }
 
@@ -1079,13 +1440,12 @@ document.addEventListener('DOMContentLoaded', function() {
     let minVal = parseInt(rangeMin.value);
     let maxVal = parseInt(rangeMax.value);
     
-    // Prevent overlap
     if (maxVal - minVal < 10) {
-        if (e.target.id === 'range-min') {
-            rangeMin.value = maxVal - 10;
-        } else {
-            rangeMax.value = minVal + 10;
-        }
+      if (e.target.id === 'range-min') {
+        rangeMin.value = maxVal - 10;
+      } else {
+        rangeMax.value = minVal + 10;
+      }
     }
     
     updatePriceSlider();
@@ -1095,30 +1455,29 @@ document.addEventListener('DOMContentLoaded', function() {
   // Event listeners
   checkboxes.forEach(cb => cb.addEventListener('change', filterProducts));
   
-  if(rangeMin && rangeMax) {
-      rangeMin.addEventListener('input', handleRangeInput);
-      rangeMax.addEventListener('input', handleRangeInput);
-      // Initialize handles
-      updatePriceSlider();
+  if (rangeMin && rangeMax) {
+    rangeMin.addEventListener('input', handleRangeInput);
+    rangeMax.addEventListener('input', handleRangeInput);
+    updatePriceSlider();
   }
   
-  if(minPrice && maxPrice) {
-      minPrice.addEventListener('input', function() {
-          let val = parseInt(this.value);
-          if(val < parseInt(rangeMax.value)) {
-             rangeMin.value = val;
-             updatePriceSlider();
-             filterProducts();
-          }
-      });
-      maxPrice.addEventListener('input', function() {
-          let val = parseInt(this.value);
-          if(val > parseInt(rangeMin.value)) {
-             rangeMax.value = val;
-             updatePriceSlider();
-             filterProducts();
-          }
-      });
+  if (minPrice && maxPrice) {
+    minPrice.addEventListener('input', function() {
+      let val = parseInt(this.value);
+      if (val < parseInt(rangeMax.value)) {
+        rangeMin.value = val;
+        updatePriceSlider();
+        filterProducts();
+      }
+    });
+    maxPrice.addEventListener('input', function() {
+      let val = parseInt(this.value);
+      if (val > parseInt(rangeMin.value)) {
+        rangeMax.value = val;
+        updatePriceSlider();
+        filterProducts();
+      }
+    });
   }
   
   // Reset buttons
@@ -1127,11 +1486,10 @@ document.addEventListener('DOMContentLoaded', function() {
       const section = this.closest('.filter-section');
       section.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
       
-      // Reset price
       if (section.querySelector('#min-price')) {
-         rangeMin.value = 0;
-         rangeMax.value = 600;
-         updatePriceSlider();
+        rangeMin.value = 0;
+        rangeMax.value = 600;
+        updatePriceSlider();
       }
       
       filterProducts();
@@ -1156,7 +1514,7 @@ document.addEventListener('DOMContentLoaded', function() {
     mobileToggle.addEventListener('click', function() {
       sidebar.classList.add('active');
       document.body.classList.add('filter-open');
-      document.body.style.overflow = 'hidden'; // Prevent scrolling
+      document.body.style.overflow = 'hidden';
     });
   }
   
@@ -1169,7 +1527,6 @@ document.addEventListener('DOMContentLoaded', function() {
   if (mobileClose) mobileClose.addEventListener('click', closeFilter);
   if (mobileApply) mobileApply.addEventListener('click', closeFilter);
   
-  // Close on click outside
   document.addEventListener('click', function(e) {
     if (document.body.classList.contains('filter-open') && 
         !sidebar.contains(e.target) && 
@@ -1178,8 +1535,197 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
+  // ===== CUSTOM CART HANDLING - NO REDIRECTS =====
+  
+  // Update UI for a specific product card
+  function updateProductCardUI(wrapper, quantity) {
+    const actions = wrapper.querySelector('.product-card__actions');
+    const qtyDisplay = wrapper.querySelector('.qty__current');
+    
+    if (!actions || !qtyDisplay) return;
+    
+    actions.dataset.cartQuantity = quantity;
+    qtyDisplay.textContent = quantity;
+    
+    if (quantity > 0) {
+      actions.classList.add('is-active');
+    } else {
+      actions.classList.remove('is-active');
+    }
+  }
+  
+  // Sync all cards from cart data
+  async function syncAllCardsFromCart() {
+    try {
+      const response = await fetch('/cart.js');
+      const cart = await response.json();
+      
+      document.querySelectorAll('.product-card__form-wrapper').forEach(wrapper => {
+        const variantId = wrapper.dataset.variantId;
+        if (!variantId) return;
+        
+        const cartItem = cart.items.find(item => item.variant_id.toString() === variantId.toString());
+        const quantity = cartItem ? cartItem.quantity : 0;
+        
+        updateProductCardUI(wrapper, quantity);
+      });
+      
+      // Update cart count in header if exists
+      // Skip dispatching new cart:update event as we are already responding to one
+      updateCartCount(cart.item_count, true);
+      
+    } catch (error) {
+      console.error('Failed to sync cart:', error);
+    }
+  }
+  
+  // Update cart count in header
+  function updateCartCount(count, skipDispatch = false) {
+    if (skipDispatch) return;
+
+    // Dispatch event for cart drawer/icon updates
+    document.dispatchEvent(new CustomEvent('cart:update', {
+      bubbles: true,
+      detail: {
+        data: { itemCount: count }
+      }
+    }));
+  }
+  
+  // Handle Add to Cart
+  async function handleAddToCart(wrapper, variantId) {
+    const actions = wrapper.querySelector('.product-card__actions');
+    if (!actions) return;
+    
+    // Add loading state
+    actions.classList.add('is-loading');
+    
+    try {
+      const formData = new FormData();
+      formData.append('id', variantId);
+      formData.append('quantity', 1);
+      
+      const response = await fetch('/cart/add.js', {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (!response.ok) throw new Error('Failed to add to cart');
+      
+      const result = await response.json();
+      
+      // Get current cart quantity for this variant
+      const cartResponse = await fetch('/cart.js');
+      const cart = await cartResponse.json();
+      const cartItem = cart.items.find(item => item.variant_id.toString() === variantId.toString());
+      const quantity = cartItem ? cartItem.quantity : 1;
+      
+      // Update UI
+      updateProductCardUI(wrapper, quantity);
+      updateCartCount(cart.item_count);
+      
+    } catch (error) {
+      console.error('Add to cart failed:', error);
+      alert('Failed to add item to cart. Please try again.');
+    } finally {
+      actions.classList.remove('is-loading');
+    }
+  }
+  
+  // Handle Quantity Change
+  async function handleQuantityChange(wrapper, variantId, newQuantity) {
+    const actions = wrapper.querySelector('.product-card__actions');
+    if (!actions) return;
+    
+    // Optimistic UI update
+    updateProductCardUI(wrapper, newQuantity);
+    
+    try {
+      const response = await fetch('/cart/change.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: variantId.toString(),
+          quantity: newQuantity
+        })
+      });
+      
+      if (!response.ok) throw new Error('Failed to update cart');
+      
+      const cart = await response.json();
+      
+      // Verify the update
+      const cartItem = cart.items.find(item => item.variant_id.toString() === variantId.toString());
+      const actualQuantity = cartItem ? cartItem.quantity : 0;
+      
+      // Update UI with actual quantity
+      updateProductCardUI(wrapper, actualQuantity);
+      updateCartCount(cart.item_count);
+      
+    } catch (error) {
+      console.error('Quantity update failed:', error);
+      // Revert to cart state on error
+      syncAllCardsFromCart();
+    }
+  }
+  
+  // Attach event listeners to all product cards
+  document.querySelectorAll('.product-card__form-wrapper').forEach(wrapper => {
+    const variantId = wrapper.dataset.variantId;
+    if (!variantId) return;
+    
+    const actions = wrapper.querySelector('.product-card__actions');
+    if (!actions) return;
+    
+    // Add to Cart button
+    const addBtn = wrapper.querySelector('[data-action="add-to-cart"]');
+    if (addBtn) {
+      addBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        handleAddToCart(wrapper, variantId);
+      });
+    }
+    
+    // Decrease quantity button
+    const decreaseBtn = wrapper.querySelector('[data-action="decrease"]');
+    if (decreaseBtn) {
+      decreaseBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const currentQty = parseInt(actions.dataset.cartQuantity) || 0;
+        const newQty = Math.max(0, currentQty - 1);
+        
+        handleQuantityChange(wrapper, variantId, newQty);
+      });
+    }
+    
+    // Increase quantity button
+    const increaseBtn = wrapper.querySelector('[data-action="increase"]');
+    if (increaseBtn) {
+      increaseBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const currentQty = parseInt(actions.dataset.cartQuantity) || 0;
+        const newQty = currentQty + 1;
+        
+        handleQuantityChange(wrapper, variantId, newQty);
+      });
+    }
+  });
+  
+  // Listen for external cart updates (from other sections)
+  document.addEventListener('cart:update', () => {
+    syncAllCardsFromCart();
+  });
+
   // Initial filter run
   filterProducts();
+  
+  // Show page after first filter
+  document.querySelector('.collection-filter-page').style.opacity = '1';
 });
 </script>
 
@@ -1187,6 +1733,12 @@ document.addEventListener('DOMContentLoaded', function() {
 {
   "name": "Collection Filter Page",
   "settings": [
+    {
+      "type": "link_list",
+      "id": "category_menu",
+      "label": "Category Menu",
+      "info": "Select a menu to display as a hierarchical category tree. Overrides block settings."
+    },
     {
       "type": "checkbox",
       "id": "show_style_filter",

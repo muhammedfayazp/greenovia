@@ -135,7 +135,7 @@
 .facet-filters__field select {
   padding: 8px 32px 8px 12px;
   border: 1px solid #ddd;
-  border-radius: 4px;  
+  border-radius: 4px;
   font-size: 14px;
   background: #fff;
   cursor: pointer;
@@ -158,11 +158,11 @@
   border-radius: 8px;
   overflow: hidden;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .card-wrapper:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   transform: translateY(-4px);
 }
 
@@ -290,7 +290,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 .quantity__input {
@@ -320,7 +320,7 @@
 }
 
 .product-form__submit:hover {
-  background: #2d5940;
+  background: #4a9b6f;
 }
 
 /* Pagination Styling */
@@ -358,11 +358,11 @@
   .collection {
     grid-template-columns: 1fr;
   }
-  
+
   .facets__wrapper {
     position: relative;
   }
-  
+
   .product-grid {
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 16px;
@@ -374,13 +374,13 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
   }
-  
+
   .collection__title {
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
   }
-  
+
   .collection__title h1 {
     font-size: 24px;
   }

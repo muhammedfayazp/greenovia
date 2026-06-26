@@ -86,9 +86,9 @@
         name="add"
       >
         <span class="quick-add__button-content">
-          <span class="quick-add__button-text">{{- 'actions.add' | t -}}</span>
-          <span class="svg-wrapper icon-plus">
-            {{- 'icon-plus.svg' | inline_asset_content -}}
+          <span class="quick-add__button-text visually-hidden">{{- 'actions.add' | t -}}</span>
+          <span class="svg-wrapper icon-add-to-cart">
+            {{- 'icon-add-to-cart.svg' | inline_asset_content -}}
           </span>
         </span>
       </button>
@@ -130,18 +130,24 @@
     align-items: center;
     background: linear-gradient(var(--color-background) 0 100%) padding-box;
     padding: 0;
-    border-radius: 50px;
-    border: 2px solid hsl(0 0% 0% / 0.15);
-    height: var(--button-size-md);
+    border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.1);
+    height: 44px;
+    width: 44px;
+    min-width: 44px;
     cursor: pointer;
     opacity: var(--quick-add-mobile-opacity, 0);
     overflow: hidden;
     color: var(--color-foreground);
     pointer-events: all;
     position: absolute;
-    right: max(var(--quick-add-right), calc((var(--border-radius) + var(--quick-add-right)) * (1 - cos(45deg))));
-    bottom: max(var(--quick-add-bottom), calc((var(--border-radius) + var(--quick-add-bottom)) * (1 - cos(45deg))));
+    right: 10px;
+    bottom: 10px;
     backdrop-filter: blur(20px) saturate(180%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 
     &:active {
       scale: 0.99;
@@ -153,15 +159,10 @@
     }
 
     &:is(:hover, :focus-visible) {
-      .add-to-cart-text__content {
-        grid-template-columns: 1fr;
-
-        span span {
-          opacity: 1;
-          translate: 0 0;
-          filter: blur(0);
-        }
-      }
+      transform: scale(1.1);
+      background: var(--gv-primary, #2D5016);
+      color: #fff;
+      border-color: transparent;
     }
 
     @media screen and (min-width: 750px) {
@@ -171,11 +172,24 @@
   }
 
   .quick-add__button .add-to-cart-text {
-    background: var(--color-background);
-    overflow: hidden;
-    border-radius: 50px;
+    display: none;
+  }
+  
+  .quick-add__button-text {
+    display: none;
+  }
+
+  .quick-add__button-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
     height: 100%;
-    gap: 0;
+  }
+
+  /* Override any grid stuff */
+  .quick-add__button .add-to-cart-text__content {
+      display: none !important;
   }
 
   .quick-add__button .svg-wrapper .checkmark-burst {

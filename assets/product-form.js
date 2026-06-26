@@ -189,7 +189,9 @@ class ProductFormComponent extends Component {
     const cartQty = cartItem ? cartItem.quantity : 0;
 
     // Use public API to update quantity selector
-    const quantitySelector = /** @type {any | undefined} */ (this.querySelector('quantity-selector-component'));
+    const quantitySelector = /** @type {any | undefined} */ (
+      this.querySelector('quantity-selector-component, cart-quantity-selector-component')
+    );
     if (quantitySelector?.setCartQuantity) {
       quantitySelector.setCartQuantity(cartQty);
     }

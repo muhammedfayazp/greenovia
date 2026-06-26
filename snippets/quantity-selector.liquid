@@ -53,8 +53,8 @@
         disabled
       {% endif %}
     >
-      <span class="visually-hidden">{{ 'accessibility.decrease_quantity' | t }}</span
-      ><span class="svg-wrapper icon-minus">
+      <span class="visually-hidden">{{ 'accessibility.decrease_quantity' | t }}</span>
+      <span class="svg-wrapper icon-minus">
         {{- 'icon-minus.svg' | inline_asset_content -}}
       </span>
     </button>
@@ -90,8 +90,8 @@
         disabled
       {% endif %}
     >
-      <span class="visually-hidden">{{ 'accessibility.increase_quantity' | t }}</span
-      ><span class="svg-wrapper icon-plus">
+      <span class="visually-hidden">{{ 'accessibility.increase_quantity' | t }}</span>
+      <span class="svg-wrapper icon-plus">
         {{- 'icon-plus.svg' | inline_asset_content -}}
       </span>
     </button>
@@ -162,6 +162,10 @@
 </div>
 
 {% stylesheet %}
+  /* ==========================================
+     QUANTITY SELECTOR - GREEN GARDEN THEME
+     ========================================== */
+  
   .quantity-selector-wrapper {
     display: flex;
     align-items: center;
@@ -171,5 +175,297 @@
     @media screen and (min-width: 750px) {
       gap: var(--gap-sm);
     }
+  }
+
+  /* Main Container */
+  .quantity-selector {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    
+    /* Premium Green Gradient */
+    background: linear-gradient(135deg, #1a5c3a 0%, #0d3d26 100%);
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    border-radius: 50px;
+    
+    /* Sizing */
+    height: 44px;
+    min-width: 120px;
+    padding: 0 6px;
+    
+    /* Depth & Shadow */
+    box-shadow: 
+      0 3px 10px rgba(18, 65, 40, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+    
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Top Highlight */
+  .quantity-selector::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(255, 255, 255, 0.3) 50%, 
+      transparent 100%);
+    pointer-events: none;
+  }
+
+  /* Hover State - Subtle Brightness */
+  .quantity-selector:hover {
+    background: linear-gradient(135deg, #1e6842 0%, #0f452d 100%);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 
+      0 4px 14px rgba(18, 65, 40, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  }
+
+  /* Buttons */
+  .quantity-selector .button {
+    width: 36px;
+    height: 36px;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    
+    /* Subtle Button Background */
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 50%;
+    
+    color: #ffffff;
+    cursor: pointer;
+    
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    
+    /* Remove default styles */
+    padding: 0;
+    margin: 0;
+    outline: none;
+    box-shadow: none !important;
+  }
+
+  /* Button Hover - Green Glow Effect */
+  .quantity-selector .button:hover {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
+    transform: scale(1.05);
+  }
+
+  /* Button Active State */
+  .quantity-selector .button:active {
+    transform: scale(0.95);
+    background: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  /* Button Disabled State */
+  .quantity-selector .button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+  }
+
+  /* Icons */
+  .quantity-selector .button .icon-minus,
+  .quantity-selector .button .icon-plus,
+  .quantity-selector .button svg {
+    width: 14px;
+    height: 14px;
+    color: #ffffff !important;
+    fill: #ffffff !important;
+    stroke: #ffffff !important;
+    stroke-width: 2;
+    transition: transform 0.2s ease;
+    pointer-events: none;
+  }
+
+  /* Icon Hover Scale */
+  .quantity-selector .button:hover svg,
+  .quantity-selector .button:hover .icon-minus,
+  .quantity-selector .button:hover .icon-plus {
+    transform: scale(1.1);
+  }
+
+  /* Input Field */
+  .quantity-selector input {
+    width: 44px;
+    height: 100%;
+    
+    /* Reset styles */
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
+    
+    /* Text styling */
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #ffffff !important;
+    text-align: center;
+    letter-spacing: 0.02em;
+    
+    padding: 0;
+    margin: 0;
+    
+    /* Remove number spinners */
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
+  .quantity-selector input::-webkit-outer-spin-button,
+  .quantity-selector input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Input Focus - No visible change, stays consistent */
+  .quantity-selector input:focus {
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+
+  /* Remove any focus rings or backgrounds */
+  .quantity-selector input:focus-visible {
+    outline: none !important;
+  }
+
+  /* Ensure no white backgrounds anywhere */
+  .quantity-selector *,
+  .quantity-selector *:hover,
+  .quantity-selector *:focus,
+  .quantity-selector *:active {
+    background-color: transparent !important;
+  }
+
+  /* Override any global button styles */
+  .quantity-selector .button,
+  .quantity-selector .button:hover,
+  .quantity-selector .button:focus,
+  .quantity-selector .button:active {
+    color: #ffffff !important;
+  }
+
+  /* ==========================================
+     MOBILE RESPONSIVE
+     ========================================== */
+
+  @media screen and (max-width: 768px) {
+    .quantity-selector {
+      height: 40px;
+      min-width: 110px;
+      padding: 0 5px;
+    }
+    
+    .quantity-selector .button {
+      width: 32px;
+      height: 32px;
+    }
+    
+    .quantity-selector .button svg,
+    .quantity-selector .button .icon-minus,
+    .quantity-selector .button .icon-plus {
+      width: 12px;
+      height: 12px;
+    }
+    
+    .quantity-selector input {
+      width: 40px;
+      font-size: 1.1rem;
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .quantity-selector {
+      height: 38px;
+      min-width: 100px;
+      padding: 0 4px;
+    }
+    
+    .quantity-selector .button {
+      width: 30px;
+      height: 30px;
+    }
+    
+    .quantity-selector .button svg,
+    .quantity-selector .button .icon-minus,
+    .quantity-selector .button .icon-plus {
+      width: 11px;
+      height: 11px;
+    }
+    
+    .quantity-selector input {
+      width: 36px;
+      font-size: 1rem;
+    }
+  }
+
+  @media screen and (max-width: 360px) {
+    .quantity-selector {
+      height: 36px;
+      min-width: 95px;
+    }
+    
+    .quantity-selector .button {
+      width: 28px;
+      height: 28px;
+    }
+    
+    .quantity-selector .button svg,
+    .quantity-selector .button .icon-minus,
+    .quantity-selector .button .icon-plus {
+      width: 10px;
+      height: 10px;
+    }
+    
+    .quantity-selector input {
+      width: 34px;
+      font-size: 0.95rem;
+    }
+  }
+
+  /* ==========================================
+     ACCESSIBILITY
+     ========================================== */
+
+  .quantity-selector .button:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.5);
+    outline-offset: 2px;
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .quantity-selector,
+    .quantity-selector .button,
+    .quantity-selector svg {
+      transition: none !important;
+    }
+  }
+
+  /* ==========================================
+     PRICE PER ITEM (Volume Pricing)
+     ========================================== */
+
+  .price-per-item {
+    font-size: 0.875rem;
+    color: rgba(26, 92, 58, 0.8);
+    font-weight: 500;
+  }
+
+  .price-per-item__text {
+    display: inline-block;
   }
 {% endstylesheet %}

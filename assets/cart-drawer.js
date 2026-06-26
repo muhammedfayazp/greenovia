@@ -9,19 +9,20 @@ import { CartAddEvent } from '@theme/events';
 class CartDrawerComponent extends DialogComponent {
   connectedCallback() {
     super.connectedCallback();
-    document.addEventListener(CartAddEvent.eventName, this.#handleCartAdd);
+    this.handleCartAdd = this.handleCartAdd.bind(this);
+    document.addEventListener(CartAddEvent.eventName, this.handleCartAdd);
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    document.removeEventListener(CartAddEvent.eventName, this.#handleCartAdd);
+    document.removeEventListener(CartAddEvent.eventName, this.handleCartAdd);
   }
 
-  #handleCartAdd = () => {
+  handleCartAdd() {
     if (this.hasAttribute('auto-open')) {
       this.showDialog();
     }
-  };
+  }
 
   open() {
     this.showDialog();

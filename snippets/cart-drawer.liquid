@@ -15,14 +15,16 @@
 ></script>
 
 <cart-drawer-component
+  id="CartDrawerMain"
   class="cart-drawer"
   {{ block.shopify_attributes }}
   {% if settings.auto_open_cart_drawer %}
     auto-open
   {% endif %}
 >
+  {%- comment -%} Cart Icon Button {%- endcomment -%}
   <button
-    class="button header-actions__action button-unstyled"
+    class="button header-actions__action button-unstyled cart-trigger-btn"
     on:click="/open"
     aria-haspopup="dialog"
     aria-label="{{ 'accessibility.cart' | t }}"
@@ -32,150 +34,548 @@
     {% render 'cart-icon-component' %}
   </button>
 
+  {%- comment -%} Cart Drawer Dialog {%- endcomment -%}
   <dialog
     ref="dialog"
-    class="cart-drawer__dialog dialog-modal dialog-drawer color-{{ settings.drawer_color_scheme }}{% if cart.empty? %} cart-drawer--empty{%endif%}"
+    class="cart-drawer__dialog dialog-modal dialog-drawer color-{{ settings.drawer_color_scheme }}{% if cart.empty? %} cart-drawer--empty{% endif %}"
     aria-labelledby="{% if cart.empty? %}cart-drawer-heading-empty{% else %}cart-drawer-heading{% endif %}"
     scroll-lock
   >
     <div class="cart-drawer__inner">
-      <cart-items-component
-        class="cart-items-component"
-        data-section-id="{{ section.id }}"
-      >
-        {%- if cart.empty? -%}
-          <div class="cart-drawer__header">
-            <button
-              ref="closeButton"
-              on:click="cart-drawer-component/close"
-              class="button close-button cart-drawer__close-button button-unstyled"
-              aria-label="{{ 'actions.close_dialog' | t }}"
-            >
-              <span class="svg-wrapper">
-                {{- 'icon-close.svg' | inline_asset_content -}}
-              </span>
-            </button>
-          </div>
-
-          <div
-            class="cart-drawer__content motion-reduce"
-            aria-label="{{ 'accessibility.cart' | t }}"
+      {%- if cart.empty? -%}
+        {%- comment -%} Empty Cart State {%- endcomment -%}
+        <div class="cart-drawer__header">
+          <h2 class="cart-drawer__heading" id="cart-drawer-heading-empty">
+            <svg class="cart-icon-large" width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M9 2L7.17 4H3C1.9 4 1 4.9 1 6V18C1 19.1 1.9 20 3 20H21C22.1 20 23 19.1 23 18V6C23 4.9 22.1 4 21 4H16.83L15 2H9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            {{ 'content.your_cart' | t }}
+          </h2>
+          <button
+            ref="closeButton"
+            on:click="#CartDrawerMain/close"
+            class="button close-button cart-drawer__close-button button-unstyled"
+            aria-label="{{ 'actions.close_dialog' | t }}"
           >
-            <h2
-              class="cart-drawer__heading h3 cart-drawer__heading--empty"
-              id="cart-drawer-heading-empty"
-            >
-              {{ 'content.your_cart_is_empty' | t }}
-            </h2>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
 
-            <div class="cart-drawer__items">
-              {% render 'cart-products', drawer_context: 'drawer' %}
+        <div class="cart-drawer__content cart-drawer__content--empty">
+          <cart-items-component
+            class="cart-items-component"
+            data-section-id="{{ section.id }}"
+          >
+            <div class="empty-cart-illustration">
+              <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+                <circle cx="60" cy="60" r="58" fill="#f0f7f4" stroke="#1a5c3a" stroke-width="2"/>
+                <path d="M40 45L35 55L35 75C35 76.1 35.9 77 37 77H83C84.1 77 85 76.1 85 75V55L80 45H40Z" fill="#e8f5e9" stroke="#1a5c3a" stroke-width="2"/>
+                <path d="M50 55V50C50 44.5 54.5 40 60 40C65.5 40 70 44.5 70 50V55" stroke="#1a5c3a" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="60" cy="90" r="3" fill="#1a5c3a"/>
+              </svg>
             </div>
-          </div>
-        {%- else -%}
-          <div
-            class="cart-drawer__header"
-            id="cart-drawer-header"
-          >
-            <h2
-              class="cart-drawer__heading h3"
-              id="cart-drawer-heading"
+            
+            <h3 class="empty-cart-heading">
+              {{ 'content.your_cart_is_empty' | t }}
+            </h3>
+            
+            <p class="empty-cart-text">
+              Start adding your favorite items to your cart!
+            </p>
+            
+            <button 
+              class="empty-cart-btn"
+              on:click="#CartDrawerMain/close"
             >
-              {{ 'content.cart_title' | t }}
-              {% render 'cart-bubble' %}
-            </h2>
-
-            <button
-              ref="closeButton"
-              on:click="cart-drawer-component/close"
-              class="button close-button cart-drawer__close-button button-unstyled"
-              aria-label="{{ 'actions.close_dialog' | t }}"
-            >
-              <span class="svg-wrapper">
-                {{- 'icon-close.svg' | inline_asset_content -}}
-              </span>
+              Continue Shopping
             </button>
-          </div>
+          </cart-items-component>
+        </div>
+      {%- else -%}
+        {%- comment -%} Cart with Items {%- endcomment -%}
+        <div class="cart-drawer__header" id="cart-drawer-header">
+          <h2 class="cart-drawer__heading" id="cart-drawer-heading">
+            <span class="cart-icon-wrapper">
+              <svg class="cart-icon-large" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                <path d="M3 6h18"></path>
+                <path d="M16 10a4 4 0 0 1-8 0"></path>
+              </svg>
+            </span>
+            <span class="cart-heading-text">{{ 'content.cart_title' | t }}</span>
+            <span class="cart-count-bubble">
+              {%- if cart.item_count < 100 -%}
+                <span aria-hidden="true">{{ cart.item_count }}</span>
+              {%- endif -%}
+              <span class="visually-hidden">{{ 'sections.header.cart_count' | t: count: cart.item_count }}</span>
+            </span>
+          </h2>
 
-          <div
-            class="cart-drawer__content motion-reduce"
-            aria-label="{{ 'accessibility.cart' | t }}"
-            style="--header-height: 60px;"
+          <button
+            ref="closeButton"
+            on:click="#CartDrawerMain/close"
+            class="button close-button cart-drawer__close-button button-unstyled"
+            aria-label="{{ 'actions.close_dialog' | t }}"
           >
-            <scroll-hint
-              class="cart-drawer__items"
-            >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <cart-items-component
+          class="cart-items-component"
+          data-section-id="{{ section.id }}"
+        >
+          <div
+            class="cart-drawer__content"
+            aria-label="{{ 'accessibility.cart' | t }}"
+            style="--header-height: 64px;"
+          >
+            <scroll-hint class="cart-drawer__items">
               {% render 'cart-products', drawer_context: 'drawer' %}
             </scroll-hint>
 
-            <div
-              class="cart-drawer__summary"
-            >
+            <div class="cart-drawer__summary">
               {% render 'cart-summary' %}
             </div>
           </div>
-        {%- endif -%}
-      </cart-items-component>
+        </cart-items-component>
+      {%- endif -%}
     </div>
   </dialog>
 </cart-drawer-component>
 
-{% stylesheet %}
-  .cart-items-component {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-  }
+<style>
+/* ==========================================
+   MODERN CART DRAWER - GREEN GARDEN THEME
+   ========================================== */
 
-  .cart-drawer__heading .cart-bubble {
-    width: fit-content;
-    border-radius: var(--style-border-radius-buttons-primary);
-    aspect-ratio: auto;
-    padding: var(--cart-padding);
-  }
+:root {
+  --cart-drawer-width: 420px;
+  --cart-drawer-padding: 20px;
+  --cart-drawer-padding-desktop: 24px;
+  --cart-header-height: 70px;
+  --cart-green: #1a5c3a;
+  --cart-green-light: #2d6e47;
+  --cart-green-dark: #0d3d26;
+  --cart-sage: #9db5a5;
+  --cart-cream: #faf8f5;
+}
 
-  .cart-drawer__heading .cart-bubble[data-maintain-ratio] {
-    aspect-ratio: 1;
-    min-width: 26px;
-  }
+/* ==========================================
+   CART DRAWER BASE
+   ========================================== */
 
+.cart-items-component {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.cart-drawer__dialog {
+  overflow: hidden;
+  width: var(--cart-drawer-width);
+  max-width: 100vw;
+  border-radius: 0;
+  border: none;
+  box-shadow: 
+    -4px 0 24px rgba(0, 0, 0, 0.1),
+    -2px 0 12px rgba(0, 0, 0, 0.05);
+}
+
+.cart-drawer__inner {
+  height: 100%;
+  overflow: hidden;
+  background: var(--cart-cream);
+}
+
+.cart-drawer__content {
+  height: calc(100% - var(--header-height));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Container itself shouldn't scroll */
+}
+
+/* ==========================================
+   CART HEADER - MODERN DESIGN
+   ========================================== */
+
+.cart-drawer__header {
+  background: #ffffff !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 1rem 1.25rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  color: #1a1a1a !important;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+@media screen and (min-width: 750px) {
   .cart-drawer__header {
-    background-color: var(--color-background);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    padding: var(--cart-drawer-padding);
-    border-bottom: var(--style-border-width) solid none;
-    position: sticky;
-    top: 0;
-    z-index: 1;
-
-    @media screen and (min-width: 750px) {
-      padding: var(--cart-drawer-padding-desktop);
-    }
+    padding: var(--cart-drawer-padding-desktop);
   }
+}
 
+.cart-drawer__heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: #1a1a1a;
+  font-family: 'Playfair Display', serif, system-ui; /* Serif as per screenshot */
+}
+
+.cart-icon-large {
+  color: #1a1a1a;
+  flex-shrink: 0;
+}
+
+.cart-heading-text {
+  font-weight: 600;
+  font-size: 1.75rem;
+  letter-spacing: -0.02em;
+}
+
+.cart-count-bubble {
+  color: #666;
+  font-size: 0.875rem;
+  font-weight: 400;
+  opacity: 0.8;
+  margin-left: -4px;
+}
+
+/* Close Button - Modern Style */
+.cart-drawer__close-button {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: #1a1a1a;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.cart-drawer__close-button:hover {
+  opacity: 0.6;
+}
+
+.cart-drawer__close-button svg {
+  color: #1a1a1a;
+  stroke-width: 2;
+}
+
+/* ==========================================
+   EMPTY CART STATE - BEAUTIFUL DESIGN
+   ========================================== */
+
+.cart-drawer__content--empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-items: center;
+  text-align: center;
+  padding: 56px 28px 40px; /* extra top padding so content sits below header */
+  min-height: 420px;
+}
+
+.empty-cart-illustration {
+  margin-bottom: 22px;
+  justify-items: center;
+  animation: float 4s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.empty-cart-heading {
+  font-family: 'Playfair Display', serif, system-ui;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--cart-green-dark);
+  margin: 0 0 12px 0;
+  letter-spacing: -0.02em;
+}
+
+.empty-cart-text {
+  font-size: 1rem;
+  color: #666;
+  margin: 0 0 32px 0;
+  line-height: 1.5;
+}
+
+.empty-cart-btn {
+  display: block;
+  width: 320px;
+  max-width: calc(100% - 56px);
+  margin: 8px auto 0 auto;
+  padding: 14px 34px;
+  background: linear-gradient(180deg, var(--cart-green) 0%, var(--cart-green-dark) 100%);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+  box-shadow: 0 10px 24px rgba(26, 92, 58, 0.16);
+  letter-spacing: 0.02em;
+}
+
+.empty-cart-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 36px rgba(26, 92, 58, 0.18);
+}
+
+.empty-cart-btn:active {
+  transform: translateY(0);
+}
+
+/* ==========================================
+   CART ITEMS AREA
+   ========================================== */
+
+.cart-drawer__items {
+  flex: 1 1 auto; /* Take up available space */
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px;
+  background: white;
+}
+
+/* Custom Scrollbar */
+.cart-drawer__items::-webkit-scrollbar {
+  width: 6px;
+}
+
+.cart-drawer__items::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.cart-drawer__items::-webkit-scrollbar-thumb {
+  background: rgba(26, 92, 58, 0.3);
+  border-radius: 3px;
+}
+
+.cart-drawer__items::-webkit-scrollbar-thumb:hover {
+  background: rgba(26, 92, 58, 0.5);
+}
+
+/* ==========================================
+   CART SUMMARY - MODERN STICKY FOOTER
+   ========================================== */
+
+.cart-drawer__summary {
+  flex: 0 0 auto; /* Don't grow or shrink */
+  background: white;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  position: relative; /* No longer need sticky inside flex container */
+  z-index: 10;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  padding-bottom: clamp(20px, 4vh, 40px); /* Responsive bottom padding */
+}
+
+/* ==========================================
+   CART TRIGGER BUTTON (HEADER)
+   ========================================== */
+
+.cart-trigger-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.cart-trigger-btn:hover {
+  transform: scale(1.05);
+}
+
+.cart-trigger-btn:active {
+  transform: scale(0.95);
+}
+
+/* ==========================================
+   MOBILE RESPONSIVE
+   ========================================== */
+
+@media screen and (max-width: 749px) {
+  :root {
+    --cart-drawer-width: 100vw;
+    --cart-drawer-padding: 16px;
+  }
+  
   .cart-drawer__dialog {
-    overflow: hidden;
+    width: 100vw;
+    max-width: 100vw;
   }
+  
+  .cart-drawer__heading {
+    font-size: 1.125rem;
+    gap: 10px;
+  }
+  
+  .cart-count-bubble {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+  }
+  
+  .cart-drawer__close-button {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .cart-drawer__close-button svg {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .cart-icon-large {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .empty-cart-illustration svg {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .empty-cart-heading {
+    font-size: 1.25rem;
+  }
+  
+  .empty-cart-text {
+    font-size: 0.9rem;
+  }
+  
+  .empty-cart-btn {
+    padding: 12px 28px;
+    font-size: 0.95rem;
+  }
+  
+  .cart-drawer__items {
+    padding: 12px;
+  }
+}
 
-  .cart-drawer__inner {
-    height: 100%;
-    overflow: hidden;
+@media screen and (max-width: 480px) {
+  .cart-drawer__heading {
+    font-size: 1rem;
   }
+  
+  .cart-count-bubble {
+    width: 26px;
+    height: 26px;
+    font-size: 0.75rem;
+  }
+  
+  .empty-cart-content {
+    padding: 32px 20px;
+  }
+  
+  .empty-cart-heading {
+    font-size: 1.125rem;
+  }
+}
 
-  .cart-drawer__content {
-    height: calc(100% - var(--header-height));
-    display: flex;
-    flex-direction: column;
-  }
+/* ==========================================
+   ANIMATIONS & TRANSITIONS
+   ========================================== */
 
-  .cart-drawer__summary {
-    background-color: var(--color-background);
-    position: sticky;
-    bottom: 0;
-    z-index: 1;
+.cart-drawer__dialog[open] {
+  animation: slideInRight 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cart-drawer__dialog.dialog-closing {
+  animation: slideOutRight 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
   }
-{% endstylesheet %}
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* ==========================================
+   ACCESSIBILITY
+   ========================================== */
+
+.cart-drawer__close-button:focus-visible,
+.empty-cart-btn:focus-visible,
+.cart-trigger-btn:focus-visible {
+  outline: 2px solid var(--cart-green);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cart-drawer__dialog[open],
+  .empty-cart-illustration {
+    animation: none !important;
+  }
+  
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ==========================================
+   LOADING STATE
+   ========================================== */
+
+.cart-drawer__content.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.cart-drawer__content.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(26, 92, 58, 0.2);
+  border-top-color: var(--cart-green);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+</style>

@@ -54,14 +54,35 @@
             style="{% render 'submenu-font-styles', settings: block_settings %}"
           >
             {% assign list_id = 'MegaMenuList-' | append: forloop.index %}
-            {% render 'mega-menu',
-              section: section,
-              parent_link: link,
-              id: list_id,
-              menu_content_type: menu_content_type,
-              content_aspect_ratio: ratio,
-              image_border_radius: image_border_radius
-            %}
+            {% assign list_id = 'MegaMenuList-' | append: forloop.index %}
+            
+            {% comment %} Check for 3 levels of nesting OR force for specific handles {% endcomment %}
+            {% assign has_grandchildren = false %}
+            {% assign force_tree_handles = "stones-soils,fertilizers-manures,pots-structures,garden-tools-irrigation" | split: "," %}
+            
+            {% if force_tree_handles contains link.handle %}
+              {% assign has_grandchildren = true %}
+            {% else %}
+              {% for child in link.links %}
+                {% if child.links != blank %}
+                  {% assign has_grandchildren = true %}
+                  {% break %}
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+
+            {% if has_grandchildren %}
+              {% render 'mega-menu-tree', parent_link: link %}
+            {% else %}
+              {% render 'mega-menu',
+                section: section,
+                parent_link: link,
+                id: list_id,
+                menu_content_type: menu_content_type,
+                content_aspect_ratio: ratio,
+                image_border_radius: image_border_radius
+              %}
+            {% endif %}
           </div>
         </div>
       {%- endif -%}

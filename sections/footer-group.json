@@ -18,16 +18,16 @@
           "type": "benefit",
           "settings": {
             "icon": "shipping",
-            "title": "Free Shipping",
-            "description": "On all orders over $50"
+            "title": "Free shipping",
+            "description": "on orders over AED 199"
           }
         },
         "benefit_jM7dfh": {
           "type": "benefit",
           "settings": {
             "icon": "discount",
-            "title": "25% Off First Order",
-            "description": "Use code GREENES at checkout"
+            "title": "10% Off First Order",
+            "description": "Use code FIRST at checkout"
           }
         },
         "benefit_nRmLcK": {
@@ -320,7 +320,7 @@
         "block_93fecb133fe8": {
           "type": "footer-copyright",
           "settings": {
-            "show_powered_by": true,
+            "show_powered_by": false,
             "font_size": "0.75rem",
             "case": "none"
           },
@@ -338,11 +338,11 @@
           "type": "social-links",
           "settings": {
             "facebook_url": "",
-            "instagram_url": "https://www.instagram.com/shopify",
-            "youtube_url": "https://www.youtube.com/shopify",
-            "tiktok_url": "https://www.tiktok.com/@shopify",
-            "twitter_url": "https://www.twitter.com/shopify",
-            "threads_url": "https://www.threads.net/@shopify",
+            "instagram_url": "https://www.instagram.com/greenovia.ae/",
+            "youtube_url": "",
+            "tiktok_url": "",
+            "twitter_url": "",
+            "threads_url": "",
             "linkedin_url": "",
             "bluesky_url": "",
             "snapchat_url": "",
@@ -360,12 +360,12 @@
         "block_b099f0b21b25"
       ],
       "settings": {
-        "section_width": "page-width",
-        "gap": 24,
+        "section_width": "full-width",
+        "gap": 12,
         "divider_thickness": 1,
         "color_scheme": "scheme-1",
-        "padding-block-start": 20,
-        "padding-block-end": 20
+        "padding-block-start": 14,
+        "padding-block-end": 14
       }
     }
   },

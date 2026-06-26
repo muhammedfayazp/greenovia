@@ -68,7 +68,7 @@ export class DialogComponent extends Component {
   /**
    * Closes the dialog.
    */
-  closeDialog = async () => {
+  async closeDialog() {
     const { dialog } = this.refs;
 
     if (!dialog.open) return;
@@ -78,9 +78,11 @@ export class DialogComponent extends Component {
 
     dialog.classList.add('dialog-closing');
 
-    await onAnimationEnd(dialog, undefined, {
-      subtree: false,
-    });
+    // Add a safety timeout to ensure it always closes even if onAnimationEnd hangs
+    await Promise.race([
+      onAnimationEnd(dialog, undefined, { subtree: false }),
+      new Promise(resolve => setTimeout(resolve, 500))
+    ]);
 
     document.body.style.width = '';
     document.body.style.position = '';
@@ -91,18 +93,18 @@ export class DialogComponent extends Component {
     dialog.classList.remove('dialog-closing');
 
     this.dispatchEvent(new DialogCloseEvent());
-  };
+  }
 
   /**
    * Toggles the dialog.
    */
-  toggleDialog = () => {
+  toggleDialog() {
     if (this.refs.dialog.open) {
       this.closeDialog();
     } else {
       this.showDialog();
     }
-  };
+  }
 
   /**
    * Closes the dialog when the user clicks outside of it.

@@ -172,6 +172,19 @@
     assign class = class | append: ' ' | append: collapse_header_paddings_class
   endif
 %}
+{% for row in rows %}
+  <div class="header__row ...">
+    <div class="header__columns spacing-style">
+
+      <!-- Existing header content -->
+      {{ content }}
+
+      <!-- New hover menu integrated via header-menu.liquid -->
+
+    </div>
+  </div>
+{% endfor %}
+
 
 <script type="application/ld+json">
   {
@@ -277,7 +290,7 @@
 
 {% stylesheet %}
   body {
-    --header-height: 60px;
+    --header-height: 64px;
     --header-group-height: var(--header-height);
     --transparent-header-offset-boolean: 0; /* stylelint-disable-line declaration-property-value-disallowed-list */
   }
@@ -585,8 +598,8 @@
 
   /* Set header paddings based on height setting */
   .header {
-    --header-padding: var(--padding-sm);
-    --font-paragraph--line-height: 1;
+    --header-padding: var(--padding-xs);
+    --font-paragraph--line-height: 1.1;
     contain: layout style;
   }
 
@@ -595,7 +608,7 @@
   }
 
   .header.header--compact {
-    --header-padding: var(--padding-2xs);
+    --header-padding: 6px;
   }
 
   .header__columns {
@@ -642,6 +655,8 @@
       margin-top: calc(var(--header-height) * var(--transparent-header-offset-boolean) * -1);
     }
   }
+
+  
 {% endstylesheet %}
 
 {% unless request.design_mode %}

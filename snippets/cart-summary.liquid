@@ -1,5 +1,5 @@
 {%- doc -%}
-  Renders the cart summary totals.
+  Renders the cart summary totals - Minimalist Design.
 
   @param {string} [accelerated_checkout_buttons_layout] - { 'vertical' } Forced layout of the additional checkout buttons, instead of relying on platform's layout.
 {%- enddoc -%}
@@ -9,7 +9,7 @@
   <div class="cart__original-total-container cart-primary-typography">
     {%- if cart.cart_level_discount_applications.size > 0 -%}
       <span class="cart__summary-item cart__original-total">
-        <span class="cart__original-total-label">{{ 'content.cart_subtotal' | t }}</span>
+        <span class="cart__original-total-label">Subtotal</span>
         <span class="cart__original-total-value cart-secondary-typography">
           {{- cart.original_total_price | money -}}
         </span>
@@ -23,8 +23,12 @@
           {%- for discount in cart.cart_level_discount_applications -%}
             <li class="cart__summary-item cart__discount">
               <span class="cart__discount-label">
-                {{- 'icon-discount.svg' | inline_asset_content -}}
-                {{ discount.title | escape }}
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="9" cy="9" r="7"/>
+                  <path d="M15 15l6 6"/>
+                  <path d="M11 6v6M8 9h6"/>
+                </svg>
+                <span class="cart__discount-title">{{ discount.title | escape }}</span>
               </span>
               <span class="cart__discount-value cart-secondary-typography"
                 >-{{ discount.total_allocated_amount | money -}}
@@ -63,7 +67,7 @@
       class="cart__summary-item cart__total"
       role="status"
     >
-      <span class="cart__total-label cart-primary-typography">{{ 'content.cart_estimated_total' | t }}</span>
+      <span class="cart__total-label cart-primary-typography">Total</span>
       <text-component
         ref="cartTotal"
         value="{{ total_price | strip_html }}"
@@ -85,55 +89,337 @@
       {% render 'tax-info', has_discounts_enabled: settings.show_add_discount_code %}
     </div>
   </div>
-</div>
 
-<div class="cart__ctas">
-  <button
-    type="submit"
-    id="checkout"
-    class="cart__checkout-button button"
-    name="checkout"
-    {% if cart == empty %}
-      disabled
-    {% endif %}
-    form="cart-form"
-  >
-    {{ 'content.checkout' | t }}
-  </button>
-
-  {% if additional_checkout_buttons and settings.show_accelerated_checkout_buttons %}
-    <div
-      class="
-        additional-checkout-buttons
-        {% if accelerated_checkout_buttons_layout == 'vertical' %}additional-checkout-buttons--vertical{% endif %}
-      "
+  <div class="cart__ctas">
+    <button
+      type="submit"
+      id="checkout"
+      class="cart__checkout-button button"
+      name="checkout"
+      {% if cart == empty %}
+        disabled
+      {% endif %}
+      form="cart-form"
     >
-      {{ content_for_additional_checkout_buttons }}
-    </div>
-  {% endif %}
+      Checkout
+    </button>
+
+    {% if additional_checkout_buttons and settings.show_accelerated_checkout_buttons %}
+      <div
+        class="
+          additional-checkout-buttons
+          {% if accelerated_checkout_buttons_layout == 'vertical' %}additional-checkout-buttons--vertical{% endif %}
+        "
+      >
+        {{ content_for_additional_checkout_buttons }}
+      </div>
+    {% endif %}
+  </div>
 </div>
 
-{% stylesheet %}
+<style>
+  /* ==========================================
+     MINIMALIST CART SUMMARY
+     ========================================== */
+
+  :root {
+    --cart-primary: #1a5c3a;
+    --cart-primary-hover: #174F19;
+    --cart-text-primary: #1a1a1a;
+    --cart-text-secondary: #666666;
+    --cart-border: #e5e5e5;
+    --cart-success: #10b981;
+    --cart-success-bg: #ecfdf5;
+  }
+
+  /* Cart Actions */
   .cart-actions {
     display: flex;
     flex-direction: column;
-    gap: var(--gap-sm);
-    border-block: 1px solid var(--color-border);
-    padding-block: var(--padding-sm);
-    margin-block-start: var(--margin-3xs);
+    gap: 0.625rem;
+    border-top: 1px solid var(--cart-border);
+    padding: 0.875rem 0;
+    margin-top: 0.625rem;
   }
 
   .cart-actions__divider {
-    border-block-start: 1px solid var(--color-border);
+    border-top: 1px solid var(--cart-border);
+    margin: 0.25rem 0;
+  }
+
+  /* Summary Totals Container */
+  .cart__summary-totals {
+    padding: 0.5rem 0 1rem 0; /* Reduced padding */
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   }
 
   .cart__summary-totals:not(:has(.cart-actions)) {
-    margin-block-start: var(--margin-3xs);
-    border-block-start: 1px solid var(--color-border);
-    padding-block-start: var(--margin-xl);
+    margin-top: 0.5rem;
+    border-top: 1px solid var(--cart-border);
+    padding-top: 0.5rem;
   }
 
-  .cart__installments {
-    color: var(--color-foreground);
+  /* Original Total (Subtotal) */
+  .cart__original-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0.5rem 0;
   }
-{% endstylesheet %}
+
+  .cart__original-total-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--cart-text-secondary);
+    letter-spacing: -0.01em;
+  }
+
+  .cart__original-total-value {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--cart-text-primary);
+    letter-spacing: -0.01em;
+  }
+
+  /* Discounts Section */
+  .cart__summary-discounts {
+    margin-top: 0.5rem;
+  }
+
+  .discounts {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .cart__discount {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0.625rem 0.875rem;
+    background: var(--cart-success-bg);
+    border: 1px solid #a7f3d0;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+  }
+
+  .cart__discount:last-child {
+    margin-bottom: 0;
+  }
+
+  .cart__discount-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #047857;
+    letter-spacing: -0.01em;
+  }
+
+  .cart__discount-label svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    stroke: #047857;
+  }
+
+  .cart__discount-title {
+    line-height: 1.3;
+  }
+
+  .cart__discount-value {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #047857;
+    white-space: nowrap;
+    letter-spacing: -0.01em;
+  }
+
+  /* Total Container */
+  .cart__total-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    width: 100%;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .cart__total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0.75rem 0;
+    border-top: 1px solid #d0d0d0;
+  }
+
+  .cart__total-label {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--cart-text-primary);
+    text-transform: none;
+    letter-spacing: -0.02em;
+  }
+
+  .cart__total-value {
+    font-size: 1.375rem;
+    font-weight: 800;
+    color: var(--cart-text-primary);
+    letter-spacing: -0.02em;
+  }
+
+  /* Installments */
+  .cart__installments {
+    color: var(--cart-text-secondary);
+    font-size: 0.75rem;
+    line-height: 1.5;
+  }
+
+  /* Tax Note */
+  .tax-note {
+    font-size: 0.6875rem;
+    color: var(--cart-text-secondary);
+    line-height: 1.5;
+  }
+
+  /* CTAs Container */
+  .cart__ctas {
+    margin-top: 0.75rem;
+    padding-bottom: 0.5rem;
+  }
+
+  /* Checkout Button - Minimalist */
+  .cart__checkout-button {
+    background: var(--cart-primary);
+    color: #ffffff;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    width: 100%;
+    padding: 1rem 1.5rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .cart__checkout-button:hover:not(:disabled) {
+    background: var(--cart-primary-hover);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+  }
+
+  .cart__checkout-button:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .cart__checkout-button:disabled {
+    background: #e5e5e5;
+    color: #999999;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  /* Additional checkout buttons */
+  .additional-checkout-buttons {
+    margin-top: 0.75rem;
+    padding-bottom: 0.5rem;
+  }
+
+  /* Mobile Responsive */
+  @media screen and (max-width: 749px) {
+    .cart__summary-totals {
+      padding-bottom: 1rem;
+    }
+
+    .cart__ctas {
+      padding-bottom: 1rem;
+    }
+
+    .cart__checkout-button {
+      margin-bottom: 0.5rem;
+      font-size: 0.9375rem;
+    }
+
+    .cart__total-value {
+      font-size: 1.25rem;
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .cart__total-label {
+      font-size: 0.9375rem;
+    }
+
+    .cart__total-value {
+      font-size: 1.125rem;
+    }
+
+    .cart__checkout-button {
+      font-size: 0.875rem;
+      padding: 0.875rem 1.25rem;
+    }
+  }
+</style>
+
+<script>
+  // Listen for cart updates and update totals dynamically
+  document.addEventListener('cart:updated', function(event) {
+    const cart = event.detail;
+    
+    const moneyFormat = window.theme && window.theme.moneyFormat ? window.theme.moneyFormat : '{{amount}}';
+    
+    function formatMoney(cents) {
+      if (typeof Shopify !== 'undefined' && Shopify.formatMoney) {
+        return Shopify.formatMoney(cents, moneyFormat);
+      }
+      return 'Dhs. ' + (cents / 100).toFixed(2);
+    }
+    
+    // Update estimated total
+    const cartTotalValueEl = document.querySelector('.cart__total-value');
+    if (cartTotalValueEl && cart.total_price !== undefined) {
+      const formattedPrice = formatMoney(cart.total_price);
+      cartTotalValueEl.textContent = formattedPrice;
+      
+      const textComponent = document.querySelector('text-component[ref="cartTotal"]');
+      if (textComponent) {
+        textComponent.setAttribute('value', formattedPrice);
+      }
+    }
+    
+    // Update original total (subtotal) if there are discounts
+    const originalTotalEl = document.querySelector('.cart__original-total-value');
+    if (originalTotalEl && cart.original_total_price !== undefined) {
+      originalTotalEl.textContent = formatMoney(cart.original_total_price);
+    }
+    
+    // Update discount amounts
+    if (cart.cart_level_discount_applications && cart.cart_level_discount_applications.length > 0) {
+      cart.cart_level_discount_applications.forEach((discount, index) => {
+        const discountValueEl = document.querySelectorAll('.cart__discount-value')[index];
+        if (discountValueEl) {
+          discountValueEl.textContent = '-' + formatMoney(discount.total_allocated_amount);
+        }
+      });
+    }
+    
+    // Disable/enable checkout button based on cart count
+    const checkoutBtn = document.getElementById('checkout');
+    if (checkoutBtn) {
+      if (cart.item_count === 0) {
+        checkoutBtn.disabled = true;
+      } else {
+        checkoutBtn.disabled = false;
+      }
+    }
+  });
+</script>

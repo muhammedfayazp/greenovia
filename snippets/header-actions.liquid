@@ -174,13 +174,14 @@
   }
 
   .cart-drawer--empty .cart-drawer__header {
-    justify-content: right;
+    justify-content: left;
     border-bottom: none;
     padding-bottom: 0;
   }
 
   .cart-drawer--empty .cart-drawer__heading {
     text-align: center;
+    font-size: x-large;
   }
 
   .cart-drawer:not(:has(.cart-form)) .cart-items__wrapper {
@@ -222,34 +223,52 @@
   }
 
   .header-actions__cart-icon {
-    --cart-bubble-size: 20px;
-    --cart-bubble-top: 4.5px;
-    --cart-bubble-right: 2.5px;
+    --cart-bubble-size: 16px;
+    --cart-bubble-top: -5px;
+    --cart-bubble-right: -5px;
 
+    /* cart-icon is a custom element; browsers default custom elements to
+       display:inline which breaks position:absolute on child elements.
+       inline-flex gives it a proper layout box so right/top offsets work. */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     position: relative;
   }
 
   .header-actions__cart-icon .cart-bubble {
     position: absolute;
-    width: var(--cart-bubble-size, 20px);
+    min-width: var(--cart-bubble-size, 16px);
+    width: auto;
+    height: var(--cart-bubble-size, 16px);
     top: var(--cart-bubble-top);
     right: var(--cart-bubble-right);
+    padding: 0 4px;
+    border-radius: 100px;
+    aspect-ratio: unset;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid #fff; /* Border instead of mask for better flexibility */
+    box-sizing: border-box;
   }
 
   .header-actions__cart-icon .cart-bubble__text,
   .cart-drawer__heading .cart-bubble__text {
     font-family: var(--font-paragraph--family);
     font-weight: var(--font-paragraph--weight);
+    font-size: 10px;
+    letter-spacing: 0.02em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .header-actions__cart-icon .cart-bubble__text-count {
+    letter-spacing: 0.05em; /* Extra space for small counts */
   }
 
   .header-actions__cart-icon.header-actions__cart-icon--has-cart svg {
-    /* Create donut mask where the cart bubble sits */
-    mask: radial-gradient(
-      calc(var(--cart-bubble-size) + 2px) at calc(100% - var(--cart-bubble-right)) var(--cart-bubble-top),
-      transparent 45.45%,
-      #fff 45.45%,
-      #fff 100%
-    );
+    /* Mask removed to prevent cutting off multi-digit pill-shaped bubbles */
   }
 
   .cart-drawer__heading .cart-bubble__background {

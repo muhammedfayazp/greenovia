@@ -1,16 +1,16 @@
 @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap");
 
-:root{
-  --gv-primary:#2D5016;
-  --gv-secondary:#5A7C3E;
-  --gv-bg:#FAFAF8;
-  --gv-white:#FFFFFF;
-  --gv-text:#2C2C2C;
-  --gv-muted:#6B6B6B;
+:root {
+  --gv-primary: #2D5016;
+  --gv-secondary: #5A7C3E;
+  --gv-bg: #FFFFFF;
+  --gv-white: #FFFFFF;
+  --gv-text: #2C2C2C;
+  --gv-muted: #6B6B6B;
 
-  --gv-font-heading:"Playfair Display", serif;
-  --gv-font-body:"Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  --gv-font-ui:"Montserrat", "Inter", system-ui, sans-serif;
+  --gv-font-heading: "Playfair Display", serif;
+  --gv-font-body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --gv-font-ui: "Montserrat", "Inter", system-ui, sans-serif;
 }
 
 /* Base Utility Classes - Extremely robust to block leakage */
@@ -52,55 +52,66 @@
 }
 
 /* Base typography */
-body{
+body {
   font-family: var(--gv-font-body);
   color: var(--gv-text);
   background: var(--gv-bg);
   line-height: 1.6;
 }
 
-h1,h2,h3,h4,h5,h6{
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--gv-font-heading);
   font-weight: 600;
   line-height: 1.15;
   color: var(--gv-primary);
 }
 
-a{ text-decoration:none; color:inherit; }
-a:hover{ color: var(--gv-secondary); }
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+a:hover {
+  color: var(--gv-secondary);
+}
 
 /* Buttons */
 button,
 input[type="submit"],
 .button,
 .btn,
-.hero-btn{
+.hero-btn {
   font-family: var(--gv-font-ui);
   font-weight: 600;
-  letter-spacing:.03em;
+  letter-spacing: .03em;
 }
 
 /* Header safety */
 .header,
-header-component{
+header-component {
   position: relative;
   z-index: 200;
 }
 
 .header img,
-header-component img{
-  width:auto !important;
-  height:auto !important;
-  max-width:none !important;
-  display:inline-block !important;
+header-component img {
+  width: auto !important;
+  height: auto !important;
+  /* max-width: none !important; */
+  display: inline-block !important;
 }
 
 /* Header icons alignment */
 .header__icons,
-.header-actions{
-  display:flex !important;
-  align-items:center !important;
-  gap:12px !important;
+.header-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
 }
 
 /* Fix boxed cart icon and generic button boxes */
@@ -120,21 +131,21 @@ header-component img{
 .header__icon,
 .header__icon--search,
 .header__icon--account,
-.header__icon--cart{
-  display:inline-flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  width:36px !important;
-  height:36px !important;
-  padding:0 !important;
+.header__icon--cart {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 36px !important;
+  height: 36px !important;
+  padding: 0 !important;
 }
 
 /* Icon graphics */
 .header__icon svg,
-.header__icon img{
-  width:18px !important;
-  height:18px !important;
-  display:block !important;
+.header__icon img {
+  width: 18px !important;
+  height: 18px !important;
+  display: block !important;
 }
 
 /* Menu typography via variables */
@@ -152,30 +163,39 @@ main img,
 .collection img,
 .card img,
 .article img,
-.plant-hero img{
-  max-width:100%;
-  height:auto;
-  display:block;
+.plant-hero img {
+  max-width: 100%;
+  height: auto;
+  display: block;
 }
 
 
 /* Header vertical padding */
 @media (min-width: 990px) {
-  .header, header-component, #header-group {
+
+  .header,
+  header-component,
+  #header-group {
     padding-bottom: 22px !important;
   }
 }
+
 @media (max-width: 989px) {
-  .header, header-component, #header-group {
+
+  .header,
+  header-component,
+  #header-group {
     padding-bottom: 14px !important;
   }
 }
+
 /* ===============================
    REMOVE TOP GAP ON SCROLL
 ================================ */
 
 /* Reset default browser spacing */
-html, body {
+html,
+body {
   margin: 0 !important;
   padding: 0 !important;
 }
@@ -205,62 +225,71 @@ main,
 html {
   overscroll-behavior: none;
 }
+
 /* 🌿 Global modern quantity counter */
-.qty--modern{
-  display:flex;
-  align-items:center;
-  background:#f6f7f2;
-  border-radius:999px;
-  padding:4px;
-  gap:4px;
-  box-shadow: inset 0 0 0 1px #e3e6de;
+.qty--modern {
+  display: flex;
+  align-items: center;
+  background: var(--gv-primary);
+  border-radius: 999px;
+  padding: 4px;
+  gap: 4px;
+  box-shadow: none;
   max-width: fit-content;
 }
 
-.qty--modern .qty__btn{
-  width:28px;
-  height:28px;
-  border:none;
-  border-radius:50%;
-  background:#fff;
-  color:#1f3d2b;
-  font-size:18px;
-  line-height:1;
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+.qty--modern .qty__btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: background .2s ease, transform .15s ease, box-shadow .2s ease;
-  box-shadow: 0 2px 6px rgba(0,0,0,.08);
+  box-shadow: none;
 }
 
-.qty--modern .qty__btn:hover{
-  background:#1f3d2b;
-  color:#fff;
+.qty--modern .qty__btn:hover {
+  background: #4a9b6f;
+  color: #fff;
   transform: scale(1.05);
 }
 
-.qty--modern .qty__btn:active{
+.qty--modern .qty__btn:active {
   transform: scale(.95);
 }
 
-.qty--modern .qty__input{
-  width:36px;
-  text-align:center;
-  border:none;
-  background:transparent;
-  font-size:14px;
-  font-weight:600;
-  color:#1f3d2b;
-  outline:none;
+.qty--modern .qty__input {
+  width: 40px;
+  text-align: center;
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  outline: none;
   appearance: textfield;
 }
 
-.qty--modern .qty__input::-webkit-outer-spin-button,
-.qty--modern .qty__input::-webkit-inner-spin-button{
-  -webkit-appearance: none;
-  margin:0;
+.qty--modern .qty__input:hover,
+.qty--modern .qty__input:focus {
+  background: transparent !important;
+  outline: none;
 }
+
+.qty--modern .qty__input::-webkit-outer-spin-button,
+.qty--modern .qty__input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 /* ===============================
    CUSTOM VARIANT PICKER (PILLS)
 ================================ */
@@ -279,8 +308,8 @@ html {
 
 /* Style the label which acts as the button */
 .variant-option__button-label,
-.product-form__input input[type=radio] + label {
-  border-radius: 50px !important;
+.product-form__input input[type=radio]+label {
+  border-radius: 4px !important;
   padding: 10px 24px !important;
   font-family: var(--gv-font-ui) !important;
   font-weight: 600 !important;
@@ -291,14 +320,14 @@ html {
   color: var(--gv-text) !important;
   background-color: transparent !important;
   transition: all 0.2s ease !important;
-  min-width: 80px !important;
+  white-space: nowrap !important;
+  min-width: 120px !important;
+  width: auto !important;
+  padding: 10px 30px !important;
   display: inline-flex !important;
   justify-content: center !important;
   align-items: center !important;
-  box-shadow: none !important;
-  cursor: pointer !important;
-  margin: 0 !important;
-  overflow: hidden !important;
+  text-align: center !important;
 }
 
 /* Hide the inner pill element if it exists from default theme */
@@ -315,16 +344,16 @@ html {
 
 /* Hover state */
 .variant-option__button-label:hover,
-.product-form__input input[type=radio] + label:hover {
-  border-color: var(--gv-secondary) !important;
+.product-form__input input[type=radio]+label:hover {
+  border-color: var(--gv-primary) !important;
   color: var(--gv-primary) !important;
-  background-color: #f4f8f4 !important;
+  background-color: transparent !important;
 }
 
 /* Selected / Checked state */
 .variant-option__button-label:has(:checked),
 .variant-option__button-label[data-current-checked="true"],
-.product-form__input input[type=radio]:checked + label {
+.product-form__input input[type=radio]:checked+label {
   background-color: var(--gv-primary) !important;
   color: var(--gv-white) !important;
   border-color: var(--gv-primary) !important;
@@ -341,7 +370,7 @@ html {
 
 /* Available/Unavailable logic visual cue */
 .variant-option__button-label:has([data-option-available='false']),
-.product-form__input input[type=radio]:disabled + label {
+.product-form__input input[type=radio]:disabled+label {
   opacity: 0.6 !important;
   background-color: #f9f9f9 !important;
   color: #a0a0a0 !important;
@@ -385,10 +414,13 @@ html {
   width: 40px !important;
   height: 40px !important;
   min-width: 40px !important;
-  border: 1px solid rgba(0,0,0,0.1) !important; /* Subtle border for white swatches */
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  /* Subtle border for white swatches */
   position: relative;
-  overflow: visible !important; /* Allow outline to show */
-  background: none !important; /* Remove pill background */
+  overflow: visible !important;
+  /* Allow outline to show */
+  background: none !important;
+  /* Remove pill background */
   box-shadow: none !important;
 }
 
@@ -422,7 +454,8 @@ html {
   opacity: 0.5 !important;
   position: relative;
   cursor: not-allowed;
-  transform: none !important; /* Prevent scale on hover */
+  transform: none !important;
+  /* Prevent scale on hover */
 }
 
 /* Cross out line for unavailable */
@@ -459,21 +492,24 @@ slideshow-component {
   z-index: 2 !important;
   display: flex !important;
   justify-content: space-between !important;
-  pointer-events: none !important; /* Let clicks pass through config area */
+  pointer-events: none !important;
+  /* Let clicks pass through config area */
   padding: 0 10px !important;
-  margin-top: -30px; /* Adjust for thumbnail height if needed */
+  margin-top: -30px;
+  /* Adjust for thumbnail height if needed */
 }
 
 .slider-button {
   position: relative !important;
-  pointer-events: auto !important; /* Re-enable pointer events for buttons */
+  pointer-events: auto !important;
+  /* Re-enable pointer events for buttons */
   background: rgba(255, 255, 255, 0.8) !important;
-  border: 1px solid rgba(0,0,0,0.1) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
   border-radius: 50% !important;
   width: 44px !important;
   height: 44px !important;
   color: var(--gv-primary) !important;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
   transition: all 0.2s ease !important;
 }
 
@@ -498,11 +534,14 @@ slideshow-component {
   flex-wrap: nowrap !important;
   overflow-x: auto !important;
   scroll-behavior: smooth;
-  scrollbar-width: none; /* Hide scrollbar Firefox */
+  scrollbar-width: none;
+  /* Hide scrollbar Firefox */
   gap: 10px !important;
 }
+
 .thumbnail-list::-webkit-scrollbar {
-    display: none; /* Hide scrollbar Chrome/Safari */
+  display: none;
+  /* Hide scrollbar Chrome/Safari */
 }
 
 
@@ -522,3 +561,213 @@ slideshow-component {
   background-color: var(--swatch-background);
 }
 
+/* Mega Menu Tree Styles */
+.mega-menu-tree {
+  width: 100%;
+  padding-top: 0;
+  padding-bottom: 0;
+  border-top: 1px solid rgba(var(--color-foreground), 0.08);
+}
+
+.mega-menu-tree__container {
+  display: flex;
+  background-color: rgb(var(--color-background));
+  min-height: 450px;
+}
+
+/* Sidebar Styles */
+.mega-menu-tree__sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  background-color: rgba(var(--color-foreground), 0.03);
+  /* Subtle gray background */
+  border-right: 1px solid rgba(var(--color-foreground), 0.08);
+  padding: 2rem 0;
+}
+
+.mega-menu-tree__sidebar-list {
+  padding: 0 1.5rem;
+}
+
+.mega-menu-tree__sidebar-item {
+  margin-bottom: 4px;
+}
+
+.mega-menu-tree__sidebar-link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  text-decoration: none;
+  color: rgb(var(--color-foreground));
+  font-weight: 500;
+  font-size: 1rem;
+  border-radius: var(--button-radius, 8px);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.mega-menu-tree__sidebar-link:hover {
+  background-color: rgba(var(--color-foreground), 0.05);
+  color: rgb(var(--color-foreground));
+}
+
+.mega-menu-tree__sidebar-link.is-active {
+  background-color: var(--gv-primary);
+  /* Use theme primary color */
+  color: #ffffff;
+  /* White text on active */
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(45, 80, 22, 0.15);
+  /* Soft shadow */
+}
+
+/* Arrow styling */
+.mega-menu-tree__arrow {
+  opacity: 0.5;
+  transition: transform 0.2s ease;
+}
+
+.mega-menu-tree__sidebar-link:hover .mega-menu-tree__arrow {
+  opacity: 1;
+  transform: translateX(2px);
+}
+
+.mega-menu-tree__sidebar-link.is-active .mega-menu-tree__arrow {
+  opacity: 1;
+  color: #ffffff;
+}
+
+/* Right Content Styles */
+.mega-menu-tree__content {
+  flex-grow: 1;
+  padding: 2.5rem 3rem;
+}
+
+.mega-menu-tree__content-panel {
+  display: none;
+  animation: fadeIn 0.25s ease-out forwards;
+}
+
+.mega-menu-tree__content-panel.is-visible {
+  display: block;
+}
+
+/* Grid layout for links */
+.mega-menu-tree__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem 1.5rem;
+  align-items: start;
+}
+
+.mega-menu-tree__grid-item {
+  margin-bottom: 0;
+}
+
+.mega-menu-tree__grid-link {
+  text-decoration: none;
+  color: rgb(var(--color-foreground));
+  font-size: 0.95rem;
+  line-height: 1.4;
+  transition: color 0.2s ease;
+  display: inline-block;
+  padding: 4px 0;
+}
+
+.mega-menu-tree__grid-link:hover {
+  color: var(--gv-secondary);
+  transform: translateX(2px);
+}
+
+.mega-menu-tree__empty {
+  color: rgba(var(--color-foreground), 0.6);
+  font-style: italic;
+  padding: 2rem;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile responsiveness */
+@media screen and (max-width: 989px) {
+  .mega-menu-tree__container {
+    flex-direction: column;
+  }
+
+  .mega-menu-tree__sidebar {
+    width: 100%;
+    border-right: none;
+    background: transparent;
+    padding: 1rem 0;
+  }
+
+  .mega-menu-tree__content {
+    display: none;
+    /* Hide content on mobile detailed view to rely on standard mobile menu */
+  }
+}
+
+/* ===============================
+   PREMIUM MENU REFINEMENTS
+================================ */
+
+/* Top Level Links */
+.menu-list__link {
+  font-family: var(--menu-top-level-font-family);
+  font-weight: 700 !important;
+  /* Bold headers */
+  font-size: 1rem !important;
+  /* Larger text */
+  letter-spacing: 0.02em;
+  padding: 1.25rem 1rem !important;
+  /* More breathing room */
+  transition: color 0.2s ease;
+  position: relative;
+}
+
+.menu-list__link:hover {
+  color: var(--gv-primary);
+}
+
+/* Underline effect on hover */
+.menu-list__link::after {
+  content: '';
+  position: absolute;
+  bottom: 0.75rem;
+  left: 1rem;
+  width: 0;
+  height: 2px;
+  background-color: var(--gv-primary);
+  transition: width 0.3s ease;
+}
+
+.menu-list__link:hover::after,
+.menu-list__link--active::after {
+  width: calc(100% - 2rem);
+}
+
+/* Mega Menu Dropdown Container - Floating Card Effect */
+.menu-list__submenu {
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1) !important;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+/* Make sure the tree runs flush */
+.mega-menu-tree {
+  border-top: none;
+}
+
+/* Cart counter badge — positioning fix moved to snippets/header-actions.liquid */
