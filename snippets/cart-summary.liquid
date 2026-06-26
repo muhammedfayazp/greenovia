@@ -385,7 +385,7 @@
     const cartTotalValueEl = document.querySelector('.cart__total-value');
     if (cartTotalValueEl && cart.total_price !== undefined) {
       const formattedPrice = formatMoney(cart.total_price);
-      cartTotalValueEl.textContent = formattedPrice;
+      cartTotalValueEl.innerHTML = formattedPrice;
       
       const textComponent = document.querySelector('text-component[ref="cartTotal"]');
       if (textComponent) {
