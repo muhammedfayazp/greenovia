@@ -44,7 +44,15 @@
                     
                     <div class="catprodrows__bottom">
                       <div class="catprodrows__price">
-                        {{ product.price | money }}
+                        {%- if product.price == 0 -%}
+                          {%- if product.compare_at_price > 0 -%}
+                            {{ product.compare_at_price | money }}
+                          {%- else -%}
+                            <span class="catprodrows__price--na">—</span>
+                          {%- endif -%}
+                        {%- else -%}
+                          {{ product.price | money }}
+                        {%- endif -%}
                       </div>
 
                       {%- assign cart_qty = cart | item_count_for_variant: product.selected_or_first_available_variant.id -%}
@@ -265,13 +273,13 @@
   position: relative;
   display: flex;
   justify-content: flex-end;
-  height: 40px;
+  height: 34px;
   margin-top: 8px;
 }
 
 .catprodrows__atc-trigger {
-  width: 40px;
-  height: 40px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   background: #1f3d2b;
   color: #fff;
@@ -285,23 +293,23 @@
 }
 
 .catprodrows__atc-trigger svg {
-  width: 20px;
-  height: 20px;
+  width: 17px;
+  height: 17px;
 }
 
 .catprodrows__qty-selector {
   position: absolute;
   right: 0;
   top: 0;
-  height: 40px;
-  width: 40px;
-  min-width: 40px;
+  height: 34px;
+  width: 34px;
+  min-width: 34px;
   background: #1f3d2b;
-  border-radius: 20px;
+  border-radius: 17px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 4px;
+  padding: 0 3px;
   overflow: hidden;
   opacity: 0;
   pointer-events: none;
@@ -318,14 +326,14 @@
 
 .catprodrows__actions.is-active .catprodrows__qty-selector {
   width: auto;
-  min-width: 105px;
+  min-width: 92px;
   opacity: 1;
   pointer-events: auto;
 }
 
 .catprodrows__qty-selector .qty__btn {
-  width: 32px;
-  height: 32px;
+  width: 26px;
+  height: 26px;
   flex-shrink: 0;
   border-radius: 50%;
   background: rgba(255,255,255,0.15);
@@ -335,7 +343,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 16px;
   padding: 0;
   transition: background 0.2s ease;
 }
@@ -364,11 +372,11 @@
 .catprodrows__qty-selector .qty__current {
   color: #fff;
   font-weight: 700;
-  font-size: 15px;
+  font-size: 13px;
   line-height: 1;
   flex: 1;
   text-align: center;
-  min-width: 24px;
+  min-width: 20px;
 }
 
 .catprodrows__bottom {
@@ -385,6 +393,11 @@
   font-weight: 700;
   color: #1f3d2b;
   white-space: nowrap;
+}
+.catprodrows__price--na {
+  color: #aaa;
+  font-weight: 400;
+  font-size: 14px;
 }
 
 .catprodrows__form-wrapper {
