@@ -20,20 +20,13 @@
           <div class="catprodrows__swiper swiper swiper-{{ block.id }}">
             <div class="swiper-wrapper">
               {% for product in col.products limit: 12 %}
-                {% if product.available %}
-                <div class="catprodrows__card swiper-slide">
-                  
+                <div class="catprodrows__card swiper-slide{% unless product.available %} catprodrows__card--soldout{% endunless %}">
+
                   <div class="catprodrows__img-container">
-                    {% comment %} <button type="button" 
-                            class="catprodrows__heart" 
-                            aria-label="Add to wishlist"
-                            data-product-id="{{ product.id }}"
-                            data-product-handle="{{ product.handle }}"
-                            onclick="toggleWishlist(this)">
-                      <svg class="heart-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                      <svg class="heart-filled" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                    </button> {% endcomment %}
-                    
+                    {% unless product.available %}
+                      <span class="catprodrows__soldout-badge">Sold Out</span>
+                    {% endunless %}
+
                     <a href="{{ product.url }}" class="catprodrows__img">
                       {% if product.featured_image %}
                         <img
@@ -86,7 +79,8 @@
                           </cart-quantity-selector-component>
 
                           <add-to-cart-component class="catprodrows__atc-wrapper">
-                            <button type="submit" class="catprodrows__atc-trigger" aria-label="Add to cart" ref="addToCartButton">
+                            <button type="submit" class="catprodrows__atc-trigger" aria-label="Add to cart" ref="addToCartButton"
+                              {% unless product.available %}disabled aria-disabled="true"{% endunless %}>
                               {{ 'icon-add-to-cart.svg' | inline_asset_content }}
                             </button>
                           </add-to-cart-component>
@@ -97,7 +91,6 @@
                   </div>
 
                 </div>
-                {% endif %}
               {% endfor %}
             </div>
           </div>
@@ -145,6 +138,34 @@
   box-shadow: 0 6px 18px rgba(0,0,0,.08);
   height: 100%;
 }
+/* Sold-out badge */
+.catprodrows__soldout-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #888;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Dim sold-out cards slightly */
+.catprodrows__card--soldout {
+  opacity: 0.75;
+}
+
+/* Disable button style for sold-out */
+.catprodrows__atc-trigger:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .catprodrows__img-container {
   position: relative;
   overflow: hidden;
