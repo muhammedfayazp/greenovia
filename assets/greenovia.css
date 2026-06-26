@@ -769,3 +769,40 @@ slideshow-component {
 .mega-menu-tree {
   border-top: none;
 }
+
+/* ===============================
+   FIX: CART COUNTER BADGE POSITION
+================================ */
+
+/*
+  cart-icon is a custom element — browsers treat custom elements as
+  display:inline by default, which breaks position:absolute on child
+  elements. Forcing inline-flex + position:relative makes it a proper
+  positioning container so the bubble renders at the correct corner.
+*/
+cart-icon,
+cart-icon.header-actions__cart-icon {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Badge sits at the top-right corner of the cart icon */
+.header-actions__cart-icon .cart-bubble {
+  position: absolute !important;
+  top: -6px !important;
+  right: -6px !important;
+  left: auto !important;
+  bottom: auto !important;
+  width: 20px !important;
+  min-width: 20px !important;
+  z-index: 10 !important;
+  pointer-events: none;
+}
+
+/* Keep CSS-variable-driven mask in sync with updated position */
+.header-actions__cart-icon {
+  --cart-bubble-top: -6px;
+  --cart-bubble-right: -6px;
+}
