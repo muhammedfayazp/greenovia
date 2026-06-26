@@ -210,6 +210,10 @@
     cursor: pointer;
     display: flex;
     justify-content: center;
+    /* Use the <a> tag as the positioning anchor for the cart bubble.
+       Custom elements (cart-icon) are unreliable as containing blocks
+       because browsers may not honour position:relative on them. */
+    position: relative;
   }
 
   .header-actions__action .svg-wrapper {
@@ -223,17 +227,13 @@
   }
 
   .header-actions__cart-icon {
-    --cart-bubble-size: 16px;
-    --cart-bubble-top: -5px;
-    --cart-bubble-right: -5px;
+    --cart-bubble-size: 18px;
+    --cart-bubble-top: -6px;
+    --cart-bubble-right: -6px;
 
-    /* cart-icon is a custom element; browsers default custom elements to
-       display:inline which breaks position:absolute on child elements.
-       inline-flex gives it a proper layout box so right/top offsets work. */
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
+    /* Do NOT set position:relative here — it fights with the <a> anchor above.
+       Custom elements are unreliable containing blocks in some browsers. */
+    display: contents;
   }
 
   .header-actions__cart-icon .cart-bubble {
