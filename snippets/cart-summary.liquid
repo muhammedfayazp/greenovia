@@ -55,12 +55,9 @@
   {% endif %}
 
   {%- liquid
-    if settings.currency_code_enabled_cart_total
-      assign total_price = cart.total_price | money_with_currency
-    else
-      assign total_price = cart.total_price | money
-    endif
+    assign total_price_value = cart.total_price | money_without_currency
   -%}
+  {%- assign total_price = '&#x20C3;' | append: total_price_value -%}
 
   <div class="cart__total-container{% if settings.show_installments %} cart__total-container--has-installments{% endif %}">
     <span
@@ -379,9 +376,10 @@
     
     function formatMoney(cents) {
       if (typeof Shopify !== 'undefined' && Shopify.formatMoney) {
-        return Shopify.formatMoney(cents, moneyFormat);
+        const raw = Shopify.formatMoney(cents, '{{amount}}');
+        return '⃃' + raw;
       }
-      return 'Dhs. ' + (cents / 100).toFixed(2);
+      return '⃃' + (cents / 100).toFixed(2);
     }
     
     // Update estimated total

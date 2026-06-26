@@ -116,13 +116,12 @@
                     </div>
                   {% endif %}
                 </div>
-                <div class="cart-item__price-main">{{ item.final_line_price | money }}</div>
+                <div class="cart-item__price-main">&#x20C3;{{ item.final_line_price | money_without_currency }}</div>
               </div>
 
               {%- comment -%} Controls Row {%- endcomment -%}
               <div class="cart-item__footer">
                 <div class="cart-item__quantity-group">
-                  <span class="cart-item__quantity-label">Qty:</span>
                   <div class="cart-item__quantity">
                     <button
                       type="button"
@@ -161,7 +160,7 @@
                   </div>
                 </div>
 
-                <div class="cart-item__line-total">{{ item.final_line_price | money }}</div>
+                <div class="cart-item__line-total">&#x20C3;{{ item.final_line_price | money_without_currency }}</div>
 
                 <button
                   type="button"
@@ -1109,10 +1108,13 @@
       },
 
       formatMoney(cents) {
+        const amount = (cents / 100).toFixed(2);
         if (typeof Shopify !== 'undefined' && Shopify.formatMoney) {
-          return Shopify.formatMoney(cents, this.moneyFormat);
+          // Strip any legacy prefix (Dhs., AED, etc.) and replace with new symbol
+          const raw = Shopify.formatMoney(cents, '{{amount}}');
+          return '⃃' + raw;
         }
-        return 'Dhs. ' + (cents / 100).toFixed(2);
+        return '⃃' + amount;
       },
 
       // Listen for cart changes from other sources (e.g., add to cart)

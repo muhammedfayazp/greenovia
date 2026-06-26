@@ -1391,7 +1391,7 @@
     // Update price
     if (priceElement) {
       const price = (variant.price / 100).toFixed(2);
-      priceElement.textContent = `Dhs. ${price} AED`;
+      priceElement.textContent = `⃃${price}`;
     }
     
     if (variant.compare_at_price && variant.compare_at_price > variant.price) {
@@ -1400,7 +1400,7 @@
         priceElement.classList.add('product-price--sale');
       }
       if (comparePriceElement) {
-        comparePriceElement.textContent = `Dhs. ${comparePrice} AED`;
+        comparePriceElement.textContent = `⃃${comparePrice}`;
         comparePriceElement.style.display = 'inline';
       }
     } else {
