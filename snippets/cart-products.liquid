@@ -116,13 +116,12 @@
                     </div>
                   {% endif %}
                 </div>
-                <div class="cart-item__price-main">{{ item.final_line_price | money }}</div>
+                <div class="cart-item__price-main"><img src="{{ 'icon-dirham.svg' | asset_url }}" class="price-symbol" aria-hidden="true" alt="">{{ item.final_line_price | money_without_currency }}</div>
               </div>
 
               {%- comment -%} Controls Row {%- endcomment -%}
               <div class="cart-item__footer">
                 <div class="cart-item__quantity-group">
-                  <span class="cart-item__quantity-label">Qty:</span>
                   <div class="cart-item__quantity">
                     <button
                       type="button"
@@ -161,7 +160,7 @@
                   </div>
                 </div>
 
-                <div class="cart-item__line-total">{{ item.final_line_price | money }}</div>
+                <div class="cart-item__line-total"><img src="{{ 'icon-dirham.svg' | asset_url }}" class="price-symbol" aria-hidden="true" alt="">{{ item.final_line_price | money_without_currency }}</div>
 
                 <button
                   type="button"
@@ -1035,12 +1034,12 @@
 
             const lineTotal = cartItem.querySelector('.cart-item__line-total');
             if (lineTotal) {
-              lineTotal.textContent = this.formatMoney(item.final_line_price);
+              lineTotal.innerHTML = this.formatMoney(item.final_line_price);
             }
 
             const price = cartItem.querySelector('.cart-item__price-main');
             if (price) {
-              price.textContent = this.formatMoney(item.final_line_price);
+              price.innerHTML = this.formatMoney(item.final_line_price);
             }
           }
         });
@@ -1109,10 +1108,13 @@
       },
 
       formatMoney(cents) {
+        const amount = (cents / 100).toFixed(2);
+        const symbol = `<img src="{{ 'icon-dirham.svg' | asset_url }}" class="price-symbol" aria-hidden="true" alt="">`;
         if (typeof Shopify !== 'undefined' && Shopify.formatMoney) {
-          return Shopify.formatMoney(cents, this.moneyFormat);
+          const raw = Shopify.formatMoney(cents, '{{amount}}');
+          return symbol + raw;
         }
-        return 'Dhs. ' + (cents / 100).toFixed(2);
+        return symbol + amount;
       },
 
       // Listen for cart changes from other sources (e.g., add to cart)

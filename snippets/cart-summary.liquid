@@ -54,13 +54,8 @@
     </div>
   {% endif %}
 
-  {%- liquid
-    if settings.currency_code_enabled_cart_total
-      assign total_price = cart.total_price | money_with_currency
-    else
-      assign total_price = cart.total_price | money
-    endif
-  -%}
+  {%- assign total_price_value = cart.total_price | money_without_currency -%}
+  {%- capture total_price -%}<img src="{{ 'icon-dirham.svg' | asset_url }}" class="price-symbol" aria-hidden="true" alt="">{{ total_price_value }}{%- endcapture -%}
 
   <div class="cart__total-container{% if settings.show_installments %} cart__total-container--has-installments{% endif %}">
     <span
@@ -378,17 +373,19 @@
     const moneyFormat = window.theme && window.theme.moneyFormat ? window.theme.moneyFormat : '{{amount}}';
     
     function formatMoney(cents) {
+      const symbol = `<img src="{{ 'icon-dirham.svg' | asset_url }}" class="price-symbol" aria-hidden="true" alt="">`;
       if (typeof Shopify !== 'undefined' && Shopify.formatMoney) {
-        return Shopify.formatMoney(cents, moneyFormat);
+        const raw = Shopify.formatMoney(cents, '{{amount}}');
+        return symbol + raw;
       }
-      return 'Dhs. ' + (cents / 100).toFixed(2);
+      return symbol + (cents / 100).toFixed(2);
     }
     
     // Update estimated total
     const cartTotalValueEl = document.querySelector('.cart__total-value');
     if (cartTotalValueEl && cart.total_price !== undefined) {
       const formattedPrice = formatMoney(cart.total_price);
-      cartTotalValueEl.textContent = formattedPrice;
+      cartTotalValueEl.innerHTML = formattedPrice;
       
       const textComponent = document.querySelector('text-component[ref="cartTotal"]');
       if (textComponent) {

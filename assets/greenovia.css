@@ -13,6 +13,17 @@
   --gv-font-ui: "Montserrat", "Inter", system-ui, sans-serif;
 }
 
+/* Dirham currency symbol icon */
+.price-symbol {
+  display: inline-block;
+  height: 0.8em;
+  width: auto;
+  vertical-align: middle;
+  margin-right: 1px;
+  position: relative;
+  top: -0.05em;
+}
+
 /* Base Utility Classes - Extremely robust to block leakage */
 .visually-hidden:not(:focus, :active) {
   clip: rect(0 0 0 0) !important;

@@ -20,20 +20,13 @@
           <div class="catprodrows__swiper swiper swiper-{{ block.id }}">
             <div class="swiper-wrapper">
               {% for product in col.products limit: 12 %}
-                {% if product.available %}
-                <div class="catprodrows__card swiper-slide">
-                  
+                <div class="catprodrows__card swiper-slide{% unless product.available %} catprodrows__card--soldout{% endunless %}">
+
                   <div class="catprodrows__img-container">
-                    {% comment %} <button type="button" 
-                            class="catprodrows__heart" 
-                            aria-label="Add to wishlist"
-                            data-product-id="{{ product.id }}"
-                            data-product-handle="{{ product.handle }}"
-                            onclick="toggleWishlist(this)">
-                      <svg class="heart-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                      <svg class="heart-filled" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                    </button> {% endcomment %}
-                    
+                    {% unless product.available %}
+                      <span class="catprodrows__soldout-badge">Sold Out</span>
+                    {% endunless %}
+
                     <a href="{{ product.url }}" class="catprodrows__img">
                       {% if product.featured_image %}
                         <img
@@ -51,7 +44,15 @@
                     
                     <div class="catprodrows__bottom">
                       <div class="catprodrows__price">
-                        {{ product.price | money }}
+                        {%- if product.price == 0 -%}
+                          {%- if product.compare_at_price > 0 -%}
+                            <img src="{{ 'icon-dirham.svg' | asset_url }}" class="price-symbol" aria-hidden="true" alt="">{{ product.compare_at_price | money_without_currency }}
+                          {%- else -%}
+                            <span class="catprodrows__price--na">—</span>
+                          {%- endif -%}
+                        {%- else -%}
+                          <img src="{{ 'icon-dirham.svg' | asset_url }}" class="price-symbol" aria-hidden="true" alt="">{{ product.price | money_without_currency }}
+                        {%- endif -%}
                       </div>
 
                       {%- assign cart_qty = cart | item_count_for_variant: product.selected_or_first_available_variant.id -%}
@@ -86,7 +87,8 @@
                           </cart-quantity-selector-component>
 
                           <add-to-cart-component class="catprodrows__atc-wrapper">
-                            <button type="submit" class="catprodrows__atc-trigger" aria-label="Add to cart" ref="addToCartButton">
+                            <button type="submit" class="catprodrows__atc-trigger" aria-label="Add to cart" ref="addToCartButton"
+                              {% unless product.available %}disabled aria-disabled="true"{% endunless %}>
                               {{ 'icon-add-to-cart.svg' | inline_asset_content }}
                             </button>
                           </add-to-cart-component>
@@ -97,7 +99,6 @@
                   </div>
 
                 </div>
-                {% endif %}
               {% endfor %}
             </div>
           </div>
@@ -145,6 +146,34 @@
   box-shadow: 0 6px 18px rgba(0,0,0,.08);
   height: 100%;
 }
+/* Sold-out badge */
+.catprodrows__soldout-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #888;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Dim sold-out cards slightly */
+.catprodrows__card--soldout {
+  opacity: 0.75;
+}
+
+/* Disable button style for sold-out */
+.catprodrows__atc-trigger:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .catprodrows__img-container {
   position: relative;
   overflow: hidden;
@@ -244,13 +273,13 @@
   position: relative;
   display: flex;
   justify-content: flex-end;
-  height: 40px;
+  height: 34px;
   margin-top: 8px;
 }
 
 .catprodrows__atc-trigger {
-  width: 40px;
-  height: 40px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   background: #1f3d2b;
   color: #fff;
@@ -264,23 +293,23 @@
 }
 
 .catprodrows__atc-trigger svg {
-  width: 20px;
-  height: 20px;
+  width: 17px;
+  height: 17px;
 }
 
 .catprodrows__qty-selector {
   position: absolute;
   right: 0;
   top: 0;
-  height: 40px;
-  width: 40px;
-  min-width: 40px;
+  height: 34px;
+  width: 34px;
+  min-width: 34px;
   background: #1f3d2b;
-  border-radius: 20px;
+  border-radius: 17px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 4px;
+  padding: 0 3px;
   overflow: hidden;
   opacity: 0;
   pointer-events: none;
@@ -297,14 +326,14 @@
 
 .catprodrows__actions.is-active .catprodrows__qty-selector {
   width: auto;
-  min-width: 105px;
+  min-width: 92px;
   opacity: 1;
   pointer-events: auto;
 }
 
 .catprodrows__qty-selector .qty__btn {
-  width: 32px;
-  height: 32px;
+  width: 26px;
+  height: 26px;
   flex-shrink: 0;
   border-radius: 50%;
   background: rgba(255,255,255,0.15);
@@ -314,7 +343,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 16px;
   padding: 0;
   transition: background 0.2s ease;
 }
@@ -343,11 +372,11 @@
 .catprodrows__qty-selector .qty__current {
   color: #fff;
   font-weight: 700;
-  font-size: 15px;
+  font-size: 13px;
   line-height: 1;
   flex: 1;
   text-align: center;
-  min-width: 24px;
+  min-width: 20px;
 }
 
 .catprodrows__bottom {
@@ -364,6 +393,11 @@
   font-weight: 700;
   color: #1f3d2b;
   white-space: nowrap;
+}
+.catprodrows__price--na {
+  color: #aaa;
+  font-weight: 400;
+  font-size: 14px;
 }
 
 .catprodrows__form-wrapper {
