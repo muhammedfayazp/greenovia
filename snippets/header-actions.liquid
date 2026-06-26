@@ -209,16 +209,19 @@
 
     cursor: pointer;
     display: flex;
+    align-items: center;
     justify-content: center;
-    /* Use the <a> tag as the positioning anchor for the cart bubble.
-       Custom elements (cart-icon) are unreliable as containing blocks
-       because browsers may not honour position:relative on them. */
+    /* The <a> tag is our positioning anchor — it is a standard element
+       so position:relative reliably creates a containing block here. */
     position: relative;
   }
 
   .header-actions__action .svg-wrapper {
     height: var(--button-size);
     width: var(--button-size);
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .header-actions__action svg {
@@ -226,49 +229,56 @@
     height: var(--icon-size-md);
   }
 
+  /* cart-icon is a custom element. position:static ensures it never
+     intercepts absolute positioning — the <a> tag above handles that. */
   .header-actions__cart-icon {
-    --cart-bubble-size: 18px;
-    --cart-bubble-top: -6px;
-    --cart-bubble-right: -6px;
-
-    /* Do NOT set position:relative here — it fights with the <a> anchor above.
-       Custom elements are unreliable containing blocks in some browsers. */
-    display: contents;
-  }
-
-  .header-actions__cart-icon .cart-bubble {
-    position: absolute;
-    min-width: var(--cart-bubble-size, 16px);
-    width: auto;
-    height: var(--cart-bubble-size, 16px);
-    top: var(--cart-bubble-top);
-    right: var(--cart-bubble-right);
-    padding: 0 4px;
-    border-radius: 100px;
-    aspect-ratio: unset;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1.5px solid #fff; /* Border instead of mask for better flexibility */
+    position: static;
+  }
+
+  /* The badge: sits at top-right of the 44px <a> button area */
+  .header-actions__cart-icon .cart-bubble {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    left: auto;
+    bottom: auto;
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    padding: 0;
+    border-radius: 50%;
+    overflow: hidden;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #fff;
     box-sizing: border-box;
+    z-index: 5;
+  }
+
+  /* Force circular background (theme default is 1rem which gives a pill) */
+  .header-actions__cart-icon .cart-bubble__background {
+    border-radius: 50%;
   }
 
   .header-actions__cart-icon .cart-bubble__text,
   .cart-drawer__heading .cart-bubble__text {
     font-family: var(--font-paragraph--family);
-    font-weight: var(--font-paragraph--weight);
+    font-weight: 700;
     font-size: 10px;
-    letter-spacing: 0.02em;
+    letter-spacing: 0;
     line-height: 1;
     font-variant-numeric: tabular-nums;
-  }
-
-  .header-actions__cart-icon .cart-bubble__text-count {
-    letter-spacing: 0.05em; /* Extra space for small counts */
+    z-index: 1;
+    position: relative;
   }
 
   .header-actions__cart-icon.header-actions__cart-icon--has-cart svg {
-    /* Mask removed to prevent cutting off multi-digit pill-shaped bubbles */
+    mask: none;
   }
 
   .cart-drawer__heading .cart-bubble__background {
