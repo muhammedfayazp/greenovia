@@ -115,21 +115,124 @@
 </disclosure-custom>
 
 {% stylesheet %}
+  .cart-discount {
+    width: 100%;
+    border-top: 1px solid #ebebeb;
+    padding: 0.875rem 0 0;
+    margin-top: 0.5rem;
+  }
+
+  /* Disclosure trigger — looks like a tag icon + link text */
+  .cart-discount [data-disclosure-trigger],
+  .cart-discount disclosure-trigger,
+  .cart-discount summary {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1f3d2b;
+    list-style: none;
+    width: 100%;
+  }
+
+  .cart-discount [data-disclosure-trigger]::before {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231f3d2b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m20.59 13.41-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z'/%3E%3Cline x1='7' y1='7' x2='7.01' y2='7'/%3E%3C/svg%3E") center/contain no-repeat;
+    flex-shrink: 0;
+  }
+
+  /* Input + Apply button */
+  .cart-discount__content {
+    height: auto;
+    padding-top: 0.75rem;
+  }
+
+  .cart-discount__form {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    height: auto;
+    padding: 0;
+  }
+
   .cart-discount__input {
-    background-color: var(--color-input-background);
-    color: var(--color-input-text);
-    border-width: var(--style-border-width-inputs);
-    border-color: var(--color-input-border);
-    border-style: solid;
-    border-radius: var(--style-border-radius-inputs);
-    padding: var(--padding-sm) var(--padding-md);
-    height: 100%;
-    flex-grow: 1;
+    flex: 1;
     min-width: 0;
+    height: 44px;
+    padding: 0 0.875rem;
+    border: 1.5px solid #d4e8c4;
+    border-radius: 10px;
+    background: #f6faf2;
+    color: #1f3d2b;
+    font-size: 0.875rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.18s ease;
+  }
+
+  .cart-discount__input:focus {
+    border-color: #5A7C3E;
+    background: #fff;
   }
 
   .cart-discount__input::placeholder {
-    color: rgb(var(--color-input-text-rgb) / var(--opacity-subdued-text));
+    color: #9bb88a;
+  }
+
+  .cart-discount__button {
+    height: 44px;
+    padding: 0 1.125rem;
+    background: #1f3d2b;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.18s ease;
+    flex-shrink: 0;
+  }
+
+  .cart-discount__button:hover {
+    background: #2D5016;
+  }
+
+  /* Applied discount pills */
+  .cart-discount__codes {
+    display: none;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    list-style: none;
+    padding: 0;
+    margin: 0.625rem 0 0;
+  }
+
+  .cart-discount__codes:has(.cart-discount__pill) {
+    display: flex;
+  }
+
+  .cart-discount__pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.75rem;
+    background: #e8f3de;
+    border: 1px solid #c2dca8;
+    border-radius: 999px;
+    color: #1f3d2b;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
 
   .cart-discount__pill-code {
@@ -140,75 +243,37 @@
     margin: 0;
   }
 
-  .cart-discount {
-    width: 100%;
-  }
-
-  .cart-discount__codes {
-    display: none;
-    gap: var(--padding-xs);
-    flex-wrap: wrap;
-    list-style: none;
-    padding-inline: 0;
-    margin: 0;
-  }
-
-  .cart-discount__codes:has(.cart-discount__pill) {
-    display: flex;
-  }
-
-  .cart-discount__button {
-    height: 100%;
-  }
-
-  .cart-discount__content {
-    height: calc(var(--button-size) + var(--padding-2xs) + var(--padding-sm));
-  }
-
-  .cart-discount__pill {
-    display: flex;
-    color: var(--color-foreground);
-    gap: var(--padding-xs);
-    align-items: center;
-    padding: var(--padding-xs) var(--padding-sm);
-    border-radius: var(--style-border-radius-pills);
-    background-color: var(--color-input-background);
-    text-transform: uppercase;
-  }
-
-  .cart-discount__form {
-    display: flex;
-    gap: var(--padding-md);
-    align-items: center;
-    height: 100%;
-    padding-block: var(--padding-2xs) var(--padding-sm);
-  }
-
   :is(.cart-discount__pill-remove, .cart-discount__pill-remove:hover) {
-    --close-icon-opacity: 0.4;
-
-    color: var(--color-foreground);
-    background-color: transparent;
-    pointer-events: all;
+    color: #5A7C3E;
+    background: transparent;
+    border: none;
     cursor: pointer;
-    height: 100%;
+    padding: 0;
+    display: flex;
+    align-items: center;
   }
 
+  /* Error */
   .cart-discount__error {
     display: flex;
     align-items: center;
-    width: 100%;
-    padding-block: var(--padding-2xs) var(--padding-sm);
+    gap: 0.375rem;
+    padding: 0.5rem 0.75rem;
+    margin-top: 0.5rem;
+    background: #fff3f3;
+    border: 1px solid #ffcdd2;
+    border-radius: 8px;
+    font-size: 0.8125rem;
+    color: #c62828;
   }
 
   .cart-discount__error .svg-wrapper {
     flex-shrink: 0;
-    width: var(--icon-size-xs);
-    height: var(--icon-size-xs);
-    margin-inline: var(--margin-3xs) var(--margin-xs);
+    width: 16px;
+    height: 16px;
   }
 
   .cart-discount__error-text {
-    margin-block-start: var(--margin-3xs);
+    margin: 0;
   }
 {% endstylesheet %}
