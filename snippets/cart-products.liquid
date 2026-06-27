@@ -116,7 +116,7 @@
                     </div>
                   {% endif %}
                 </div>
-                <div class="cart-item__price-main"><span class="dirham-symbol" aria-hidden="true">&#xE000;</span>{{ item.final_line_price | money_without_currency }}</div>
+                <div class="cart-item__price-main"><span class="dirham-symbol" aria-hidden="true">&#xE000;</span>{{ item.price | money_without_currency }}</div>
               </div>
 
               {%- comment -%} Controls Row {%- endcomment -%}
@@ -469,13 +469,13 @@
 
 .cart-item {
   display: flex;
-  gap: 1rem;
-  padding: 1rem 1rem;
+  gap: 0.875rem;
+  padding: 1rem;
   background: var(--cart-bg);
   border-bottom: 1px solid var(--cart-border);
-  transition: all 0.2s ease;
+  transition: background 0.2s ease;
   position: relative;
-  align-items: stretch;
+  align-items: flex-start;
 }
 
 .cart-item:hover {
@@ -491,8 +491,8 @@
    ========================================== */
 
 .cart-item__image-wrapper {
-  width: 85px;
-  height: 85px;
+  width: 80px;
+  height: 80px;
   flex-shrink: 0;
 }
 
@@ -500,13 +500,13 @@
   display: block;
   width: 100%;
   height: 100%;
-  border-radius: 12px;
+  border-radius: 10px;
   overflow: hidden;
-  background: #ffffff;
-  border: 1px solid #e5e5e5;
-  transition: all 0.2s ease;
+  background: #f7f7f7;
+  border: 1px solid #ebebeb;
+  transition: border-color 0.2s ease;
   position: relative;
-  padding: 8px;
+  padding: 6px;
 }
 
 .cart-item__image-link:hover {
@@ -538,7 +538,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 0.5rem;
   min-width: 0;
 }
 
@@ -546,8 +546,7 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 1rem;
-  margin-bottom: 0.75rem;
+  gap: 0.75rem;
 }
 
 .cart-item__info {
@@ -556,13 +555,13 @@
 }
 
 .cart-item__title {
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   font-weight: 600;
   color: var(--cart-text-primary);
   text-decoration: none;
-  line-height: 1.35;
+  line-height: 1.4;
   display: block;
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.25rem;
   letter-spacing: -0.01em;
   transition: color 0.2s ease;
 }
@@ -574,29 +573,28 @@
 .cart-item__variants {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.35rem;
+  gap: 0.25rem;
   margin: 0;
 }
 
 .cart-item__variant-item {
-  font-size: 0.8125rem;
-  color: var(--cart-text-tertiary);
-  padding: 0.25rem 0.5rem;
-  background: var(--cart-bg-hover);
-  border-radius: 4px;
-  border: 1px solid rgba(0, 0, 0, 0.04);
+  font-size: 0.75rem;
+  color: var(--cart-text-secondary);
+  background: none;
+  border: none;
+  padding: 0;
 }
 
+/* Unit price — top right of item header */
 .cart-item__price-main {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--cart-text-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--cart-text-secondary);
   white-space: nowrap;
   flex-shrink: 0;
-  letter-spacing: -0.01em;
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: 1px;
 }
 
 /* FOOTER: Controls Row */
@@ -604,9 +602,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid rgba(0, 0, 0, 0.04);
+  gap: 0.5rem;
 }
 
 .cart-item__quantity-group {
@@ -625,11 +621,11 @@
 .cart-item__quantity {
   display: inline-flex;
   align-items: center;
-  background: #ffffff;
-  border-radius: 6px;
+  background: #f5f5f5;
+  border-radius: 20px;
   padding: 2px;
-  border: 1px solid var(--cart-border);
-  gap: 0px;
+  border: none;
+  gap: 0;
   transition: all 0.15s ease;
 }
 
@@ -639,18 +635,19 @@
 }
 
 .qty-btn {
-  width: 32px;
-  height: 32px;
-  background: transparent;
+  width: 28px;
+  height: 28px;
+  background: #fff;
   border: none;
-  color: var(--cart-text-secondary);
+  color: var(--cart-text-primary);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.15s ease;
   padding: 0;
-  border-radius: 4px;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
 
 .qty-btn:hover:not(:disabled) {
@@ -664,16 +661,15 @@
 }
 
 .qty-input {
-  width: 40px;
+  width: 32px;
   border: none;
   background: transparent;
   text-align: center;
   font-weight: 700;
   color: var(--cart-text-primary);
-  font-size: 0.9375rem;
-  padding: 0 2px;
+  font-size: 0.875rem;
+  padding: 0;
   margin: 0;
-  letter-spacing: -0.01em;
   font-family: inherit;
 }
 
@@ -689,16 +685,13 @@
 
 .cart-item__line-total {
   font-weight: 700;
-  color: var(--cart-primary);
-  font-size: 1rem;
+  color: var(--cart-text-primary);
+  font-size: 0.9375rem;
   white-space: nowrap;
-  letter-spacing: -0.01em;
-  min-width: 60px;
-  text-align: right;
+  margin-left: auto;
   display: inline-flex;
   align-items: center;
-  justify-content: flex-end;
-  gap: 2px;
+  gap: 1px;
 }
 
 .cart-item__remove {
