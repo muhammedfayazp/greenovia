@@ -257,18 +257,32 @@
   background: rgba(255,255,255,0.15);
 }
 
-@media (max-width: 768px) {
-  .gv-testimonials { padding: 60px 0; }
+@media (max-width: 900px) {
+  .gv-testimonials__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .gv-testimonials__card:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 600px) {
+  .gv-testimonials { padding: 48px 0; }
+  .gv-testimonials__container { padding: 0 16px; }
   .gv-testimonials__grid {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
+  .gv-testimonials__card:last-child { grid-column: auto; }
   .gv-testimonials__stats {
     flex-wrap: wrap;
-    gap: 1.5rem;
+    gap: 1.25rem;
+    padding: 1.5rem;
+    border-radius: 16px;
   }
   .gv-testimonials__stat-divider { display: none; }
-  .gv-testimonials__stat { flex: 0 0 45%; }
+  .gv-testimonials__stat { flex: 0 0 calc(50% - 0.625rem); }
+  .gv-testimonials__stat strong { font-size: 1.375rem; }
 }
 {% endstylesheet %}
 
