@@ -116,7 +116,7 @@
                     </div>
                   {% endif %}
                 </div>
-                <div class="cart-item__price-main"><img src="{{ 'icon-dirham.svg' | asset_url }}" class="price-symbol" aria-hidden="true" alt="">{{ item.final_line_price | money_without_currency }}</div>
+                <div class="cart-item__price-main"><span class="dirham-symbol" aria-hidden="true">&#xE000;</span>{{ item.final_line_price | money_without_currency }}</div>
               </div>
 
               {%- comment -%} Controls Row {%- endcomment -%}
@@ -160,7 +160,7 @@
                   </div>
                 </div>
 
-                <div class="cart-item__line-total"><img src="{{ 'icon-dirham.svg' | asset_url }}" class="price-symbol" aria-hidden="true" alt="">{{ item.final_line_price | money_without_currency }}</div>
+                <div class="cart-item__line-total"><span class="dirham-symbol" aria-hidden="true">&#xE000;</span>{{ item.final_line_price | money_without_currency }}</div>
 
                 <button
                   type="button"
@@ -594,6 +594,9 @@
   white-space: nowrap;
   flex-shrink: 0;
   letter-spacing: -0.01em;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
 }
 
 /* FOOTER: Controls Row */
@@ -692,6 +695,10 @@
   letter-spacing: -0.01em;
   min-width: 60px;
   text-align: right;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
 }
 
 .cart-item__remove {
@@ -1109,7 +1116,7 @@
 
       formatMoney(cents) {
         const amount = (cents / 100).toFixed(2);
-        const symbol = `<img src="{{ 'icon-dirham.svg' | asset_url }}" class="price-symbol" aria-hidden="true" alt="">`;
+        const symbol = `<span class="dirham-symbol" aria-hidden="true">&#xE000;</span>`;
         if (typeof Shopify !== 'undefined' && Shopify.formatMoney) {
           const raw = Shopify.formatMoney(cents, '{{amount}}');
           return symbol + raw;

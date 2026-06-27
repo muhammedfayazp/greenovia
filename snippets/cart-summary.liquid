@@ -55,7 +55,7 @@
   {% endif %}
 
   {%- assign total_price_value = cart.total_price | money_without_currency -%}
-  {%- capture total_price -%}<img src="{{ 'icon-dirham.svg' | asset_url }}" class="price-symbol" aria-hidden="true" alt="">{{ total_price_value }}{%- endcapture -%}
+  {%- capture total_price -%}<span class="dirham-symbol" aria-hidden="true">&#xE000;</span>{{ total_price_value }}{%- endcapture -%}
 
   <div class="cart__total-container{% if settings.show_installments %} cart__total-container--has-installments{% endif %}">
     <span
@@ -265,6 +265,9 @@
     font-weight: 800;
     color: var(--cart-text-primary);
     letter-spacing: -0.02em;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
   }
 
   /* Installments */
@@ -373,7 +376,7 @@
     const moneyFormat = window.theme && window.theme.moneyFormat ? window.theme.moneyFormat : '{{amount}}';
     
     function formatMoney(cents) {
-      const symbol = `<img src="{{ 'icon-dirham.svg' | asset_url }}" class="price-symbol" aria-hidden="true" alt="">`;
+      const symbol = `<span class="dirham-symbol" aria-hidden="true">&#xE000;</span>`;
       if (typeof Shopify !== 'undefined' && Shopify.formatMoney) {
         const raw = Shopify.formatMoney(cents, '{{amount}}');
         return symbol + raw;
