@@ -460,6 +460,21 @@
         "view_all_text": "View all",
         "view_all_link": "shopify://collections/all"
       }
+    },
+    "trust_bar_gv1": {
+      "type": "trust-bar",
+      "name": "Trust Bar",
+      "settings": {}
+    },
+    "testimonials_gv1": {
+      "type": "testimonials",
+      "name": "Testimonials",
+      "settings": {}
+    },
+    "newsletter_gv1": {
+      "type": "newsletter-strip",
+      "name": "Newsletter",
+      "settings": {}
     }
   },
   "order": [
@@ -467,8 +482,11 @@
     "hero_plant_WdReax",
     "plant_landing_slider_w7ehJ7",
     "hero_p9CmMG",
+    "trust_bar_gv1",
     "category_product_rows_wwMeap",
     "shop_by_category_e8ipig",
+    "testimonials_gv1",
+    "newsletter_gv1",
     "daily_deals_WpJVGc"
   ]
 }
