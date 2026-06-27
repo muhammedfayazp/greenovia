@@ -95,10 +95,10 @@
       <div class="product-price-wrapper">
         {% assign current_variant = product.selected_or_first_available_variant %}
         <span class="product-price {% if current_variant.compare_at_price > current_variant.price %}product-price--sale{% endif %}" id="productPrice">
-          {{ current_variant.price | money }}
+          <span class="dirham-symbol" aria-hidden="true">&#xE000;</span>{{ current_variant.price | money_without_currency }}
         </span>
         {% if current_variant.compare_at_price > current_variant.price %}
-          <span class="product-price-compare" id="productComparePrice">{{ current_variant.compare_at_price | money }}</span>
+          <span class="product-price-compare" id="productComparePrice"><span class="dirham-symbol" aria-hidden="true">&#xE000;</span>{{ current_variant.compare_at_price | money_without_currency }}</span>
         {% endif %}
       </div>
 
@@ -106,6 +106,7 @@
 
 
       {%- comment -%} Product Form {%- endcomment -%}
+      <product-form-component data-section-id="{{ section.id }}" data-product-id="{{ product.id }}">
       {% form 'product', product, id: 'product-form' %}
         <input type="hidden" name="id" value="{{ current_variant.id }}" id="productVariantId">
         
@@ -231,6 +232,7 @@
         {{ product.description }}
       </div>
       {% endform %}
+      </product-form-component>
     </div>
   </div>
 </div>
@@ -643,6 +645,7 @@
   display: flex;
   gap: var(--gap-sm);
   margin-top: var(--gap-sm);
+  align-items: center;
 }
 
 .quantity-wrapper {
@@ -650,104 +653,59 @@
   align-items: center;
   justify-content: space-between;
   height: 52px;
-  min-width: 140px;
-  padding: 0 6px;
-  
-  background: linear-gradient(135deg, var(--forest-medium) 0%, var(--forest-dark) 100%);
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  min-width: 130px;
+  padding: 0 5px;
+  background: #f5f5f5;
+  border: 1.5px solid #e0e0e0;
   border-radius: var(--radius-pill);
-  
-  box-shadow: 
-    0 4px 16px rgba(26, 92, 58, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.15);
-  
-  position: relative;
   transition: var(--transition-fast);
-}
-
-.quantity-wrapper::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    rgba(255, 255, 255, 0.4) 50%, 
-    transparent 100%);
 }
 
 .quantity-wrapper:hover {
-  background: linear-gradient(135deg, var(--forest-light) 0%, var(--forest-medium) 100%);
-  border-color: rgba(255, 255, 255, 0.3);
-  box-shadow: 
-    0 6px 20px rgba(26, 92, 58, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  border-color: #5A7C3E;
+  background: #f0f7eb;
 }
 
 .quantity-btn {
-  width: 38px;
-  height: 38px;
-  
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: #fff;
+  border: 1.5px solid #e0e0e0;
   border-radius: 50%;
-  
-  color: white;
+  color: #1f3d2b;
   cursor: pointer;
   transition: var(--transition-fast);
-  
-  position: relative;
-  overflow: hidden;
-}
-
-.quantity-btn::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.25) 0%, transparent 70%);
-  opacity: 0;
-  transition: opacity var(--transition-fast);
+  flex-shrink: 0;
 }
 
 .quantity-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
-  border-color: rgba(255, 255, 255, 0.5);
-}
-
-.quantity-btn:hover::before {
-  opacity: 1;
+  background: #1f3d2b;
+  border-color: #1f3d2b;
+  color: #fff;
 }
 
 .quantity-btn:active {
-  transform: scale(0.9);
+  transform: scale(0.92);
 }
 
 .quantity-btn svg {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   stroke-width: 2.5;
 }
 
 .quantity-input {
-  width: 55px;
+  width: 44px;
   height: 100%;
-  
   border: none;
   background: transparent;
-  
-  font-size: 1.2rem;
+  font-size: 1.05rem;
   font-weight: 700;
-  color: white;
+  color: #1f3d2b;
   text-align: center;
-  letter-spacing: 0.02em;
-  
   -moz-appearance: textfield;
   appearance: textfield;
 }
@@ -961,26 +919,27 @@
   /* Smaller quantity counter for mobile */
   .quantity-wrapper {
     height: 48px;
-    min-width: 110px;
-    max-width: 110px;
+    min-width: 120px;
+    max-width: 120px;
     padding: 0 4px;
     flex-shrink: 0;
   }
-  
+
   .quantity-btn {
     width: 34px;
     height: 34px;
   }
-  
+
   .quantity-btn svg {
     width: 12px;
     height: 12px;
   }
-  
+
   .quantity-input {
     width: 38px;
     font-size: 1rem;
     font-weight: 700;
+    color: #1f3d2b;
   }
   
   /* Full width add to cart button */
@@ -1140,22 +1099,23 @@
   /* Even smaller counter for tiny screens */
   .quantity-wrapper {
     height: 44px;
-    min-width: 100px;
+    min-width: 110px;
   }
-  
+
   .quantity-btn {
     width: 30px;
     height: 30px;
   }
-  
+
   .quantity-btn svg {
     width: 10px;
     height: 10px;
   }
-  
+
   .quantity-input {
     width: 36px;
     font-size: 0.95rem;
+    color: #1f3d2b;
   }
   
   .add-to-cart-btn {
@@ -1389,18 +1349,19 @@
     }
     
     // Update price
+    const dirhamSpan = `<span class="dirham-symbol" aria-hidden="true">&#xE000;</span>`;
     if (priceElement) {
       const price = (variant.price / 100).toFixed(2);
-      priceElement.textContent = `⃃${price}`;
+      priceElement.innerHTML = `${dirhamSpan}${price}`;
     }
-    
+
     if (variant.compare_at_price && variant.compare_at_price > variant.price) {
       const comparePrice = (variant.compare_at_price / 100).toFixed(2);
       if (priceElement) {
         priceElement.classList.add('product-price--sale');
       }
       if (comparePriceElement) {
-        comparePriceElement.textContent = `⃃${comparePrice}`;
+        comparePriceElement.innerHTML = `${dirhamSpan}${comparePrice}`;
         comparePriceElement.style.display = 'inline';
       }
     } else {
@@ -1444,64 +1405,6 @@
     radio.addEventListener('change', updateVariant);
   });
   
-  // ==========================================
-  // FORM SUBMISSION & CART ADD EVENT
-  // ==========================================
-  
-  const productForm = document.getElementById('product-form');
-  
-  if (productForm) {
-    productForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      const variantId = document.getElementById('productVariantId')?.value;
-      const quantity = parseInt(document.getElementById('quantityInput')?.value || 1);
-      
-      if (!variantId) {
-        console.error('No variant selected');
-        return;
-      }
-      
-      // Add to cart via Shopify API
-      fetch('/cart/add.js', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          items: [{
-            id: variantId,
-            quantity: quantity
-          }]
-        })
-      })
-      .then(response => {
-        if (!response.ok) throw new Error('Failed to add to cart');
-        return response.json();
-      })
-      .then(cart => {
-        // Dispatch custom event for cart drawer
-        const event = new CustomEvent('cart:add', {
-          bubbles: true,
-          detail: {
-            cart: cart,
-            variantId: variantId,
-            quantity: quantity
-          }
-        });
-        document.dispatchEvent(event);
-        
-        // Reset quantity
-        if (document.getElementById('quantityInput')) {
-          document.getElementById('quantityInput').value = 1;
-        }
-      })
-      .catch(error => {
-        console.error('Error adding to cart:', error);
-        alert('Unable to add item to cart. Please try again.');
-      });
-    });
-  }
-  
+
 })();
-</script>
+</script>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           

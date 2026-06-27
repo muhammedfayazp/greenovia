@@ -1,0 +1,197 @@
+<section class="gv-newsletter">
+  <div class="gv-newsletter__inner page-width">
+
+    <div class="gv-newsletter__deco gv-newsletter__deco--left">
+      <svg viewBox="0 0 200 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M100 280 C100 280 20 220 20 140 C20 60 60 20 100 20 C140 20 180 60 180 140 C180 220 100 280 100 280Z" fill="rgba(255,255,255,0.06)"/>
+        <path d="M100 260 C100 260 40 210 40 145 C40 80 70 45 100 45" stroke="rgba(255,255,255,0.12)" stroke-width="1.5" fill="none"/>
+        <circle cx="100" cy="140" r="8" fill="rgba(255,255,255,0.1)"/>
+        <circle cx="60" cy="100" r="4" fill="rgba(255,255,255,0.08)"/>
+        <circle cx="140" cy="180" r="6" fill="rgba(255,255,255,0.06)"/>
+      </svg>
+    </div>
+
+    <div class="gv-newsletter__deco gv-newsletter__deco--right">
+      <svg viewBox="0 0 200 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M100 280 C100 280 20 220 20 140 C20 60 60 20 100 20 C140 20 180 60 180 140 C180 220 100 280 100 280Z" fill="rgba(255,255,255,0.06)"/>
+        <path d="M100 260 C100 260 160 210 160 145 C160 80 130 45 100 45" stroke="rgba(255,255,255,0.12)" stroke-width="1.5" fill="none"/>
+        <circle cx="100" cy="140" r="8" fill="rgba(255,255,255,0.1)"/>
+        <circle cx="140" cy="100" r="4" fill="rgba(255,255,255,0.08)"/>
+        <circle cx="60" cy="180" r="6" fill="rgba(255,255,255,0.06)"/>
+      </svg>
+    </div>
+
+    <div class="gv-newsletter__content">
+      <div class="gv-newsletter__leaf">🌿</div>
+      <h2 class="gv-newsletter__heading">Get 10% Off Your First Order</h2>
+      <p class="gv-newsletter__subtext">Subscribe for plant care tips, new arrivals, and exclusive offers delivered to your inbox.</p>
+
+      {% form 'customer', id: 'newsletter-form' %}
+        <input type="hidden" name="contact[tags]" value="newsletter">
+        <div class="gv-newsletter__form">
+          <input
+            type="email"
+            name="contact[email]"
+            class="gv-newsletter__input"
+            placeholder="Your email address"
+            required
+            aria-label="Email address"
+          >
+          <button type="submit" class="gv-newsletter__btn">
+            Subscribe & Save
+          </button>
+        </div>
+        {% if form.posted_successfully? %}
+          <p class="gv-newsletter__success">🎉 You're in! Check your inbox for your 10% discount code.</p>
+        {% endif %}
+      {% endform %}
+
+      <p class="gv-newsletter__disclaimer">No spam, unsubscribe anytime. By subscribing you agree to our privacy policy.</p>
+    </div>
+
+  </div>
+</section>
+
+{% stylesheet %}
+.gv-newsletter {
+  background: linear-gradient(135deg, #1f3d2b 0%, #2D5016 50%, #3a6b1e 100%);
+  padding: 80px 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.gv-newsletter__inner {
+  max-width: 700px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+.gv-newsletter__deco {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 200px;
+  height: 300px;
+  pointer-events: none;
+}
+
+.gv-newsletter__deco--left { left: 0; }
+.gv-newsletter__deco--right { right: 0; transform: translateY(-50%) scaleX(-1); }
+
+.gv-newsletter__content {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.gv-newsletter__leaf {
+  font-size: 2.5rem;
+  animation: sway 4s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+@keyframes sway {
+  0%, 100% { transform: rotate(-6deg); }
+  50% { transform: rotate(6deg); }
+}
+
+.gv-newsletter__heading {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.75rem, 4vw, 2.625rem);
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.gv-newsletter__subtext {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.75);
+  margin: 0;
+  max-width: 480px;
+  line-height: 1.6;
+}
+
+.gv-newsletter__form {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 520px;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 999px;
+  padding: 6px;
+  backdrop-filter: blur(8px);
+  margin-top: 0.5rem;
+}
+
+.gv-newsletter__input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-size: 0.9375rem;
+  padding: 0.625rem 1rem;
+  font-family: inherit;
+  min-width: 0;
+}
+
+.gv-newsletter__input::placeholder {
+  color: rgba(255,255,255,0.5);
+}
+
+.gv-newsletter__btn {
+  background: #fff;
+  color: #1f3d2b;
+  border: none;
+  border-radius: 999px;
+  padding: 0.625rem 1.5rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.gv-newsletter__btn:hover {
+  background: #e8f3de;
+  transform: scale(1.02);
+}
+
+.gv-newsletter__success {
+  color: #a8e6a3;
+  font-size: 0.9375rem;
+  margin: 0;
+  font-weight: 500;
+}
+
+.gv-newsletter__disclaimer {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.4);
+  margin: 0;
+}
+
+@media (max-width: 560px) {
+  .gv-newsletter { padding: 60px 20px; }
+  .gv-newsletter__form {
+    flex-direction: column;
+    border-radius: 16px;
+    padding: 8px;
+  }
+  .gv-newsletter__input { padding: 0.75rem 1rem; }
+  .gv-newsletter__btn { border-radius: 10px; padding: 0.75rem; }
+  .gv-newsletter__deco { display: none; }
+}
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Newsletter Strip",
+  "settings": []
+}
+{% endschema %}

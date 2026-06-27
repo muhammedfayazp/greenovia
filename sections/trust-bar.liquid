@@ -1,0 +1,193 @@
+<div class="trust-bar">
+  <div class="trust-bar__track">
+    <div class="trust-bar__item">
+      <span class="trust-bar__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12H3l9-9 9 9h-2M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>
+          <path d="M9 21v-6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v6"/>
+        </svg>
+      </span>
+      <div class="trust-bar__text">
+        <strong>Free Delivery</strong>
+        <span>On orders over AED 150</span>
+      </div>
+    </div>
+
+    <div class="trust-bar__divider"></div>
+
+    <div class="trust-bar__item">
+      <span class="trust-bar__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="m9 12 2 2 4-4"/>
+        </svg>
+      </span>
+      <div class="trust-bar__text">
+        <strong>Plant Guarantee</strong>
+        <span>30-day healthy plant promise</span>
+      </div>
+    </div>
+
+    <div class="trust-bar__divider"></div>
+
+    <div class="trust-bar__item">
+      <span class="trust-bar__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2a7 7 0 0 1 7 7c0 5-7 13-7 13S5 14 5 9a7 7 0 0 1 7-7z"/>
+          <circle cx="12" cy="9" r="2.5"/>
+        </svg>
+      </span>
+      <div class="trust-bar__text">
+        <strong>UAE-Wide Delivery</strong>
+        <span>Dubai, Abu Dhabi & more</span>
+      </div>
+    </div>
+
+    <div class="trust-bar__divider"></div>
+
+    <div class="trust-bar__item">
+      <span class="trust-bar__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 11a9 9 0 1 1 18 0"/>
+          <path d="M6.5 15.5A2.5 2.5 0 0 0 9 18h.5a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v.5"/>
+          <path d="M15 15h.5a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H15a2.5 2.5 0 0 1-2.5-2.5v-.5"/>
+        </svg>
+      </span>
+      <div class="trust-bar__text">
+        <strong>Expert Plant Advice</strong>
+        <span>Chat with our specialists</span>
+      </div>
+    </div>
+
+    <div class="trust-bar__divider"></div>
+
+    <div class="trust-bar__item">
+      <span class="trust-bar__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v3"/>
+          <path d="M3 8h18l-1.5 9A2 2 0 0 1 17.5 19h-11A2 2 0 0 1 4.5 17L3 8Z"/>
+          <path d="M10 12a2 2 0 1 0 4 0"/>
+        </svg>
+      </span>
+      <div class="trust-bar__text">
+        <strong>Easy Returns</strong>
+        <span>Hassle-free within 7 days</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+.trust-bar {
+  background: #f8faf5;
+  border-top: 1px solid #e0ebd5;
+  border-bottom: 1px solid #e0ebd5;
+  overflow: hidden;
+}
+
+.trust-bar__track {
+  display: flex;
+  align-items: stretch;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.trust-bar__item {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 1.125rem 2rem;
+  flex: 1;
+  flex-shrink: 0;          /* never shrink below content */
+  min-width: 200px;        /* minimum so text never collapses */
+}
+
+.trust-bar__divider {
+  width: 1px;
+  background: #ddebd0;
+  align-self: stretch;
+  margin: 0.75rem 0;
+  flex-shrink: 0;
+}
+
+.trust-bar__icon {
+  width: 40px;
+  height: 40px;
+  background: #e8f3de;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #2D5016;
+}
+
+.trust-bar__icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.trust-bar__text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.trust-bar__text strong {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #1f3d2b;
+  white-space: nowrap;
+}
+
+.trust-bar__text span {
+  font-size: 0.75rem;
+  color: #6b8a5a;
+  white-space: nowrap;
+}
+
+/* Mobile: horizontal scroll strip */
+@media (max-width: 900px) {
+  .trust-bar__track {
+    overflow-x: auto;
+    overflow-y: visible;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+    /* fade hint on right edge */
+    -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+    mask-image: linear-gradient(to right, black 85%, transparent 100%);
+  }
+  .trust-bar__track::-webkit-scrollbar { display: none; }
+
+  .trust-bar__item {
+    padding: 0.875rem 1.25rem;
+    min-width: 180px;
+  }
+}
+
+@media (max-width: 480px) {
+  .trust-bar__item {
+    padding: 0.875rem 1rem;
+    min-width: 160px;
+    gap: 0.625rem;
+  }
+  .trust-bar__icon {
+    width: 34px;
+    height: 34px;
+  }
+  .trust-bar__icon svg {
+    width: 16px;
+    height: 16px;
+  }
+  .trust-bar__text strong { font-size: 0.8125rem; }
+  .trust-bar__text span { font-size: 0.6875rem; }
+}
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Trust Bar",
+  "settings": []
+}
+{% endschema %}
