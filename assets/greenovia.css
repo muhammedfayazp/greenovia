@@ -13,16 +13,25 @@
   --gv-font-ui: "Montserrat", "Inter", system-ui, sans-serif;
 }
 
-/* Dirham currency symbol icon */
-img.price-symbol {
-  display: inline !important;
-  width: 13px !important;
-  height: 16px !important;
-  vertical-align: middle;
-  margin-right: 2px;
-  position: relative;
-  top: -1px;
-  flex-shrink: 0;
+/* UAE Dirham symbol — custom font from github.com/prasathmani/dirham-symbol */
+@font-face {
+  font-family: "UAESymbol";
+  src:
+    url("dirham.woff2") format("woff2"),
+    url("dirham.woff") format("woff"),
+    url("dirham.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+.dirham-symbol {
+  font-family: "UAESymbol", sans-serif;
+  font-size: inherit;
+  color: inherit;
+  line-height: 1;
+  display: inline;
+  vertical-align: baseline;
+  margin-right: 1px;
 }
 
 /* Base Utility Classes - Extremely robust to block leakage */
