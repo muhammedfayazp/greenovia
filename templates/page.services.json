@@ -1,0 +1,9 @@
+{
+  "sections": {
+    "services": {
+      "type": "greenovia-services",
+      "settings": {}
+    }
+  },
+  "order": ["services"]
+}
