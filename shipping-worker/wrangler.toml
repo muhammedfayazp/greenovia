@@ -1,0 +1,5 @@
+name = "greenovia-shipping"
+main = "src/index.js"
+compatibility_date = "2024-09-01"
+
+# No secrets go here — use: wrangler secret put GOOGLE_MAPS_KEY
