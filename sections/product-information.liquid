@@ -1350,4 +1350,33 @@
       atcPrice.innerHTML = `<span class="dirham-symbol" aria-hidden="true">&#xE000;</span>${(variant.price / 100).toFixed(2)}`;
     }
     
-    // Update 
+    // Update image based on variant — match by media ID
+    if (variant.featured_image && productData.images) {
+      const targetId = variant.featured_image.id;
+      const imageIndex = productData.images.findIndex(img => img.id === targetId);
+      if (imageIndex !== -1 && imageIndex !== currentSlide) {
+        goToSlide(imageIndex);
+      }
+    }
+    
+    // Update variant label selected values
+    variantRadios.forEach(radio => {
+      if (radio.checked) {
+        const labelEl = document.getElementById(`variant-selected-${radio.dataset.optionPosition}`);
+        if (labelEl) labelEl.textContent = radio.value;
+      }
+    });
+
+    // Update URL
+    const url = new URL(window.location);
+    url.searchParams.set('variant', variant.id);
+    window.history.replaceState({}, '', url);
+  }
+
+  variantRadios.forEach(radio => {
+    radio.addEventListener('change', updateVariant);
+  });
+  
+
+})();
+</script>
