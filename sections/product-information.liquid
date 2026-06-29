@@ -269,7 +269,7 @@
   max-width: 1300px;
   margin: 0 auto;
   padding: var(--gap-lg) var(--gap-md);
-  background: #f8f5f0;
+  background: transparent;
   border-radius: 0;
 }
 
@@ -316,7 +316,7 @@
 
 .slider-slide {
   min-width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 4 / 5;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1360,15 +1360,4 @@
     });
 
     // Update URL
-    const url = new URL(window.location);
-    url.searchParams.set('variant', variant.id);
-    window.history.replaceState({}, '', url);
-  }
-
-  variantRadios.forEach(radio => {
-    radio.addEventListener('change', updateVariant);
-  });
-  
-
-})();
-</script>
+    co
