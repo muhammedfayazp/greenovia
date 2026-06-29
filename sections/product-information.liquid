@@ -335,24 +335,34 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 48px;
-  height: 48px;
-  background: rgba(255, 255, 255, 0.95);
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.92);
   border: none;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: var(--transition-fast);
-  box-shadow: var(--shadow-sm);
+  transition: opacity var(--transition-fast), background var(--transition-fast), transform 0.15s ease;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.12);
   z-index: 10;
   color: var(--text-dark);
   opacity: 0;
 }
 
-.product-image-slider:hover .slider-arrow {
-  opacity: 1;
+/* Desktop: show on hover */
+@media (hover: hover) {
+  .product-image-slider:hover .slider-arrow {
+    opacity: 1;
+  }
+}
+
+/* Touch devices: always show arrows */
+@media (hover: none) {
+  .slider-arrow {
+    opacity: 0.85;
+  }
 }
 
 .slider-arrow:hover {
@@ -1124,99 +1134,99 @@
   // ==========================================
   // IMAGE SLIDER WITH SWIPE
   // ==========================================
-  
+
   const slider = document.getElementById('imageSlider');
   const sliderTrack = document.getElementById('sliderTrack');
-  const slides = sliderTrack.querySelectorAll('.slider-slide');
+  const slides = sliderTrack ? sliderTrack.querySelectorAll('.slider-slide') : [];
   const dots = document.querySelectorAll('.slider-dot');
   const prevBtn = document.getElementById('prevSlide');
   const nextBtn = document.getElementById('nextSlide');
-  
+
   let currentSlide = 0;
   let startX = 0;
   let currentX = 0;
   let isDragging = false;
-  
+
+  function slideWidth() {
+    return slider ? slider.offsetWidth : 0;
+  }
+
   function goToSlide(index) {
+    if (!slider || !sliderTrack || slides.length === 0) return;
     if (index < 0) index = slides.length - 1;
     if (index >= slides.length) index = 0;
-    
+
     currentSlide = index;
-    sliderTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
-    
-    // Update dots
-    dots.forEach((dot, i) => {
-      dot.classList.toggle('active', i === currentSlide);
-    });
-    
-    // Update thumbnails
-    const thumbnails = document.querySelectorAll('.thumbnail-item');
-    thumbnails.forEach((thumb, i) => {
+    // Use pixels — translateX(%) is % of the TRACK width (all slides combined), not one slide
+    sliderTrack.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+    sliderTrack.style.transform = `translateX(-${currentSlide * slideWidth()}px)`;
+
+    dots.forEach((dot, i) => dot.classList.toggle('active', i === currentSlide));
+    document.querySelectorAll('.thumbnail-item').forEach((thumb, i) => {
       thumb.classList.toggle('active', i === currentSlide);
+      if (i === currentSlide) thumb.scrollIntoView({ block: 'nearest', inline: 'nearest' });
     });
   }
-  
-  // Arrow navigation
-  if (prevBtn) {
-    prevBtn.addEventListener('click', () => goToSlide(currentSlide - 1));
+
+  if (prevBtn) prevBtn.addEventListener('click', () => goToSlide(currentSlide - 1));
+  if (nextBtn) nextBtn.addEventListener('click', () => goToSlide(currentSlide + 1));
+  dots.forEach((dot, i) => dot.addEventListener('click', () => goToSlide(i)));
+
+  // Swipe / drag
+  function getX(e) {
+    return e.touches ? e.touches[0].pageX : e.pageX;
   }
-  if (nextBtn) {
-    nextBtn.addEventListener('click', () => goToSlide(currentSlide + 1));
-  }
-  
-  // Dot navigation
-  dots.forEach((dot, index) => {
-    dot.addEventListener('click', () => goToSlide(index));
-  });
-  
-  // Touch/Mouse swipe
+
   function handleStart(e) {
     isDragging = true;
-    startX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
+    startX = getX(e);
+    currentX = startX; // FIX: init so a bare tap never triggers slide change
     sliderTrack.style.transition = 'none';
   }
-  
+
   function handleMove(e) {
     if (!isDragging) return;
-    
-    currentX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
+    currentX = getX(e);
     const diff = currentX - startX;
-    const offset = -currentSlide * slider.offsetWidth + diff;
-    sliderTrack.style.transform = `translateX(${offset}px)`;
+    sliderTrack.style.transform = `translateX(${-currentSlide * slideWidth() + diff}px)`;
   }
-  
+
   function handleEnd() {
     if (!isDragging) return;
-    
     isDragging = false;
-    sliderTrack.style.transition = '';
-    
+
     const diff = currentX - startX;
-    const threshold = slider.offsetWidth * 0.2;
-    
-    if (diff > threshold && currentSlide > 0) {
-      goToSlide(currentSlide - 1);
-    } else if (diff < -threshold && currentSlide < slides.length - 1) {
+    const threshold = slideWidth() * 0.15;
+
+    if (diff < -threshold && currentSlide < slides.length - 1) {
       goToSlide(currentSlide + 1);
+    } else if (diff > threshold && currentSlide > 0) {
+      goToSlide(currentSlide - 1);
     } else {
-      goToSlide(currentSlide);
+      goToSlide(currentSlide); // snap back
     }
   }
-  
+
   if (slider) {
     slider.addEventListener('mousedown', handleStart);
     slider.addEventListener('mousemove', handleMove);
     slider.addEventListener('mouseup', handleEnd);
     slider.addEventListener('mouseleave', handleEnd);
-    
     slider.addEventListener('touchstart', handleStart, { passive: true });
     slider.addEventListener('touchmove', handleMove, { passive: true });
     slider.addEventListener('touchend', handleEnd);
   }
-  
-  // Thumbnail click
-  const thumbnails = document.querySelectorAll('.thumbnail-item');
-  thumbnails.forEach((thumb, index) => {
+
+  // Re-snap on window resize (slider width changes)
+  window.addEventListener('resize', () => {
+    if (sliderTrack) {
+      sliderTrack.style.transition = 'none';
+      sliderTrack.style.transform = `translateX(-${currentSlide * slideWidth()}px)`;
+    }
+  });
+
+  // Thumbnails
+  document.querySelectorAll('.thumbnail-item').forEach((thumb, index) => {
     thumb.addEventListener('click', () => goToSlide(index));
   });
   
@@ -1340,35 +1350,4 @@
       atcPrice.innerHTML = `<span class="dirham-symbol" aria-hidden="true">&#xE000;</span>${(variant.price / 100).toFixed(2)}`;
     }
     
-    // Update image based on variant
-    if (variant.featured_image && productData.images) {
-      const imageIndex = productData.images.findIndex(img => 
-        img.src.includes(variant.featured_image.src.split('?')[0].split('/').pop())
-      );
-      
-      if (imageIndex !== -1 && imageIndex !== currentSlide) {
-        goToSlide(imageIndex);
-      }
-    }
-    
-    // Update variant label selected values
-    variantRadios.forEach(radio => {
-      if (radio.checked) {
-        const labelEl = document.getElementById(`variant-selected-${radio.dataset.optionPosition}`);
-        if (labelEl) labelEl.textContent = radio.value;
-      }
-    });
-
-    // Update URL
-    const url = new URL(window.location);
-    url.searchParams.set('variant', variant.id);
-    window.history.replaceState({}, '', url);
-  }
-
-  variantRadios.forEach(radio => {
-    radio.addEventListener('change', updateVariant);
-  });
-  
-
-})();
-</script>
+    // Update 
