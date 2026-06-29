@@ -56,6 +56,18 @@
     </div>
   </div>
 
+  <!-- Chat with Expert bar -->
+  <a class="gv-chat-expert-bar" href="https://wa.me/971XXXXXXXXX?text=Hi%20Greenovia%2C%20I%20need%20plant%20advice!" target="_blank" rel="noopener" id="gvWhatsappLink">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+      <path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.554 4.12 1.522 5.854L.057 23.886a.5.5 0 00.636.598l6.218-2.07A11.93 11.93 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.9a9.87 9.87 0 01-5.031-1.373l-.36-.214-3.733 1.244 1.244-3.638-.233-.374A9.867 9.867 0 012.1 12C2.1 6.534 6.534 2.1 12 2.1c5.465 0 9.9 4.434 9.9 9.9 0 5.465-4.435 9.9-9.9 9.9z" fill-rule="evenodd"/>
+    </svg>
+    <span>Chat with a plant expert on WhatsApp</span>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="margin-left:auto;opacity:0.6">
+      <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </a>
+
   <!-- Input -->
   <div class="gv-chat-input-row">
     <input
@@ -313,6 +325,32 @@
   border-color: #1f3d2b;
 }
 
+/* ===== CHAT WITH EXPERT BAR ===== */
+.gv-chat-expert-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 16px;
+  background: #f0f9f3;
+  border-top: 1px solid #d0ead9;
+  color: #1f3d2b;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: background 0.15s ease;
+}
+
+.gv-chat-expert-bar:hover {
+  background: #e0f2e9;
+  color: #1f3d2b;
+}
+
+.gv-chat-expert-bar svg:first-child {
+  color: #25d366;
+  flex-shrink: 0;
+}
+
 /* ===== INPUT ===== */
 .gv-chat-input-row {
   display: flex;
@@ -391,62 +429,79 @@
   // ==========================================
   // PLANT KNOWLEDGE BASE
   // ==========================================
+
+  function shopLink(label, query) {
+    return `<a href="/search?q=${encodeURIComponent(query)}" style="color:#1f3d2b;font-weight:600;text-decoration:underline;">${label} →</a>`;
+  }
+
   const KB = [
     {
       match: /water|how often|when to water|overwater|underwater|dry|moist/i,
-      reply: "💧 **Watering guide:** Most houseplants need watering every 7–10 days in summer and every 14 days in winter. The best method: stick your finger 2–3 cm into the soil — if it feels dry, water thoroughly until it drains from the bottom. In the UAE heat, check more frequently. Succulents and cacti need far less — once every 2–3 weeks."
+      reply: "💧 **Watering guide:** Most houseplants need watering every 7–10 days in summer and every 14 days in winter. Stick your finger 2–3 cm into the soil — if dry, water thoroughly until it drains. In the UAE heat, check more frequently. Succulents and cacti need far less — once every 2–3 weeks."
     },
     {
       match: /yellow|yellowing|yellow leaves/i,
-      reply: "🍂 **Yellow leaves** usually mean one of three things:\n• **Overwatering** (most common) — let the soil dry out more between waterings\n• **Too little light** — move closer to a window\n• **Nutrient deficiency** — try a balanced liquid fertilizer monthly\n\nCheck the roots too — mushy dark roots mean root rot from overwatering."
+      reply: "🍂 **Yellow leaves** usually mean:\n• **Overwatering** (most common) — let soil dry out more\n• **Too little light** — move closer to a window\n• **Nutrient deficiency** — try a balanced liquid fertilizer monthly\n\nCheck the roots too — mushy dark roots = root rot from overwatering.\n\nNeed a hardier plant? " + shopLink("Browse easy-care plants", "easy care indoor plants")
     },
     {
       match: /low light|no light|dark room|no window|shade/i,
-      reply: "🌿 **Top plants for low-light spaces:**\n• **ZZ Plant** — nearly indestructible, loves neglect\n• **Pothos** — fast-growing, trails beautifully\n• **Snake Plant** — architectural, air-purifying\n• **Peace Lily** — flowers even in shade\n• **Cast Iron Plant** — as tough as its name\n\nAll are available at Greenovia. Want me to help you find one?"
+      reply: "🌿 **Top low-light plants:**\n• " + shopLink("ZZ Plant", "ZZ plant") + " — nearly indestructible\n• " + shopLink("Pothos", "pothos") + " — fast-growing, trails beautifully\n• " + shopLink("Snake Plant", "snake plant") + " — architectural, air-purifying\n• " + shopLink("Peace Lily", "peace lily") + " — flowers even in shade\n\nAll available at Greenovia with delivery across UAE!"
     },
     {
       match: /uae|dubai|abu dhabi|hot|heat|summer|humid|climate|weather/i,
-      reply: "☀️ **UAE plant care tips:**\n• Keep plants away from direct afternoon sun through glass — it magnifies heat and scorches leaves\n• Water more frequently in summer (May–Sep) as soil dries fast\n• AC rooms are very dry — mist leaves or use a pebble tray with water for humidity\n• **Best UAE indoor plants:** Anthurium, Dracaena, Pothos, ZZ Plant, Snake Plant, and Peace Lily all thrive here."
+      reply: "☀️ **UAE plant care tips:**\n• Keep plants away from direct afternoon sun through glass — it scorches leaves\n• Water more frequently in summer (May–Sep)\n• AC rooms are very dry — mist leaves regularly\n\n**Best UAE indoor plants:** " + shopLink("Anthurium", "anthurium") + ", " + shopLink("Dracaena", "dracaena") + ", " + shopLink("ZZ Plant", "zz plant") + ", " + shopLink("Snake Plant", "snake plant")
     },
     {
       match: /light|sunlight|bright|indirect|direct sun|window/i,
-      reply: "🌤️ **Light guide:**\n• **Bright indirect** (near window, no direct rays): Monstera, Fiddle Leaf Fig, Calathea\n• **Direct sun** (south/west window): Cacti, succulents, Bougainvillea\n• **Low light** (away from windows): ZZ Plant, Snake Plant, Pothos\n\nIn the UAE, east-facing windows give gentle morning sun — perfect for most tropicals."
+      reply: "🌤️ **Light guide:**\n• **Bright indirect:** " + shopLink("Monstera", "monstera") + ", " + shopLink("Fiddle Leaf Fig", "fiddle leaf fig") + "\n• **Direct sun:** " + shopLink("Cacti & Succulents", "cactus succulent") + "\n• **Low light:** " + shopLink("ZZ Plant", "zz plant") + ", " + shopLink("Pothos", "pothos") + "\n\nEast-facing windows give gentle morning sun — perfect for most tropicals."
     },
     {
       match: /fertiliz|feed|nutrient|fertiliser/i,
-      reply: "🌱 **Fertilizing tips:**\n• Feed during the growing season (Feb–Oct in UAE) once a month with a balanced liquid fertilizer (NPK 10-10-10)\n• Never fertilize in winter — plants rest and excess salts burn roots\n• For flowering plants, switch to a high-phosphorus fertilizer to boost blooms\n• Always water before fertilizing — applying to dry soil damages roots"
+      reply: "🌱 **Fertilizing tips:**\n• Feed monthly (Feb–Oct) with balanced liquid fertilizer (NPK 10-10-10)\n• Never fertilize in winter — plants rest\n• For flowering plants, use high-phosphorus fertilizer\n• Always water before fertilizing to protect roots\n\n" + shopLink("Browse all plants", "indoor plants")
     },
     {
       match: /repot|pot|root bound|roots|too big|new pot/i,
-      reply: "🪴 **Repotting guide:**\n• Repot when roots circle the bottom or grow out of drainage holes — usually every 1–2 years\n• Choose a pot only 2–3 cm larger than the current one (too big = soggy soil)\n• Best time: spring (March–April)\n• Use well-draining potting mix — add perlite for better drainage\n• Water well after repotting and keep in shade for a week to recover"
+      reply: "🪴 **Repotting guide:**\n• Repot when roots grow out of drainage holes — every 1–2 years\n• Choose a pot only 2–3 cm larger (too big = soggy soil)\n• Best time: spring (March–April)\n• Use well-draining mix + perlite for better drainage\n• Keep in shade for a week after repotting to recover"
     },
     {
       match: /drooping|wilting|sad|dying|help|rescue|limp|falling/i,
-      reply: "🆘 **Drooping plant rescue:**\n1. Check the soil — bone dry? Water immediately. Soggy? Let it dry out\n2. Check for pests under leaves (spider mites leave tiny webs)\n3. If the pot is in direct harsh sun, move to bright indirect light\n4. Trim any brown/black roots, repot in fresh soil if root rot is present\n5. Most plants bounce back in 1–2 weeks with correct care\n\nIf you purchased from us, our team is happy to help in store — bring a photo! 📸"
+      reply: "🆘 **Drooping plant rescue:**\n1. Bone dry soil? Water immediately\n2. Soggy soil? Let it fully dry out\n3. Check for pests under leaves\n4. Move out of harsh direct sun\n5. Trim black/mushy roots, repot in fresh soil\n\nMost plants bounce back in 1–2 weeks. Our experts are happy to help — use the WhatsApp button below! 📸"
     },
     {
       match: /pest|bug|insect|mite|aphid|scale|mealybug|gnats|fly/i,
-      reply: "🐛 **Dealing with pests:**\n• **Spider mites** (tiny dots, webbing): spray with diluted neem oil every 3 days\n• **Mealybugs** (white fluff): dab with rubbing alcohol on a cotton swab\n• **Fungus gnats** (tiny flies): let soil dry completely between waterings, use yellow sticky traps\n• **Scale** (brown bumps): scrape off, then treat with neem oil\n\nNeem oil is the best all-rounder — available at our store!"
+      reply: "🐛 **Dealing with pests:**\n• **Spider mites** (tiny dots + webs): spray with diluted neem oil every 3 days\n• **Mealybugs** (white fluff): dab with rubbing alcohol\n• **Fungus gnats** (tiny flies): let soil dry out completely\n• **Scale** (brown bumps): scrape off then treat with neem oil\n\nNeem oil is the best all-rounder — " + shopLink("ask us in store", "accessories")
     },
     {
-      match: /flowering|flower|bloom|not flowering|no flowers/i,
-      reply: "🌸 **Getting plants to flower:**\n• Ensure correct light — most flowering plants need bright indirect light\n• Switch to a phosphorus-rich fertilizer (e.g., 5-10-5) during the growing season\n• Some plants like **Kalanchoe** and **Christmas Cactus** need a period of darkness (10–12 hrs) to trigger blooming\n• **Peace Lilies** flower more when slightly root-bound\n• **Anthuriums** bloom year-round with bright indirect light and monthly feeding"
+      match: /flower|bloom|not flowering|no flowers|anthurium|orchid/i,
+      reply: "🌸 **Getting plants to flower:**\n• Ensure bright indirect light\n• Switch to phosphorus-rich fertilizer (e.g., 5-10-5)\n• **Anthuriums** bloom year-round with monthly feeding → " + shopLink("Shop Anthuriums", "anthurium") + "\n• **Orchids** need a cool night temp to re-bloom → " + shopLink("Shop Orchids", "orchid") + "\n• **Peace Lilies** flower more when slightly root-bound → " + shopLink("Shop Peace Lily", "peace lily")
     },
     {
       match: /indoor|office|home|living room|bedroom|bathroom/i,
-      reply: "🏡 **Best plants by room:**\n• **Living room:** Monstera, Fiddle Leaf Fig, Bird of Paradise (statement plants)\n• **Bedroom:** Snake Plant, Pothos, Peace Lily (air-purifying)\n• **Bathroom:** Ferns, Calathea, Orchids (love humidity)\n• **Office/desk:** ZZ Plant, Pothos, Cactus (low maintenance)\n• **Kitchen:** Herbs like basil & mint, or a small Aloe Vera\n\nWant a specific recommendation? Tell me your space!"
+      reply: "🏡 **Best plants by room:**\n• **Living room:** " + shopLink("Monstera", "monstera") + ", " + shopLink("Bird of Paradise", "bird of paradise") + "\n• **Bedroom:** " + shopLink("Snake Plant", "snake plant") + ", " + shopLink("Peace Lily", "peace lily") + "\n• **Bathroom:** " + shopLink("Ferns", "fern") + ", " + shopLink("Calathea", "calathea") + "\n• **Office:** " + shopLink("ZZ Plant", "zz plant") + ", " + shopLink("Pothos", "pothos")
     },
     {
       match: /outdoor|garden|balcony|terrace|patio/i,
-      reply: "🌳 **Outdoor & balcony plants for UAE:**\n• **Bougainvillea** — vibrant, drought-tolerant\n• **Ixora** — compact shrub with red/orange blooms\n• **Jasmine** — fragrant climber for trellises\n• **Desert Rose (Adenium)** — stunning, loves full UAE sun\n• **Palms** — Date Palm, Areca Palm for shade\n\nFor balconies, use UV-resistant pots and water daily in summer."
+      reply: "🌳 **Outdoor plants for UAE:**\n• " + shopLink("Bougainvillea", "bougainvillea") + " — vibrant, drought-tolerant\n• " + shopLink("Desert Rose (Adenium)", "adenium desert rose") + " — loves full UAE sun\n• " + shopLink("Areca Palm", "areca palm") + " — great for shade on balconies\n• " + shopLink("Jasmine", "jasmine") + " — fragrant climber\n\nWater outdoor plants daily in summer."
     },
     {
       match: /price|cost|how much|order|buy|shop|delivery|shipping/i,
-      reply: "🛒 **Shopping at Greenovia:**\nYou can browse and order plants directly from our store — we deliver across the UAE. For specific pricing, visit our product pages or contact our team.\n\nWe offer free delivery on orders over AED 199 and a 30-day satisfaction guarantee on all plants! 🌿"
+      reply: "🛒 **Shopping at Greenovia:**\nWe deliver across the UAE. Free delivery on orders over AED 199 and a 30-day satisfaction guarantee.\n\n" + shopLink("Browse all plants", "plants") + " | " + shopLink("Indoor plants", "indoor plants") + " | " + shopLink("Outdoor plants", "outdoor plants")
     },
     {
       match: /gift|gifting|present|occasion|birthday|anniversary/i,
-      reply: "🎁 **Plant gifting ideas:**\n• **Anthuriums** — long-lasting flowers, elegant and modern\n• **Orchids** — classic luxury gift\n• **Succulents** — low maintenance, great for beginners\n• **Peace Lily** — thoughtful and air-purifying\n• **Mini Monstera** — trendy and beautiful\n\nWe offer gift wrapping and can include a personalised card. Contact us for gift orders!"
+      reply: "🎁 **Plant gifting ideas:**\n• " + shopLink("Anthurium", "anthurium") + " — elegant, long-lasting flowers\n• " + shopLink("Orchid", "orchid") + " — classic luxury gift\n• " + shopLink("Succulents", "succulent") + " — low maintenance, great for beginners\n• " + shopLink("Peace Lily", "peace lily") + " — thoughtful & air-purifying\n\nWe offer gift wrapping — chat with us on WhatsApp for gift orders!"
+    },
+    {
+      match: /monstera|cheese|swiss/i,
+      reply: "🧀 **Monstera deliciosa** (Swiss Cheese Plant):\n• Light: bright indirect\n• Water: every 7–10 days, let top 5cm dry\n• Humidity: loves a mist or humidifier\n• Wipe leaves monthly to keep them glossy\n\n" + shopLink("Shop Monstera →", "monstera")
+    },
+    {
+      match: /pothos|devil|money plant/i,
+      reply: "🌿 **Pothos** is one of the easiest plants ever:\n• Thrives in almost any light (even artificial)\n• Water when soil is dry — every 1–2 weeks\n• Trails beautifully from shelves or hangs\n• Propagates easily in water\n\n" + shopLink("Shop Pothos →", "pothos")
+    },
+    {
+      match: /snake plant|sansevieria|mother in law/i,
+      reply: "🐍 **Snake Plant** — perfect for beginners:\n• Tolerates low light and neglect\n• Water only every 2–3 weeks (less in winter)\n• Air-purifying — great for bedrooms\n• Nearly indestructible!\n\n" + shopLink("Shop Snake Plant →", "snake plant")
     }
   ];
 
