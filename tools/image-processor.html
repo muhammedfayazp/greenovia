@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Greenovia — Image Processor</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f4f7f4;
+    color: #1a1a1a;
+    min-height: 100vh;
+    padding: 32px 20px;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .logo {
+    font-family: Georgia, serif;
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: #1f3d2b;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
+
+  .logo span { color: #4a7c59; font-size: 0.85rem; font-family: sans-serif; font-weight: 400; display: block; letter-spacing: 0; }
+
+  .dropzone {
+    border: 2px dashed #b8d4bc;
+    border-radius: 16px;
+    background: #fff;
+    padding: 48px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    max-width: 720px;
+    margin: 0 auto 24px;
+  }
+
+  .dropzone.drag-over {
+    border-color: #2d5a3d;
+    background: #f0f8f0;
+  }
+
+  .dropzone svg { color: #4a7c59; margin-bottom: 16px; }
+
+  .dropzone p { color: #555; font-size: 1rem; margin-bottom: 8px; }
+
+  .dropzone small { color: #999; font-size: 0.8rem; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: background 0.15s, transform 0.1s;
+    text-decoration: none;
+  }
+
+  .btn:active { transform: scale(0.98); }
+
+  .btn-primary { background: #1f3d2b; color: #fff; }
+  .btn-primary:hover { background: #2d5a3d; }
+
+  .btn-outline { background: #fff; color: #1f3d2b; border: 1.5px solid #1f3d2b; }
+  .btn-outline:hover { background: #f0f8f0; }
+
+  .btn-sm { padding: 6px 14px; font-size: 0.8rem; }
+
+  .btn-danger { background: #fee2e2; color: #991b1b; }
+  .btn-danger:hover { background: #fecaca; }
+
+  .controls {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px 24px;
+    max-width: 720px;
+    margin: 0 auto 24px;
+    border: 1px solid #e0eae0;
+    display: none;
+  }
+
+  .controls h3 { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4a7c59; margin-bottom: 16px; }
+
+  .controls-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    align-items: end;
+  }
+
+  @media (max-width: 600px) {
+    .controls-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  .control-item label {
+    display: block;
+    font-size: 0.78rem;
+    color: #666;
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+
+  .control-item input[type="range"] {
+    width: 100%;
+    accent-color: #2d5a3d;
+  }
+
+  .control-item select, .control-item input[type="color"] {
+    width: 100%;
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    background: #fff;
+    color: #1a1a1a;
+    cursor: pointer;
+  }
+
+  .control-item input[type="color"] {
+    height: 36px;
+    padding: 2px 4px;
+    cursor: pointer;
+  }
+
+  .val { font-size: 0.78rem; color: #888; text-align: right; margin-top: 2px; }
+
+  .preview-section {
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  .preview-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .preview-header h2 { font-size: 1rem; font-weight: 500; color: #1a1a1a; }
+
+  .preview-header .count { font-size: 0.85rem; color: #888; }
+
+  .preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .preview-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #e0eae0;
+    position: relative;
+  }
+
+  .preview-card canvas {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+  }
+
+  .card-footer {
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  .card-name {
+    font-size: 0.75rem;
+    color: #555;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+  }
+
+  .card-actions { display: flex; gap: 4px; }
+
+  .actions-bar {
+    max-width: 720px;
+    margin: 0 auto 48px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    display: none;
+  }
+
+  #fileInput { display: none; }
+
+  .empty { display: none; }
+
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    display: inline-block;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    greenovia
+    <span>Product Image Processor</span>
+  </div>
+</div>
+
+<input type="file" id="fileInput" accept="image/*" multiple>
+
+<div class="dropzone" id="dropzone">
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+    <polyline points="17 8 12 3 7 8"/>
+    <line x1="12" y1="3" x2="12" y2="15"/>
+  </svg>
+  <p>Drop product images here or click to upload</p>
+  <small>JPG, PNG, WEBP — multiple files supported</small>
+</div>
+
+<div class="controls" id="controls">
+  <h3>Watermark Settings</h3>
+  <div class="controls-grid">
+    <div class="control-item">
+      <label>Position (top → bottom)</label>
+      <input type="range" id="wmY" min="50" max="95" value="80">
+      <div class="val" id="wmYVal">80%</div>
+    </div>
+    <div class="control-item">
+      <label>Size</label>
+      <input type="range" id="wmSize" min="12" max="60" value="28">
+      <div class="val" id="wmSizeVal">28px</div>
+    </div>
+    <div class="control-item">
+      <label>Opacity</label>
+      <input type="range" id="wmOpacity" min="20" max="100" value="70">
+      <div class="val" id="wmOpacityVal">70%</div>
+    </div>
+    <div class="control-item">
+      <label>Color</label>
+      <input type="color" id="wmColor" value="#ffffff">
+    </div>
+    <div class="control-item">
+      <label>Style</label>
+      <select id="wmStyle">
+        <option value="text">Text only</option>
+        <option value="pill" selected>Pill background</option>
+        <option value="outline">Outline box</option>
+      </select>
+    </div>
+    <div class="control-item">
+      <label>Crop anchor</label>
+      <select id="cropAnchor">
+        <option value="center" selected>Center</option>
+        <option value="top">Top (show more of top)</option>
+        <option value="bottom">Bottom (show more of bottom)</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<div class="preview-section" id="previewSection" style="display:none">
+  <div class="preview-header">
+    <h2>Processed images</h2>
+    <span class="count" id="countLabel"></span>
+  </div>
+  <div class="preview-grid" id="previewGrid"></div>
+</div>
+
+<div class="actions-bar" id="actionsBar">
+  <button class="btn btn-outline" id="clearAll">Clear all</button>
+  <button class="btn btn-primary" id="downloadAll">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Download all (.zip)
+  </button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('fileInput');
+const previewGrid = document.getElementById('previewGrid');
+const previewSection = document.getElementById('previewSection');
+const actionsBar = document.getElementById('actionsBar');
+const controls = document.getElementById('controls');
+const countLabel = document.getElementById('countLabel');
+
+let processedImages = [];
+
+// Settings
+function getSettings() {
+  return {
+    wmY: parseInt(document.getElementById('wmY').value) / 100,
+    wmSize: parseInt(document.getElementById('wmSize').value),
+    wmOpacity: parseInt(document.getElementById('wmOpacity').value) / 100,
+    wmColor: document.getElementById('wmColor').value,
+    wmStyle: document.getElementById('wmStyle').value,
+    cropAnchor: document.getElementById('cropAnchor').value,
+  };
+}
+
+// Live-update all canvases when settings change
+function onSettingChange() {
+  document.getElementById('wmYVal').textContent = document.getElementById('wmY').value + '%';
+  document.getElementById('wmSizeVal').textContent = document.getElementById('wmSize').value + 'px';
+  document.getElementById('wmOpacityVal').textContent = document.getElementById('wmOpacity').value + '%';
+  reprocessAll();
+}
+
+['wmY','wmSize','wmOpacity','wmColor','wmStyle','cropAnchor'].forEach(id => {
+  document.getElementById(id).addEventListener('input', onSettingChange);
+  document.getElementById(id).addEventListener('change', onSettingChange);
+});
+
+// Drag & drop
+dropzone.addEventListener('click', () => fileInput.click());
+
+dropzone.addEventListener('dragover', e => {
+  e.preventDefault();
+  dropzone.classList.add('drag-over');
+});
+
+dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
+
+dropzone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropzone.classList.remove('drag-over');
+  handleFiles([...e.dataTransfer.files]);
+});
+
+fileInput.addEventListener('change', e => handleFiles([...e.target.files]));
+
+function handleFiles(files) {
+  const images = files.filter(f => f.type.startsWith('image/'));
+  if (!images.length) return;
+  images.forEach(f => loadAndProcess(f));
+}
+
+function loadAndProcess(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const entry = { img, name: file.name, file };
+      processedImages.push(entry);
+      addCard(entry);
+      updateUI();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function processImage(img, settings) {
+  const size = Math.min(img.width, img.height);
+  const canvas = document.createElement('canvas');
+  canvas.width = 1000;
+  canvas.height = 1000;
+  const ctx = canvas.getContext('2d');
+
+  // Square crop
+  let sx = 0, sy = 0;
+  if (img.width > img.height) {
+    sx = (img.width - size) / 2;
+    if (settings.cropAnchor === 'top') sx = 0;
+    if (settings.cropAnchor === 'bottom') sx = img.width - size;
+  } else {
+    sy = (img.height - size) / 2;
+    if (settings.cropAnchor === 'top') sy = 0;
+    if (settings.cropAnchor === 'bottom') sy = img.height - size;
+  }
+
+  // Draw cropped image
+  ctx.drawImage(img, sx, sy, size, size, 0, 0, 1000, 1000);
+
+  // Watermark
+  drawWatermark(ctx, 1000, settings);
+
+  return canvas;
+}
+
+function hexToRgba(hex, alpha) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+function drawWatermark(ctx, size, settings) {
+  const text = 'greenovia';
+  const fontSize = Math.round((settings.wmSize / 28) * (size * 0.065));
+  const x = size / 2;
+  const y = size * settings.wmY;
+  const alpha = settings.wmOpacity;
+  const color = settings.wmColor;
+
+  ctx.save();
+  ctx.font = `500 ${fontSize}px Georgia, serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.letterSpacing = '2px';
+
+  const metrics = ctx.measureText(text);
+  const tw = metrics.width;
+  const th = fontSize;
+  const pad = fontSize * 0.5;
+
+  if (settings.wmStyle === 'pill') {
+    ctx.fillStyle = hexToRgba('#1f3d2b', alpha * 0.65);
+    const rx = tw / 2 + pad;
+    const ry = th / 2 + pad * 0.5;
+    ctx.beginPath();
+    ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = hexToRgba(color, Math.min(alpha + 0.2, 1));
+  } else if (settings.wmStyle === 'outline') {
+    ctx.strokeStyle = hexToRgba(color, alpha);
+    ctx.lineWidth = fontSize * 0.08;
+    const rx = tw / 2 + pad;
+    const ry = th / 2 + pad * 0.4;
+    ctx.beginPath();
+    ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.fillStyle = hexToRgba(color, alpha);
+  } else {
+    ctx.shadowColor = 'rgba(0,0,0,0.5)';
+    ctx.shadowBlur = fontSize * 0.4;
+    ctx.fillStyle = hexToRgba(color, alpha);
+  }
+
+  ctx.fillText(text, x, y);
+  ctx.restore();
+}
+
+function addCard(entry) {
+  const settings = getSettings();
+  const canvas = processImage(entry.img, settings);
+  entry.canvas = canvas;
+
+  const card = document.createElement('div');
+  card.className = 'preview-card';
+  card.dataset.index = processedImages.length - 1;
+
+  const displayCanvas = document.createElement('canvas');
+  displayCanvas.width = 400;
+  displayCanvas.height = 400;
+  const dCtx = displayCanvas.getContext('2d');
+  dCtx.drawImage(canvas, 0, 0, 400, 400);
+
+  entry.displayCanvas = displayCanvas;
+
+  const footer = document.createElement('div');
+  footer.className = 'card-footer';
+
+  const name = document.createElement('span');
+  name.className = 'card-name';
+  name.title = entry.name;
+  name.textContent = entry.name;
+
+  const actions = document.createElement('div');
+  actions.className = 'card-actions';
+
+  const dlBtn = document.createElement('button');
+  dlBtn.className = 'btn btn-outline btn-sm';
+  dlBtn.textContent = '↓';
+  dlBtn.title = 'Download';
+  dlBtn.addEventListener('click', () => downloadOne(entry));
+
+  const rmBtn = document.createElement('button');
+  rmBtn.className = 'btn btn-danger btn-sm';
+  rmBtn.textContent = '✕';
+  rmBtn.title = 'Remove';
+  rmBtn.addEventListener('click', () => removeCard(card, entry));
+
+  actions.appendChild(dlBtn);
+  actions.appendChild(rmBtn);
+  footer.appendChild(name);
+  footer.appendChild(actions);
+  card.appendChild(displayCanvas);
+  card.appendChild(footer);
+  previewGrid.appendChild(card);
+}
+
+function reprocessAll() {
+  const settings = getSettings();
+  processedImages.forEach((entry, i) => {
+    if (!entry.img) return;
+    const canvas = processImage(entry.img, settings);
+    entry.canvas = canvas;
+    const dCtx = entry.displayCanvas.getContext('2d');
+    dCtx.clearRect(0, 0, 400, 400);
+    dCtx.drawImage(canvas, 0, 0, 400, 400);
+  });
+}
+
+function removeCard(card, entry) {
+  const idx = processedImages.indexOf(entry);
+  if (idx > -1) processedImages.splice(idx, 1);
+  card.remove();
+  updateUI();
+}
+
+function updateUI() {
+  const hasImages = processedImages.length > 0;
+  previewSection.style.display = hasImages ? 'block' : 'none';
+  actionsBar.style.display = hasImages ? 'flex' : 'none';
+  controls.style.display = hasImages ? 'block' : 'none';
+  countLabel.textContent = processedImages.length + ' image' + (processedImages.length !== 1 ? 's' : '');
+}
+
+function downloadOne(entry) {
+  const a = document.createElement('a');
+  const name = entry.name.replace(/\.[^.]+$/, '') + '_gv.jpg';
+  a.download = name;
+  a.href = entry.canvas.toDataURL('image/jpeg', 0.92);
+  a.click();
+}
+
+document.getElementById('downloadAll').addEventListener('click', async () => {
+  const btn = document.getElementById('downloadAll');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Zipping…';
+
+  const zip = new JSZip();
+  processedImages.forEach(entry => {
+    const name = entry.name.replace(/\.[^.]+$/, '') + '_gv.jpg';
+    const dataUrl = entry.canvas.toDataURL('image/jpeg', 0.92);
+    const base64 = dataUrl.split(',')[1];
+    zip.file(name, base64, { base64: true });
+  });
+
+  const blob = await zip.generateAsync({ type: 'blob' });
+  const a = document.createElement('a');
+  a.download = 'greenovia-images.zip';
+  a.href = URL.createObjectURL(blob);
+  a.click();
+  URL.revokeObjectURL(a.href);
+
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download all (.zip)';
+});
+
+document.getElementById('clearAll').addEventListener('click', () => {
+  processedImages = [];
+  previewGrid.innerHTML = '';
+  fileInput.value = '';
+  updateUI();
+});
+</script>
+</body>
+</html>

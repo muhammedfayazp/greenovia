@@ -1,0 +1,241 @@
+{% comment %}
+  Homepage Services Teaser — Greenovia Garden Center
+  Shows 4 service cards with icons + links to the full services page
+{% endcomment %}
+
+<section class="gv-home-services">
+  <div class="gv-home-services__inner">
+
+    <div class="gv-home-services__header">
+      <p class="gv-home-services__label">What We Do</p>
+      <h2 class="gv-home-services__heading">More Than Just Plants</h2>
+      <p class="gv-home-services__sub">
+        From garden design to ongoing maintenance, we help homes and businesses in the UAE thrive outdoors.
+      </p>
+    </div>
+
+    <div class="gv-home-services__grid">
+
+      <!-- Garden Maintenance -->
+      <a class="gv-home-services__card" href="/pages/services">
+        <div class="gv-home-services__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22V12"/>
+            <path d="M5 12c0-3.87 3.13-7 7-7s7 3.13 7 7"/>
+            <path d="M2 12h3M19 12h3"/>
+            <path d="M4.22 4.22l2.12 2.12M17.66 6.34l2.12-2.12"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </div>
+        <h3 class="gv-home-services__card-title">Garden Maintenance</h3>
+        <p class="gv-home-services__card-text">Regular upkeep including pruning, fertilising, pest control, and seasonal planting to keep your garden looking its best year-round.</p>
+        <span class="gv-home-services__cta">Learn more →</span>
+      </a>
+
+      <!-- Landscaping -->
+      <a class="gv-home-services__card" href="/pages/services">
+        <div class="gv-home-services__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 21h18"/>
+            <path d="M9 8c0 2.21-1.79 4-4 4v9h8V12c-2.21 0-4-1.79-4-4z"/>
+            <path d="M15 3c0 3.31-2.69 6-6 6"/>
+            <path d="M19 8c0 3.31-2.69 6-6 6v7h6V8z"/>
+          </svg>
+        </div>
+        <h3 class="gv-home-services__card-title">Landscaping</h3>
+        <p class="gv-home-services__card-text">Full landscape design and installation for residential and commercial properties — from concept to completion, built for the UAE climate.</p>
+        <span class="gv-home-services__cta">Learn more →</span>
+      </a>
+
+      <!-- Garden Design -->
+      <a class="gv-home-services__card" href="/pages/services">
+        <div class="gv-home-services__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20h9"/>
+            <path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
+          </svg>
+        </div>
+        <h3 class="gv-home-services__card-title">Garden Design</h3>
+        <p class="gv-home-services__card-text">Bespoke garden plans tailored to your space, lifestyle, and budget — balancing beauty with low-maintenance plant selection.</p>
+        <span class="gv-home-services__cta">Learn more →</span>
+      </a>
+
+      <!-- Irrigation -->
+      <a class="gv-home-services__card" href="/pages/services">
+        <div class="gv-home-services__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10"/>
+            <path d="M12 6v6l4 2"/>
+            <path d="M16.24 7.76A6 6 0 0121 12"/>
+          </svg>
+        </div>
+        <h3 class="gv-home-services__card-title">Irrigation Systems</h3>
+        <p class="gv-home-services__card-text">Smart drip and sprinkler systems designed for UAE water efficiency. Installation, maintenance, and timer programming included.</p>
+        <span class="gv-home-services__cta">Learn more →</span>
+      </a>
+
+    </div>
+
+    <div class="gv-home-services__footer">
+      <a href="/pages/services" class="gv-home-services__btn">View All Services</a>
+    </div>
+
+  </div>
+</section>
+
+<style>
+.gv-home-services {
+  background: #f5f8f5;
+  padding: 72px 24px;
+}
+
+.gv-home-services__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.gv-home-services__header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.gv-home-services__label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #4a7c59;
+  margin: 0 0 10px;
+}
+
+.gv-home-services__heading {
+  font-family: 'Lora', 'Georgia', serif;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 500;
+  color: #1a1a1a;
+  margin: 0 0 14px;
+  line-height: 1.2;
+}
+
+.gv-home-services__sub {
+  font-size: 1rem;
+  color: #555;
+  max-width: 520px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.gv-home-services__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .gv-home-services__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 540px) {
+  .gv-home-services__grid {
+    grid-template-columns: 1fr;
+  }
+  .gv-home-services {
+    padding: 48px 16px;
+  }
+}
+
+.gv-home-services__card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 28px 24px;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid #e8ede8;
+}
+
+.gv-home-services__card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.gv-home-services__icon {
+  width: 44px;
+  height: 44px;
+  background: #e8f0e8;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2d5a3d;
+  margin-bottom: 4px;
+  flex-shrink: 0;
+}
+
+.gv-home-services__icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.gv-home-services__card-title {
+  font-family: 'Lora', 'Georgia', serif;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.gv-home-services__card-text {
+  font-size: 0.875rem;
+  color: #666;
+  line-height: 1.6;
+  margin: 0;
+  flex: 1;
+}
+
+.gv-home-services__cta {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #2d5a3d;
+  margin-top: 4px;
+}
+
+.gv-home-services__footer {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.gv-home-services__btn {
+  display: inline-block;
+  background: #1f3d2b;
+  color: #fff;
+  text-decoration: none;
+  padding: 14px 32px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  transition: background 0.2s ease;
+}
+
+.gv-home-services__btn:hover {
+  background: #2d5a3d;
+}
+</style>
+
+{% schema %}
+{
+  "name": "Homepage Services",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Homepage Services"
+    }
+  ]
+}
+{% endschema %}
