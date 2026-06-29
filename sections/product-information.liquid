@@ -214,14 +214,17 @@
     "product": {{ product | json }},
     "variants": {{ product.variants | json }},
     "images": [
+      {% assign image_count = 0 %}
       {% for media in product.media %}
         {% if media.media_type == 'image' %}
+          {% if image_count > 0 %},{% endif %}
           {
             "id": {{ media.id }},
             "src": "{{ media | image_url: width: 1000 }}",
             "variant_ids": {{ media.variant_ids | json }},
             "alt": {{ media.alt | default: product.title | json }}
-          }{% unless forloop.last %},{% endunless %}
+          }
+          {% assign image_count = image_count | plus: 1 %}
         {% endif %}
       {% endfor %}
     ]
@@ -1347,36 +1350,4 @@
       }
     }
     if (atcPrice) {
-      atcPrice.innerHTML = `<span class="dirham-symbol" aria-hidden="true">&#xE000;</span>${(variant.price / 100).toFixed(2)}`;
-    }
-    
-    // Update image based on variant — match by media ID
-    if (variant.featured_image && productData.images) {
-      const targetId = variant.featured_image.id;
-      const imageIndex = productData.images.findIndex(img => img.id === targetId);
-      if (imageIndex !== -1 && imageIndex !== currentSlide) {
-        goToSlide(imageIndex);
-      }
-    }
-    
-    // Update variant label selected values
-    variantRadios.forEach(radio => {
-      if (radio.checked) {
-        const labelEl = document.getElementById(`variant-selected-${radio.dataset.optionPosition}`);
-        if (labelEl) labelEl.textContent = radio.value;
-      }
-    });
-
-    // Update URL
-    const url = new URL(window.location);
-    url.searchParams.set('variant', variant.id);
-    window.history.replaceState({}, '', url);
-  }
-
-  variantRadios.forEach(radio => {
-    radio.addEventListener('change', updateVariant);
-  });
-  
-
-})();
-</script>
+      atcPrice.innerHTML = `<span class="dirham-symbo
