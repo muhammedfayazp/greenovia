@@ -1350,4 +1350,43 @@
       }
     }
     if (atcPrice) {
-      atcPrice.innerHTML = `<span class="dirham-symbo
+      atcPrice.innerHTML = `<span class="dirham-symbol" aria-hidden="true">&#xE000;</span>${(variant.price / 100).toFixed(2)}`;
+    }
+    
+    // Update image: find the first image whose variant_ids includes this variant
+    if (productData.images && productData.images.length > 0) {
+      const vid = variant.id;
+      let imageIndex = productData.images.findIndex(img =>
+        Array.isArray(img.variant_ids) && img.variant_ids.includes(vid)
+      );
+      // Fallback: use featured_image src filename match
+      if (imageIndex === -1 && variant.featured_image) {
+        const filename = variant.featured_image.src.split('?')[0].split('/').pop().split('.')[0];
+        imageIndex = productData.images.findIndex(img => img.src.includes(filename));
+      }
+      if (imageIndex !== -1 && imageIndex !== currentSlide) {
+        goToSlide(imageIndex);
+      }
+    }
+    
+    // Update variant label selected values
+    variantRadios.forEach(radio => {
+      if (radio.checked) {
+        const labelEl = document.getElementById(`variant-selected-${radio.dataset.optionPosition}`);
+        if (labelEl) labelEl.textContent = radio.value;
+      }
+    });
+
+    // Update URL
+    const url = new URL(window.location);
+    url.searchParams.set('variant', variant.id);
+    window.history.replaceState({}, '', url);
+  }
+
+  variantRadios.forEach(radio => {
+    radio.addEventListener('change', updateVariant);
+  });
+  
+
+})();
+</script>

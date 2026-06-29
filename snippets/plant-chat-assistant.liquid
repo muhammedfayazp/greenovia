@@ -1,0 +1,572 @@
+{% comment %} Greenovia AI Plant Care Chat Assistant {% endcomment %}
+
+<!-- Chat Launcher Button -->
+<button class="gv-chat-launcher" id="gvChatLauncher" aria-label="Chat with plant expert">
+  <span class="gv-chat-launcher__icon gv-chat-launcher__icon--open">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </span>
+  <span class="gv-chat-launcher__icon gv-chat-launcher__icon--close" style="display:none">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+      <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>
+  </span>
+  <span class="gv-chat-launcher__label">Plant Expert</span>
+</button>
+
+<!-- Chat Panel -->
+<div class="gv-chat-panel" id="gvChatPanel" aria-hidden="true">
+  <!-- Header -->
+  <div class="gv-chat-header">
+    <div class="gv-chat-header__avatar">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2C6 2 3 7 3 12c0 3.5 2 6.5 5 8v2h8v-2c3-1.5 5-4.5 5-8 0-5-3-10-9-10z" fill="rgba(255,255,255,0.3)"/>
+        <path d="M12 2c1 3-1 5-3 7 2 0 4-1 5-3 0 3-2 5-4 6 3 0 6-2 7-5 1 4-1 8-5 10" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+    </div>
+    <div class="gv-chat-header__info">
+      <span class="gv-chat-header__name">Greenovia Plant Expert</span>
+      <span class="gv-chat-header__status">
+        <span class="gv-chat-header__dot"></span>Online
+      </span>
+    </div>
+    <button class="gv-chat-header__close" id="gvChatClose" aria-label="Close chat">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Messages -->
+  <div class="gv-chat-messages" id="gvChatMessages">
+    <div class="gv-chat-msg gv-chat-msg--bot">
+      <div class="gv-chat-msg__bubble">
+        👋 Hi! I'm your Greenovia plant expert. Ask me anything about plant care, watering, light needs, or finding the perfect plant for your space!
+      </div>
+      <div class="gv-chat-msg__time">Just now</div>
+    </div>
+
+    <!-- Quick reply chips -->
+    <div class="gv-chat-chips" id="gvChatChips">
+      <button class="gv-chat-chip" data-query="How often should I water my plant?">💧 Watering tips</button>
+      <button class="gv-chat-chip" data-query="What plants are good for low light indoors?">🌿 Low light plants</button>
+      <button class="gv-chat-chip" data-query="My plant leaves are turning yellow">🍂 Yellow leaves</button>
+      <button class="gv-chat-chip" data-query="Best plants for UAE climate">☀️ UAE plants</button>
+    </div>
+  </div>
+
+  <!-- Input -->
+  <div class="gv-chat-input-row">
+    <input
+      type="text"
+      class="gv-chat-input"
+      id="gvChatInput"
+      placeholder="Ask about plant care…"
+      autocomplete="off"
+      maxlength="200"
+    />
+    <button class="gv-chat-send" id="gvChatSend" aria-label="Send">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<style>
+/* ===== CHAT LAUNCHER ===== */
+.gv-chat-launcher {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 20px 0 16px;
+  height: 52px;
+  background: #1f3d2b;
+  border: none;
+  border-radius: 999px;
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(31,61,43,0.45);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-family: inherit;
+}
+
+.gv-chat-launcher:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(31,61,43,0.5);
+}
+
+.gv-chat-launcher__label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+
+/* ===== CHAT PANEL ===== */
+.gv-chat-panel {
+  position: fixed;
+  bottom: 88px;
+  right: 24px;
+  z-index: 9998;
+  width: 360px;
+  max-width: calc(100vw - 32px);
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-height: 520px;
+
+  opacity: 0;
+  transform: translateY(16px) scale(0.97);
+  pointer-events: none;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.gv-chat-panel.gv-chat-panel--open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: all;
+}
+
+/* ===== HEADER ===== */
+.gv-chat-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  background: #1f3d2b;
+  color: white;
+  flex-shrink: 0;
+}
+
+.gv-chat-header__avatar {
+  width: 38px;
+  height: 38px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.gv-chat-header__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.gv-chat-header__name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.gv-chat-header__status {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.7);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.gv-chat-header__dot {
+  width: 7px;
+  height: 7px;
+  background: #4ade80;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.gv-chat-header__close {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.7);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s ease;
+}
+
+.gv-chat-header__close:hover {
+  color: white;
+}
+
+/* ===== MESSAGES ===== */
+.gv-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  scroll-behavior: smooth;
+}
+
+.gv-chat-msg {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-width: 85%;
+}
+
+.gv-chat-msg--bot {
+  align-self: flex-start;
+}
+
+.gv-chat-msg--user {
+  align-self: flex-end;
+}
+
+.gv-chat-msg__bubble {
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.gv-chat-msg--bot .gv-chat-msg__bubble {
+  background: #f0f4f1;
+  color: #1a1a1a;
+  border-bottom-left-radius: 4px;
+}
+
+.gv-chat-msg--user .gv-chat-msg__bubble {
+  background: #1f3d2b;
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.gv-chat-msg__time {
+  font-size: 0.7rem;
+  color: #aaa;
+  padding: 0 4px;
+}
+
+.gv-chat-msg--user .gv-chat-msg__time {
+  text-align: right;
+}
+
+/* Typing indicator */
+.gv-chat-typing .gv-chat-msg__bubble {
+  padding: 12px 16px;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.gv-chat-typing-dot {
+  width: 7px;
+  height: 7px;
+  background: #999;
+  border-radius: 50%;
+  animation: typing 1.2s infinite;
+}
+
+.gv-chat-typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.gv-chat-typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typing {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-5px); opacity: 1; }
+}
+
+/* Quick reply chips */
+.gv-chat-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.gv-chat-chip {
+  padding: 6px 12px;
+  background: white;
+  border: 1.5px solid #d0e8d8;
+  border-radius: 999px;
+  color: #1f3d2b;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  font-family: inherit;
+}
+
+.gv-chat-chip:hover {
+  background: #f0f9f3;
+  border-color: #1f3d2b;
+}
+
+/* ===== INPUT ===== */
+.gv-chat-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border-top: 1px solid #f0f0f0;
+  flex-shrink: 0;
+  background: white;
+}
+
+.gv-chat-input {
+  flex: 1;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 999px;
+  padding: 9px 16px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s ease;
+  min-width: 0;
+}
+
+.gv-chat-input:focus {
+  border-color: #1f3d2b;
+}
+
+.gv-chat-send {
+  width: 38px;
+  height: 38px;
+  background: #1f3d2b;
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.gv-chat-send:hover {
+  background: #2d5a3a;
+  transform: scale(1.05);
+}
+
+.gv-chat-send:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+@media (max-width: 480px) {
+  .gv-chat-launcher {
+    bottom: 16px;
+    right: 16px;
+    height: 48px;
+    padding: 0 16px 0 14px;
+  }
+
+  .gv-chat-panel {
+    bottom: 76px;
+    right: 16px;
+    left: 16px;
+    width: auto;
+    max-height: 460px;
+  }
+}
+</style>
+
+<script>
+(function() {
+  'use strict';
+
+  // ==========================================
+  // PLANT KNOWLEDGE BASE
+  // ==========================================
+  const KB = [
+    {
+      match: /water|how often|when to water|overwater|underwater|dry|moist/i,
+      reply: "💧 **Watering guide:** Most houseplants need watering every 7–10 days in summer and every 14 days in winter. The best method: stick your finger 2–3 cm into the soil — if it feels dry, water thoroughly until it drains from the bottom. In the UAE heat, check more frequently. Succulents and cacti need far less — once every 2–3 weeks."
+    },
+    {
+      match: /yellow|yellowing|yellow leaves/i,
+      reply: "🍂 **Yellow leaves** usually mean one of three things:\n• **Overwatering** (most common) — let the soil dry out more between waterings\n• **Too little light** — move closer to a window\n• **Nutrient deficiency** — try a balanced liquid fertilizer monthly\n\nCheck the roots too — mushy dark roots mean root rot from overwatering."
+    },
+    {
+      match: /low light|no light|dark room|no window|shade/i,
+      reply: "🌿 **Top plants for low-light spaces:**\n• **ZZ Plant** — nearly indestructible, loves neglect\n• **Pothos** — fast-growing, trails beautifully\n• **Snake Plant** — architectural, air-purifying\n• **Peace Lily** — flowers even in shade\n• **Cast Iron Plant** — as tough as its name\n\nAll are available at Greenovia. Want me to help you find one?"
+    },
+    {
+      match: /uae|dubai|abu dhabi|hot|heat|summer|humid|climate|weather/i,
+      reply: "☀️ **UAE plant care tips:**\n• Keep plants away from direct afternoon sun through glass — it magnifies heat and scorches leaves\n• Water more frequently in summer (May–Sep) as soil dries fast\n• AC rooms are very dry — mist leaves or use a pebble tray with water for humidity\n• **Best UAE indoor plants:** Anthurium, Dracaena, Pothos, ZZ Plant, Snake Plant, and Peace Lily all thrive here."
+    },
+    {
+      match: /light|sunlight|bright|indirect|direct sun|window/i,
+      reply: "🌤️ **Light guide:**\n• **Bright indirect** (near window, no direct rays): Monstera, Fiddle Leaf Fig, Calathea\n• **Direct sun** (south/west window): Cacti, succulents, Bougainvillea\n• **Low light** (away from windows): ZZ Plant, Snake Plant, Pothos\n\nIn the UAE, east-facing windows give gentle morning sun — perfect for most tropicals."
+    },
+    {
+      match: /fertiliz|feed|nutrient|fertiliser/i,
+      reply: "🌱 **Fertilizing tips:**\n• Feed during the growing season (Feb–Oct in UAE) once a month with a balanced liquid fertilizer (NPK 10-10-10)\n• Never fertilize in winter — plants rest and excess salts burn roots\n• For flowering plants, switch to a high-phosphorus fertilizer to boost blooms\n• Always water before fertilizing — applying to dry soil damages roots"
+    },
+    {
+      match: /repot|pot|root bound|roots|too big|new pot/i,
+      reply: "🪴 **Repotting guide:**\n• Repot when roots circle the bottom or grow out of drainage holes — usually every 1–2 years\n• Choose a pot only 2–3 cm larger than the current one (too big = soggy soil)\n• Best time: spring (March–April)\n• Use well-draining potting mix — add perlite for better drainage\n• Water well after repotting and keep in shade for a week to recover"
+    },
+    {
+      match: /drooping|wilting|sad|dying|help|rescue|limp|falling/i,
+      reply: "🆘 **Drooping plant rescue:**\n1. Check the soil — bone dry? Water immediately. Soggy? Let it dry out\n2. Check for pests under leaves (spider mites leave tiny webs)\n3. If the pot is in direct harsh sun, move to bright indirect light\n4. Trim any brown/black roots, repot in fresh soil if root rot is present\n5. Most plants bounce back in 1–2 weeks with correct care\n\nIf you purchased from us, our team is happy to help in store — bring a photo! 📸"
+    },
+    {
+      match: /pest|bug|insect|mite|aphid|scale|mealybug|gnats|fly/i,
+      reply: "🐛 **Dealing with pests:**\n• **Spider mites** (tiny dots, webbing): spray with diluted neem oil every 3 days\n• **Mealybugs** (white fluff): dab with rubbing alcohol on a cotton swab\n• **Fungus gnats** (tiny flies): let soil dry completely between waterings, use yellow sticky traps\n• **Scale** (brown bumps): scrape off, then treat with neem oil\n\nNeem oil is the best all-rounder — available at our store!"
+    },
+    {
+      match: /flowering|flower|bloom|not flowering|no flowers/i,
+      reply: "🌸 **Getting plants to flower:**\n• Ensure correct light — most flowering plants need bright indirect light\n• Switch to a phosphorus-rich fertilizer (e.g., 5-10-5) during the growing season\n• Some plants like **Kalanchoe** and **Christmas Cactus** need a period of darkness (10–12 hrs) to trigger blooming\n• **Peace Lilies** flower more when slightly root-bound\n• **Anthuriums** bloom year-round with bright indirect light and monthly feeding"
+    },
+    {
+      match: /indoor|office|home|living room|bedroom|bathroom/i,
+      reply: "🏡 **Best plants by room:**\n• **Living room:** Monstera, Fiddle Leaf Fig, Bird of Paradise (statement plants)\n• **Bedroom:** Snake Plant, Pothos, Peace Lily (air-purifying)\n• **Bathroom:** Ferns, Calathea, Orchids (love humidity)\n• **Office/desk:** ZZ Plant, Pothos, Cactus (low maintenance)\n• **Kitchen:** Herbs like basil & mint, or a small Aloe Vera\n\nWant a specific recommendation? Tell me your space!"
+    },
+    {
+      match: /outdoor|garden|balcony|terrace|patio/i,
+      reply: "🌳 **Outdoor & balcony plants for UAE:**\n• **Bougainvillea** — vibrant, drought-tolerant\n• **Ixora** — compact shrub with red/orange blooms\n• **Jasmine** — fragrant climber for trellises\n• **Desert Rose (Adenium)** — stunning, loves full UAE sun\n• **Palms** — Date Palm, Areca Palm for shade\n\nFor balconies, use UV-resistant pots and water daily in summer."
+    },
+    {
+      match: /price|cost|how much|order|buy|shop|delivery|shipping/i,
+      reply: "🛒 **Shopping at Greenovia:**\nYou can browse and order plants directly from our store — we deliver across the UAE. For specific pricing, visit our product pages or contact our team.\n\nWe offer free delivery on orders over AED 199 and a 30-day satisfaction guarantee on all plants! 🌿"
+    },
+    {
+      match: /gift|gifting|present|occasion|birthday|anniversary/i,
+      reply: "🎁 **Plant gifting ideas:**\n• **Anthuriums** — long-lasting flowers, elegant and modern\n• **Orchids** — classic luxury gift\n• **Succulents** — low maintenance, great for beginners\n• **Peace Lily** — thoughtful and air-purifying\n• **Mini Monstera** — trendy and beautiful\n\nWe offer gift wrapping and can include a personalised card. Contact us for gift orders!"
+    }
+  ];
+
+  const FALLBACK = "🌿 That's a great question! While I cover many plant topics, this one might need a specialist's eye. You can:\n• Browse our plant care guides on the website\n• Contact our experts directly via the Contact page\n• Visit our store — our team loves plant questions!\n\nIs there anything else about watering, light, pests, or plant selection I can help with?";
+
+  function getReply(text) {
+    for (const entry of KB) {
+      if (entry.match.test(text)) return entry.reply;
+    }
+    return FALLBACK;
+  }
+
+  // Format markdown-ish text with line breaks and bold
+  function formatText(text) {
+    return text
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n/g, '<br>');
+  }
+
+  // ==========================================
+  // UI
+  // ==========================================
+  const launcher = document.getElementById('gvChatLauncher');
+  const panel = document.getElementById('gvChatPanel');
+  const closeBtn = document.getElementById('gvChatClose');
+  const messagesEl = document.getElementById('gvChatMessages');
+  const input = document.getElementById('gvChatInput');
+  const sendBtn = document.getElementById('gvChatSend');
+  const chips = document.getElementById('gvChatChips');
+  const iconOpen = launcher.querySelector('.gv-chat-launcher__icon--open');
+  const iconClose = launcher.querySelector('.gv-chat-launcher__icon--close');
+
+  let isOpen = false;
+
+  function openChat() {
+    isOpen = true;
+    panel.classList.add('gv-chat-panel--open');
+    panel.setAttribute('aria-hidden', 'false');
+    iconOpen.style.display = 'none';
+    iconClose.style.display = '';
+    input.focus();
+  }
+
+  function closeChat() {
+    isOpen = false;
+    panel.classList.remove('gv-chat-panel--open');
+    panel.setAttribute('aria-hidden', 'true');
+    iconOpen.style.display = '';
+    iconClose.style.display = 'none';
+  }
+
+  launcher.addEventListener('click', () => isOpen ? closeChat() : openChat());
+  closeBtn.addEventListener('click', closeChat);
+
+  function getTime() {
+    const d = new Date();
+    return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+  }
+
+  function addMessage(text, role) {
+    if (chips) chips.remove();
+
+    const msg = document.createElement('div');
+    msg.className = `gv-chat-msg gv-chat-msg--${role}`;
+
+    const bubble = document.createElement('div');
+    bubble.className = 'gv-chat-msg__bubble';
+    bubble.innerHTML = formatText(text);
+
+    const time = document.createElement('div');
+    time.className = 'gv-chat-msg__time';
+    time.textContent = getTime();
+
+    msg.appendChild(bubble);
+    msg.appendChild(time);
+    messagesEl.appendChild(msg);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+    return msg;
+  }
+
+  function showTyping() {
+    const typing = document.createElement('div');
+    typing.className = 'gv-chat-msg gv-chat-msg--bot gv-chat-typing';
+    typing.innerHTML = '<div class="gv-chat-msg__bubble"><span class="gv-chat-typing-dot"></span><span class="gv-chat-typing-dot"></span><span class="gv-chat-typing-dot"></span></div>';
+    messagesEl.appendChild(typing);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+    return typing;
+  }
+
+  function handleSend(query) {
+    const text = (query || input.value).trim();
+    if (!text) return;
+
+    addMessage(text, 'user');
+    input.value = '';
+    sendBtn.disabled = true;
+
+    const typing = showTyping();
+
+    // Simulate a brief "thinking" delay
+    const delay = 600 + Math.random() * 600;
+    setTimeout(() => {
+      typing.remove();
+      addMessage(getReply(text), 'bot');
+      sendBtn.disabled = false;
+    }, delay);
+  }
+
+  sendBtn.addEventListener('click', () => handleSend());
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') handleSend();
+  });
+
+  // Quick chip clicks
+  document.querySelectorAll('.gv-chat-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      handleSend(chip.dataset.query);
+      openChat();
+    });
+  });
+
+})();
+</script>
