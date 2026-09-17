@@ -158,6 +158,30 @@ export function fetchConfig(type = 'json', config = {}) {
   };
 }
 
+/** @type {Promise<void>} */
+let cartMutationQueue = Promise.resolve();
+
+/**
+ * Queues a cart-mutating request (add to cart, quantity change, etc.) so it only starts
+ * once every previously queued cart mutation has finished, including its DOM update.
+ * Without this, two concurrent cart requests (e.g. removing one line item while adding
+ * another) can resolve out of order and the response for the request that was sent first
+ * can overwrite the cart UI after the response for the request sent second, leaving the
+ * cart out of sync with the actual cart contents.
+ *
+ * @template T
+ * @param {() => Promise<T>} task - The async task to run once the queue is clear.
+ * @returns {Promise<T>} Resolves/rejects with the task's own result.
+ */
+export function queueCartMutation(task) {
+  const result = cartMutationQueue.then(task, task);
+  cartMutationQueue = result.then(
+    () => undefined,
+    () => undefined
+  );
+  return result;
+}
+
 /**
  * Creates a debounced function that delays calling the provided function (fn)
  * until after wait milliseconds have elapsed since the last time

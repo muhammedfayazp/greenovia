@@ -1,5 +1,5 @@
 import { Component } from '@theme/component';
-import { fetchConfig, preloadImage, onAnimationEnd } from '@theme/utilities';
+import { fetchConfig, preloadImage, onAnimationEnd, queueCartMutation } from '@theme/utilities';
 import { ThemeEvents, CartAddEvent, CartErrorEvent, CartUpdateEvent, VariantUpdateEvent } from '@theme/events';
 import { cartPerformance } from '@theme/performance';
 import { morph } from '@theme/morph';
@@ -331,77 +331,82 @@ class ProductFormComponent extends Component {
     }
 
     try {
-      const response = await fetch(Theme.routes.cart_add_url, config);
-      const data = await response.json();
+      // Queue this behind any other in-flight cart mutation (e.g. a quantity change or
+      // removal started just before this) so responses can't be applied out of order and
+      // leave the cart UI out of sync with the actual cart contents.
+      await queueCartMutation(async () => {
+        const response = await fetch(Theme.routes.cart_add_url, config);
+        const data = await response.json();
 
-      if (data.status) {
-        this.dispatchEvent(
-          new CartErrorEvent(form.getAttribute('id') || '', data.message, data.description, data.errors)
-        );
+        if (data.status) {
+          this.dispatchEvent(
+            new CartErrorEvent(form.getAttribute('id') || '', data.message, data.description, data.errors)
+          );
 
-        if (addToCartTextError) {
-          addToCartTextError.classList.remove('hidden');
+          if (addToCartTextError) {
+            addToCartTextError.classList.remove('hidden');
 
-          const textNode = addToCartTextError.childNodes[2];
-          if (textNode) {
-            textNode.textContent = data.message;
-          } else {
-            const newTextNode = document.createTextNode(data.message);
-            addToCartTextError.appendChild(newTextNode);
+            const textNode = addToCartTextError.childNodes[2];
+            if (textNode) {
+              textNode.textContent = data.message;
+            } else {
+              const newTextNode = document.createTextNode(data.message);
+              addToCartTextError.appendChild(newTextNode);
+            }
+
+            this.#setLiveRegionText(data.message);
+
+            this.#timeout = setTimeout(() => {
+              if (!addToCartTextError) return;
+              addToCartTextError.classList.add('hidden');
+              this.#clearLiveRegionText();
+            }, ERROR_MESSAGE_DISPLAY_DURATION);
           }
 
-          this.#setLiveRegionText(data.message);
-
-          this.#timeout = setTimeout(() => {
-            if (!addToCartTextError) return;
-            addToCartTextError.classList.add('hidden');
-            this.#clearLiveRegionText();
-          }, ERROR_MESSAGE_DISPLAY_DURATION);
+          this.dispatchEvent(
+            new CartAddEvent({}, this.id, {
+              didError: true,
+              source: 'product-form-component',
+              itemCount: 0,
+              productId: this.dataset.productId,
+            })
+          );
+          return;
         }
 
-        this.dispatchEvent(
-          new CartAddEvent({}, this.id, {
-            didError: true,
+        // Successful add
+        if (addToCartTextError) {
+          addToCartTextError.classList.add('hidden');
+        }
+
+        const items = data.items || [data];
+        const addedQty = items.reduce((acc, item) => acc + (item.quantity || 1), 0);
+        const variantId = items[0]?.variant_id?.toString();
+
+        // Update cart icon
+        const anyAddToCartButton = allAddToCartContainers[0]?.refs.addToCartButton;
+        if (anyAddToCartButton) {
+          const addedTextElement = anyAddToCartButton.querySelector('.add-to-cart-text--added');
+          const addedText = addedTextElement?.textContent?.trim() || Theme.translations.added;
+          this.#setLiveRegionText(addedText);
+          setTimeout(() => this.#clearLiveRegionText(), SUCCESS_MESSAGE_DISPLAY_DURATION);
+        }
+
+        document.dispatchEvent(
+          new CartAddEvent(data, this.id, {
             source: 'product-form-component',
-            itemCount: 0,
+            itemCount: addedQty,
             productId: this.dataset.productId,
+            variantId: variantId,
+            sections: data.sections,
           })
         );
-        return;
-      }
 
-      // Successful add
-      if (addToCartTextError) {
-        addToCartTextError.classList.add('hidden');
-      }
-
-      const items = data.items || [data];
-      const addedQty = items.reduce((acc, item) => acc + (item.quantity || 1), 0);
-      const variantId = items[0]?.variant_id?.toString();
-
-      // Update cart icon
-      const anyAddToCartButton = allAddToCartContainers[0]?.refs.addToCartButton;
-      if (anyAddToCartButton) {
-        const addedTextElement = anyAddToCartButton.querySelector('.add-to-cart-text--added');
-        const addedText = addedTextElement?.textContent?.trim() || Theme.translations.added;
-        this.#setLiveRegionText(addedText);
-        setTimeout(() => this.#clearLiveRegionText(), SUCCESS_MESSAGE_DISPLAY_DURATION);
-      }
-
-      document.dispatchEvent(
-        new CartAddEvent(data, this.id, {
-          source: 'product-form-component',
-          itemCount: addedQty,
-          productId: this.dataset.productId,
-          variantId: variantId,
-          sections: data.sections,
-        })
-      );
-
-      // Fire-and-forget: this only refreshes this form's own "in cart" quantity label.
-      // The cart drawer/icon already have what they need from `data.sections` above,
-      // so don't make the whole cart update wait on this extra request.
-      this.#fetchAndUpdateCartQuantity();
+        // Fire-and-forget: this only refreshes this form's own "in cart" quantity label.
+        // The cart drawer/icon already have what they need from `data.sections` above,
+        // so don't make the whole cart update wait on this extra request.
+        this.#fetchAndUpdateCartQuantity();
+      });
     } catch (error) {
       console.error('Add to cart error:', error);
     } finally {
