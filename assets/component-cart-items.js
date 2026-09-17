@@ -1,5 +1,5 @@
 import { Component } from '@theme/component';
-import { fetchConfig, debounce, onAnimationEnd, prefersReducedMotion, resetShimmer } from '@theme/utilities';
+import { fetchConfig, debounce, onAnimationEnd, prefersReducedMotion, resetShimmer, queueCartMutation } from '@theme/utilities';
 import { morphSection, sectionRenderer } from '@theme/section-renderer';
 import {
   ThemeEvents,
@@ -136,51 +136,56 @@ class CartItemsComponent extends Component {
 
     cartTotal?.shimmer();
 
-    fetch(`${Theme.routes.cart_change_url}`, fetchConfig('json', { body }))
-      .then((response) => {
-        return response.text();
-      })
-      .then((responseText) => {
-        const parsedResponseText = JSON.parse(responseText);
+    // Queue this behind any other in-flight cart mutation (e.g. an add-to-cart request
+    // that started just before this one) so responses can't be applied out of order and
+    // leave the cart UI out of sync with the actual cart contents.
+    queueCartMutation(() =>
+      fetch(`${Theme.routes.cart_change_url}`, fetchConfig('json', { body }))
+        .then((response) => {
+          return response.text();
+        })
+        .then((responseText) => {
+          const parsedResponseText = JSON.parse(responseText);
 
-        resetShimmer(this);
+          resetShimmer(this);
 
-        if (parsedResponseText.errors) {
-          this.#handleCartError(line, parsedResponseText);
-          return;
-        }
+          if (parsedResponseText.errors) {
+            this.#handleCartError(line, parsedResponseText);
+            return;
+          }
 
-        const newSectionHTML = new DOMParser().parseFromString(
-          parsedResponseText.sections[this.sectionId],
-          'text/html'
-        );
+          const newSectionHTML = new DOMParser().parseFromString(
+            parsedResponseText.sections[this.sectionId],
+            'text/html'
+          );
 
-        // Grab the new cart item count from a hidden element
-        const newCartHiddenItemCount = newSectionHTML.querySelector('[ref="cartItemCount"]')?.textContent;
-        const newCartItemCount = newCartHiddenItemCount ? parseInt(newCartHiddenItemCount, 10) : 0;
+          // Grab the new cart item count from a hidden element
+          const newCartHiddenItemCount = newSectionHTML.querySelector('[ref="cartItemCount"]')?.textContent;
+          const newCartItemCount = newCartHiddenItemCount ? parseInt(newCartHiddenItemCount, 10) : 0;
 
-        // Update data-cart-quantity for all matching variants
-        this.#updateQuantitySelectors(parsedResponseText);
+          // Update data-cart-quantity for all matching variants
+          this.#updateQuantitySelectors(parsedResponseText);
 
-        this.dispatchEvent(
-          new CartUpdateEvent(parsedResponseText, this.sectionId, {
-            itemCount: newCartItemCount,
-            source: 'cart-items-component',
-            sections: parsedResponseText.sections,
-          })
-        );
+          this.dispatchEvent(
+            new CartUpdateEvent(parsedResponseText, this.sectionId, {
+              itemCount: newCartItemCount,
+              source: 'cart-items-component',
+              sections: parsedResponseText.sections,
+            })
+          );
 
-        morphSection(this.sectionId, parsedResponseText.sections[this.sectionId]);
+          morphSection(this.sectionId, parsedResponseText.sections[this.sectionId]);
 
-        this.#updateCartQuantitySelectorButtonStates();
-      })
-      .catch((error) => {
-        console.error(error);
-      })
-      .finally(() => {
-        this.#enableCartItems();
-        cartPerformance.measureFromMarker(cartPerformaceUpdateMarker);
-      });
+          this.#updateCartQuantitySelectorButtonStates();
+        })
+        .catch((error) => {
+          console.error(error);
+        })
+        .finally(() => {
+          this.#enableCartItems();
+          cartPerformance.measureFromMarker(cartPerformaceUpdateMarker);
+        })
+    );
   }
 
   /**
