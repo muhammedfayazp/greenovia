@@ -122,10 +122,20 @@
     margin-top: 0.5rem;
   }
 
-  /* Disclosure trigger — looks like a tag icon + link text */
-  .cart-discount [data-disclosure-trigger],
-  .cart-discount disclosure-trigger,
-  .cart-discount summary {
+  /* .cart-actions already draws its own top border/padding around this element,
+     so drop this one to avoid a double line with an empty-looking gap between them. */
+  .cart-actions .cart-discount {
+    border-top: none;
+    padding-top: 0;
+    margin-top: 0;
+  }
+
+  /* Disclosure trigger — looks like a tag icon + link text.
+     The real element rendered by snippets/disclosure-trigger.liquid is
+     `button.disclosure-trigger`; it also sets `color: var(--color-foreground)`, which can
+     resolve to a color meant for a dark background (from settings.drawer_color_scheme) and
+     become invisible against this drawer's white background, so force a legible color here. */
+  .cart-discount .disclosure-trigger {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -135,12 +145,12 @@
     padding: 0 !important;
     font-size: 0.875rem;
     font-weight: 600;
-    color: #1f3d2b;
+    color: #1f3d2b !important;
     list-style: none;
     width: 100%;
   }
 
-  .cart-discount [data-disclosure-trigger]::before {
+  .cart-discount .disclosure-trigger::before {
     content: '';
     display: inline-block;
     width: 16px;

@@ -105,6 +105,64 @@ class CartItemsComponent extends Component {
   }
 
   /**
+   * Removes every item from the cart.
+   */
+  clearCart() {
+    const cartPerformaceUpdateMarker = cartPerformance.createStartingMarker('clear-all:user-action');
+
+    this.#disableCartItems();
+
+    const { cartTotal } = this.refs;
+
+    const cartItemsComponents = document.querySelectorAll('cart-items-component');
+    const sectionsToUpdate = new Set([this.sectionId]);
+    cartItemsComponents.forEach((item) => {
+      if (item instanceof HTMLElement && item.dataset.sectionId) {
+        sectionsToUpdate.add(item.dataset.sectionId);
+      }
+    });
+
+    const body = JSON.stringify({
+      sections: Array.from(sectionsToUpdate).join(','),
+      sections_url: window.location.pathname,
+    });
+
+    cartTotal?.shimmer();
+
+    queueCartMutation(() =>
+      fetch(`${Theme.routes.cart_clear_url}`, fetchConfig('json', { body }))
+        .then((response) => response.text())
+        .then((responseText) => {
+          const parsedResponseText = JSON.parse(responseText);
+
+          resetShimmer(this);
+
+          if (parsedResponseText.errors) {
+            console.error(parsedResponseText.errors);
+            return;
+          }
+
+          this.dispatchEvent(
+            new CartUpdateEvent(parsedResponseText, this.sectionId, {
+              itemCount: 0,
+              source: 'cart-items-component',
+              sections: parsedResponseText.sections,
+            })
+          );
+
+          morphSection(this.sectionId, parsedResponseText.sections[this.sectionId]);
+        })
+        .catch((error) => {
+          console.error(error);
+        })
+        .finally(() => {
+          this.#enableCartItems();
+          cartPerformance.measureFromMarker(cartPerformaceUpdateMarker);
+        })
+    );
+  }
+
+  /**
    * Updates the quantity.
    * @param {Object} config - The config.
    * @param {number} config.line - The line.

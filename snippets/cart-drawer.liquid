@@ -38,19 +38,49 @@
   <dialog
     ref="dialog"
     class="cart-drawer__dialog dialog-modal dialog-drawer color-{{ settings.drawer_color_scheme }}{% if cart.empty? %} cart-drawer--empty{% endif %}"
-    aria-labelledby="{% if cart.empty? %}cart-drawer-heading-empty{% else %}cart-drawer-heading{% endif %}"
+    aria-labelledby="cart-drawer-heading"
     scroll-lock
   >
+    {%- comment -%}
+      The header and the cart-items-component below share the exact same structure and
+      element ids across the empty/non-empty states on purpose. The AJAX cart flow morphs
+      this markup in place (rather than doing a full replace) whenever the cart changes, and
+      the morph only works correctly when it can match up old/new nodes by tag and id. If the
+      two states have different DOM shapes, the very first add-to-cart from an empty cart can
+      end up morphing into a broken hybrid of both states and appear to still show "empty".
+    {%- endcomment -%}
     <div class="cart-drawer__inner">
-      {%- if cart.empty? -%}
-        {%- comment -%} Empty Cart State {%- endcomment -%}
-        <div class="cart-drawer__header">
-          <h2 class="cart-drawer__heading" id="cart-drawer-heading-empty">
-            <svg class="cart-icon-large" width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M9 2L7.17 4H3C1.9 4 1 4.9 1 6V18C1 19.1 1.9 20 3 20H21C22.1 20 23 19.1 23 18V6C23 4.9 22.1 4 21 4H16.83L15 2H9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <div class="cart-drawer__header">
+        <h2 class="cart-drawer__heading" id="cart-drawer-heading">
+          <span class="cart-icon-wrapper">
+            <svg class="cart-icon-large" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+              <path d="M3 6h18"></path>
+              <path d="M16 10a4 4 0 0 1-8 0"></path>
             </svg>
-            {{ 'content.your_cart' | t }}
-          </h2>
+          </span>
+          <span class="cart-heading-text">{{ 'content.cart_title' | t }}</span>
+          {%- unless cart.empty? -%}
+            <span class="cart-count-bubble">
+              {%- if cart.item_count < 100 -%}
+                <span aria-hidden="true">{{ cart.item_count }}</span>
+              {%- endif -%}
+              <span class="visually-hidden">{{ 'sections.header.cart_count' | t: count: cart.item_count }}</span>
+            </span>
+          {%- endunless -%}
+        </h2>
+
+        <div class="cart-drawer__header-actions">
+          {%- unless cart.empty? -%}
+            <button
+              type="button"
+              on:click="#CartDrawerItems/clearCart"
+              class="button button-unstyled cart-drawer__clear-all"
+            >
+              {{ 'actions.clear_all' | t }}
+            </button>
+          {%- endunless -%}
+
           <button
             ref="closeButton"
             on:click="#CartDrawerMain/close"
@@ -62,12 +92,16 @@
             </svg>
           </button>
         </div>
+      </div>
 
-        <div class="cart-drawer__content cart-drawer__content--empty">
-          <cart-items-component
-            class="cart-items-component"
-            data-section-id="{{ section.id }}"
-          >
+      <cart-items-component
+        id="CartDrawerItems"
+        class="cart-items-component"
+        data-section-id="{{ section.id }}"
+      >
+        {%- if cart.empty? -%}
+          {%- comment -%} Empty Cart State {%- endcomment -%}
+          <div class="cart-drawer__content cart-drawer__content--empty">
             <div class="empty-cart-illustration">
               <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
                 <circle cx="60" cy="60" r="58" fill="#f0f7f4" stroke="#1a5c3a" stroke-width="2"/>
@@ -76,63 +110,27 @@
                 <circle cx="60" cy="90" r="3" fill="#1a5c3a"/>
               </svg>
             </div>
-            
+
             <h3 class="empty-cart-heading">
               {{ 'content.your_cart_is_empty' | t }}
             </h3>
-            
+
             <p class="empty-cart-text">
               Start adding your favorite items to your cart!
             </p>
-            
-            <button 
+
+            <button
               class="empty-cart-btn"
               on:click="#CartDrawerMain/close"
             >
               Continue Shopping
             </button>
-          </cart-items-component>
-        </div>
-      {%- else -%}
-        {%- comment -%} Cart with Items {%- endcomment -%}
-        <div class="cart-drawer__header" id="cart-drawer-header">
-          <h2 class="cart-drawer__heading" id="cart-drawer-heading">
-            <span class="cart-icon-wrapper">
-              <svg class="cart-icon-large" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
-                <path d="M3 6h18"></path>
-                <path d="M16 10a4 4 0 0 1-8 0"></path>
-              </svg>
-            </span>
-            <span class="cart-heading-text">{{ 'content.cart_title' | t }}</span>
-            <span class="cart-count-bubble">
-              {%- if cart.item_count < 100 -%}
-                <span aria-hidden="true">{{ cart.item_count }}</span>
-              {%- endif -%}
-              <span class="visually-hidden">{{ 'sections.header.cart_count' | t: count: cart.item_count }}</span>
-            </span>
-          </h2>
-
-          <button
-            ref="closeButton"
-            on:click="#CartDrawerMain/close"
-            class="button close-button cart-drawer__close-button button-unstyled"
-            aria-label="{{ 'actions.close_dialog' | t }}"
-          >
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-            </svg>
-          </button>
-        </div>
-
-        <cart-items-component
-          class="cart-items-component"
-          data-section-id="{{ section.id }}"
-        >
+          </div>
+        {%- else -%}
+          {%- comment -%} Cart with Items {%- endcomment -%}
           <div
             class="cart-drawer__content"
             aria-label="{{ 'accessibility.cart' | t }}"
-            style="--header-height: 64px;"
           >
             <scroll-hint class="cart-drawer__items">
               {% render 'cart-products', drawer_context: 'drawer' %}
@@ -142,8 +140,8 @@
               {% render 'cart-summary' %}
             </div>
           </div>
-        </cart-items-component>
-      {%- endif -%}
+        {%- endif -%}
+      </cart-items-component>
     </div>
   </dialog>
 </cart-drawer-component>
@@ -182,7 +180,7 @@
   max-width: 100vw;
   border-radius: 0;
   border: none;
-  box-shadow: 
+  box-shadow:
     -4px 0 24px rgba(0, 0, 0, 0.1),
     -2px 0 12px rgba(0, 0, 0, 0.05);
 }
@@ -191,10 +189,23 @@
   height: 100%;
   overflow: hidden;
   background: var(--cart-cream);
+  /* Let the header take its natural height and the items component fill the rest, so the
+     checkout button never gets clipped by a header-height guess that doesn't match reality. */
+  display: flex;
+  flex-direction: column;
+}
+
+.cart-drawer__inner .cart-drawer__header {
+  flex: 0 0 auto;
+}
+
+.cart-drawer__inner cart-items-component {
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .cart-drawer__content {
-  height: calc(100% - var(--header-height));
+  height: 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden; /* Container itself shouldn't scroll */
@@ -209,6 +220,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
   width: 100%;
   padding: 1rem 1.25rem;
   position: sticky;
@@ -229,8 +241,9 @@
   align-items: center;
   gap: 8px;
   margin: 0;
+  min-width: 0;
   color: #1a1a1a;
-  font-family: 'Playfair Display', serif, system-ui; /* Serif as per screenshot */
+  font-family: 'Playfair Display', serif, system-ui;
 }
 
 .cart-icon-large {
@@ -240,16 +253,52 @@
 
 .cart-heading-text {
   font-weight: 600;
-  font-size: 1.75rem;
+  font-size: 1.375rem;
   letter-spacing: -0.02em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .cart-count-bubble {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--cart-green);
+  color: #ffffff;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.cart-drawer__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
+/* Clear All Button */
+.cart-drawer__clear-all {
+  padding: 0;
+  background: none;
+  border: none;
   color: #666;
-  font-size: 0.875rem;
-  font-weight: 400;
-  opacity: 0.8;
-  margin-left: -4px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+
+.cart-drawer__clear-all:hover {
+  color: var(--cart-green);
 }
 
 /* Close Button - Modern Style */
@@ -431,16 +480,17 @@
   }
   
   .cart-drawer__heading {
-    font-size: 1.125rem;
     gap: 10px;
   }
-  
-  .cart-count-bubble {
-    width: 28px;
-    height: 28px;
-    font-size: 0.8rem;
+
+  .cart-heading-text {
+    font-size: 1.125rem;
   }
-  
+
+  .cart-drawer__clear-all {
+    font-size: 0.75rem;
+  }
+
   .cart-drawer__close-button {
     width: 36px;
     height: 36px;
@@ -481,16 +531,10 @@
 }
 
 @media screen and (max-width: 480px) {
-  .cart-drawer__heading {
+  .cart-heading-text {
     font-size: 1rem;
   }
-  
-  .cart-count-bubble {
-    width: 26px;
-    height: 26px;
-    font-size: 0.75rem;
-  }
-  
+
   .empty-cart-content {
     padding: 32px 20px;
   }
