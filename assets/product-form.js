@@ -388,8 +388,6 @@ class ProductFormComponent extends Component {
         setTimeout(() => this.#clearLiveRegionText(), SUCCESS_MESSAGE_DISPLAY_DURATION);
       }
 
-      await this.#fetchAndUpdateCartQuantity();
-
       document.dispatchEvent(
         new CartAddEvent(data, this.id, {
           source: 'product-form-component',
@@ -399,6 +397,11 @@ class ProductFormComponent extends Component {
           sections: data.sections,
         })
       );
+
+      // Fire-and-forget: this only refreshes this form's own "in cart" quantity label.
+      // The cart drawer/icon already have what they need from `data.sections` above,
+      // so don't make the whole cart update wait on this extra request.
+      this.#fetchAndUpdateCartQuantity();
     } catch (error) {
       console.error('Add to cart error:', error);
     } finally {
