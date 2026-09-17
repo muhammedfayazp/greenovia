@@ -475,6 +475,11 @@
       "type": "newsletter-strip",
       "name": "Newsletter",
       "settings": {}
+    },
+    "homepage_services_gv1": {
+      "type": "homepage-services",
+      "name": "Our Services",
+      "settings": {}
     }
   },
   "order": [
@@ -485,6 +490,7 @@
     "trust_bar_gv1",
     "category_product_rows_wwMeap",
     "shop_by_category_e8ipig",
+    "homepage_services_gv1",
     "testimonials_gv1",
     "newsletter_gv1",
     "daily_deals_WpJVGc"
