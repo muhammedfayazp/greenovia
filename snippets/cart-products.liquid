@@ -24,7 +24,7 @@
     {%- comment -%} Empty State {%- endcomment -%}
     <div class="cart-empty-state">
       <div class="cart-empty-backdrop"></div>
-      
+
       <div class="cart-empty-icon-wrapper">
         <div class="cart-empty-icon-circle">
           <svg width="52" height="52" viewBox="0 0 48 48" fill="none" class="cart-empty-icon-svg">
@@ -38,7 +38,7 @@
       <div class="cart-empty-content">
         <h1 class="cart-empty-heading">Your cart is empty</h1>
         <p class="cart-empty-text">Discover beautiful items and start building your collection today.</p>
-        
+
         <div class="cart-empty-actions">
           <a
             class="cart-empty-button cart-empty-button--primary"
@@ -64,7 +64,7 @@
   {%- else -%}
     {%- comment -%} Cart Items {%- endcomment -%}
     <span class="visually-hidden" ref="cartItemCount" aria-hidden="true">{{- cart.item_count -}}</span>
-    
+
     <form
       action="{{ routes.cart_url }}"
       class="modern-cart-form"
@@ -84,10 +84,10 @@
             <div class="cart-item__image-wrapper">
               <a href="{{ item.url }}" class="cart-item__image-link">
                 {% if item.image %}
-                  <img 
-                    src="{{ item.image | image_url: width: 200 }}" 
+                  <img
+                    src="{{ item.image | image_url: width: 200 }}"
                     alt="{{ item.product.title | escape }}"
-                    class="cart-item__img" 
+                    class="cart-item__img"
                     loading="lazy"
                   />
                 {% else %}
@@ -106,7 +106,7 @@
               <div class="cart-item__header">
                 <div class="cart-item__info">
                   <a href="{{ item.url }}" class="cart-item__title">{{ item.product.title }}</a>
-                  
+
                   {%- comment -%} Variants {%- endcomment -%}
                   {% if item.product.has_only_default_variant == false %}
                     <div class="cart-item__variants">
@@ -119,45 +119,26 @@
                 <div class="cart-item__price-main"><span class="dirham-symbol" aria-hidden="true">&#xE000;</span>{{ item.price | money_without_currency }}</div>
               </div>
 
-              {%- comment -%} Controls Row {%- endcomment -%}
+              {%- comment -%}
+                Controls Row.
+
+                The quantity control is the theme's shared quantity-selector snippet (the same
+                one CartItemsComponent's JS is built to talk to via QuantitySelectorUpdateEvent),
+                and the remove button calls CartItemsComponent's own onLineItemRemove method
+                directly through the on:click action attribute. Both go through the same queued
+                /cart/change.js flow and DOM morph as every other cart mutation in the theme, so
+                this row can't fall out of sync with the server the way a separate hand-rolled
+                fetch (bypassing that flow) previously could.
+              {%- endcomment -%}
               <div class="cart-item__footer">
                 <div class="cart-item__quantity-group">
-                  <div class="cart-item__quantity">
-                    <button
-                      type="button"
-                      class="qty-btn qty-btn--minus"
-                      data-action="decrease"
-                      data-line="{{ item.index | plus: 1 }}"
-                      aria-label="Decrease quantity"
-                    >
-                      <svg width="12" height="2" viewBox="0 0 12 2" fill="none">
-                        <path d="M0 1H12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                      </svg>
-                    </button>
-
-                    <input
-                      type="number"
-                      class="qty-input"
-                      name="updates[]"
-                      value="{{ item.quantity }}"
-                      min="0"
-                      data-line="{{ item.index | plus: 1 }}"
-                      aria-label="Quantity"
-                      readonly
-                    />
-
-                    <button
-                      type="button"
-                      class="qty-btn qty-btn--plus"
-                      data-action="increase"
-                      data-line="{{ item.index | plus: 1 }}"
-                      aria-label="Increase quantity"
-                    >
-                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                        <path d="M6 0V12M0 6H12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                      </svg>
-                    </button>
-                  </div>
+                  {% render 'quantity-selector',
+                    product: item.product,
+                    variant: item.variant,
+                    in_cart_quantity: item.quantity,
+                    line_index: item.index,
+                    class: 'cart-item__quantity'
+                  %}
                 </div>
 
                 <div class="cart-item__line-total"><span class="dirham-symbol" aria-hidden="true">&#xE000;</span>{{ item.final_line_price | money_without_currency }}</div>
@@ -165,8 +146,7 @@
                 <button
                   type="button"
                   class="cart-item__remove"
-                  data-action="remove"
-                  data-line="{{ item.index | plus: 1 }}"
+                  on:click="/onLineItemRemove/{{ item.index | plus: 1 }}"
                   aria-label="Remove {{ item.product.title | escape }}"
                   title="Remove from cart"
                 >
@@ -177,8 +157,11 @@
               </div>
 
               {%- comment -%} Error Message {%- endcomment -%}
-              <div class="cart-item__error hidden" data-error="{{ item.index | plus: 1 }}">
-                <span class="cart-item__error-text"></span>
+              <div
+                class="cart-item__error hidden"
+                ref="cartItemErrorContainer-{{ item.index | plus: 1 }}"
+              >
+                <span class="cart-item__error-text" ref="cartItemError-{{ item.index | plus: 1 }}"></span>
               </div>
             </div>
           </div>
@@ -611,76 +594,26 @@
   gap: 0.5rem;
 }
 
-.cart-item__quantity-label {
-  font-size: 0.8125rem;
-  color: var(--cart-text-secondary);
-  font-weight: 600;
-  white-space: nowrap;
+/* Compact the shared quantity-selector component (used theme-wide) to fit a cart row */
+cart-quantity-selector-component.cart-item__quantity {
+  height: 32px;
+  min-width: 96px;
+  padding: 0 4px;
 }
 
-.cart-item__quantity {
-  display: inline-flex;
-  align-items: center;
-  background: #f5f5f5;
-  border-radius: 20px;
-  padding: 2px;
-  border: none;
-  gap: 0;
-  transition: all 0.15s ease;
+cart-quantity-selector-component.cart-item__quantity .button {
+  width: 24px;
+  height: 24px;
 }
 
-.cart-item__quantity:focus-within {
-  border-color: var(--cart-primary);
-  box-shadow: 0 0 0 2px rgba(26, 92, 58, 0.1);
+cart-quantity-selector-component.cart-item__quantity .button svg {
+  width: 10px;
+  height: 10px;
 }
 
-.qty-btn {
+cart-quantity-selector-component.cart-item__quantity input {
   width: 28px;
-  height: 28px;
-  background: #fff;
-  border: none;
-  color: var(--cart-text-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  padding: 0;
-  border-radius: 50%;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-}
-
-.qty-btn:hover:not(:disabled) {
-  background: rgba(26, 92, 58, 0.08);
-  color: var(--cart-primary);
-}
-
-.qty-btn:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-}
-
-.qty-input {
-  width: 32px;
-  border: none;
-  background: transparent;
-  text-align: center;
-  font-weight: 700;
-  color: var(--cart-text-primary);
-  font-size: 0.875rem;
-  padding: 0;
-  margin: 0;
-  font-family: inherit;
-}
-
-.qty-input:hover,
-.qty-input:focus {
-  background: transparent !important;
-  outline: none;
-}
-
-.qty-input:focus {
-  outline: none;
+  font-size: 0.8125rem;
 }
 
 .cart-item__line-total {
@@ -780,16 +713,6 @@
     font-size: 0.9375rem;
   }
 
-  .qty-btn {
-    width: 30px;
-    height: 30px;
-  }
-
-  .qty-input {
-    width: 36px;
-    font-size: 0.875rem;
-  }
-
   .modern-cart-header {
     flex-direction: column;
     align-items: flex-start;
@@ -826,10 +749,6 @@
   .cart-item__footer {
     width: 100%;
     flex-basis: 100%;
-  }
-
-  .cart-item__quantity-label {
-    font-size: 0.75rem;
   }
 
   .cart-empty-state {
@@ -876,7 +795,6 @@
   border: 0 !important;
 }
 
-.qty-btn:focus-visible,
 .cart-item__remove:focus-visible,
 .cart-item__title:focus-visible,
 .cart-empty-button:focus-visible {
@@ -891,335 +809,3 @@
   }
 }
 </style>
-
-<script>
-  // Enhanced Cart Functionality with Auto-Update
-  (function() {
-    'use strict';
-
-    const CartManager = {
-      init() {
-        this.cartForm = document.querySelector('.modern-cart-form');
-
-        this.moneyFormat = window.theme?.moneyFormat || '{{amount}}';
-        this.bindEvents();
-        this.listenForCartChanges();
-      },
-
-      bindEvents() {
-        // Use event delegation so buttons work after DOM updates/replacement
-        document.addEventListener('click', (e) => {
-          const btn = e.target.closest('[data-action]');
-          if (!btn) return;
-          const action = btn.dataset.action;
-          if (action === 'decrease') {
-            e.preventDefault();
-            this.handleDecrease(btn);
-          } else if (action === 'increase') {
-            e.preventDefault();
-            this.handleIncrease(btn);
-          } else if (action === 'remove') {
-            e.preventDefault();
-            this.handleRemove(btn);
-          }
-        });
-      },
-
-      handleDecrease(button) {
-        const btn = button;
-        const line = parseInt(btn.dataset.line);
-        let input = null;
-        const cartItem = btn.closest('[data-line-index]');
-        if (cartItem) input = cartItem.querySelector('.qty-input');
-        if (!input) input = document.querySelector(`.qty-input[data-line="${line}"]`);
-        if (!input) return;
-        const currentValue = parseInt(input.value) || 0;
-        const newValue = Math.max(0, currentValue - 1);
-        if (newValue >= 0) this.updateQuantity(line, newValue, btn);
-      },
-
-      handleIncrease(button) {
-        const btn = button;
-        const line = parseInt(btn.dataset.line);
-        let input = null;
-        const cartItem = btn.closest('[data-line-index]');
-        if (cartItem) input = cartItem.querySelector('.qty-input');
-        if (!input) input = document.querySelector(`.qty-input[data-line="${line}"]`);
-        if (!input) return;
-        const currentValue = parseInt(input.value) || 0;
-        const newValue = currentValue + 1;
-        this.updateQuantity(line, newValue, btn);
-      },
-
-      handleRemove(button) {
-        const btn = button;
-        const line = parseInt(btn.dataset.line);
-        this.updateQuantity(line, 0, btn);
-      },
-
-      updateQuantity(line, newQuantity, button) {
-        if (button) button.disabled = true;
-
-        fetch('/cart/change.js', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            line: line,
-            quantity: newQuantity
-          })
-        })
-        .then(response => response.json())
-        .then(cart => {
-          if (newQuantity === 0) {
-            this.removeCartItem(line, cart);
-          } else {
-            this.updateCartDisplay(cart);
-          }
-        })
-        .catch(error => {
-          console.error('Cart update error:', error);
-          this.showError(line, 'Unable to update quantity');
-        })
-        .finally(() => {
-          if (button) button.disabled = false;
-        });
-      },
-
-      removeCartItem(line, cart) {
-        const cartItem = document.querySelector(`[data-line-index="${line - 1}"]`);
-        if (cartItem) {
-          cartItem.style.opacity = '0';
-          cartItem.style.transform = 'translateX(-20px)';
-          
-          setTimeout(() => {
-            cartItem.remove();
-            this.updateCartDisplay(cart);
-          }, 250);
-        } else {
-          this.updateCartDisplay(cart);
-        }
-      },
-
-      updateCartDisplay(cart) {
-        // Update cart count in all possible locations
-        const cartCountSelectors = [
-          '[ref="cartItemCount"]',
-          '.cart-count',
-          '.cart-item-count',
-          '[data-cart-count]',
-          '#cart-count',
-          '.cart-drawer__count',
-          '[data-cart-item-count]'
-        ];
-        
-        cartCountSelectors.forEach(selector => {
-          const elements = document.querySelectorAll(selector);
-          elements.forEach(el => {
-            el.textContent = cart.item_count;
-            el.setAttribute('data-count', cart.item_count);
-          });
-        });
-
-        // Update each cart item
-        cart.items.forEach((item, index) => {
-          const cartItem = document.querySelector(`[data-line-index="${index}"]`);
-          
-          if (cartItem) {
-            const qtyInput = cartItem.querySelector('.qty-input');
-            if (qtyInput) {
-              qtyInput.value = item.quantity;
-            }
-
-            const lineTotal = cartItem.querySelector('.cart-item__line-total');
-            if (lineTotal) {
-              lineTotal.innerHTML = this.formatMoney(item.final_line_price);
-            }
-
-            const price = cartItem.querySelector('.cart-item__price-main');
-            if (price) {
-              price.innerHTML = this.formatMoney(item.final_line_price);
-            }
-          }
-        });
-
-        // Dispatch custom event for other scripts
-        document.dispatchEvent(new CustomEvent('cart:updated', { 
-          detail: cart,
-          bubbles: true 
-        }));
-        
-        // Show empty state if no items
-        if (cart.item_count === 0) {
-          this.showEmptyCart();
-        }
-      },
-
-      showEmptyCart() {
-        const cartWrapper = document.querySelector('.modern-cart-wrapper');
-        if (!cartWrapper) return;
-        
-        const cartForm = cartWrapper.querySelector('.modern-cart-form');
-        if (cartForm) {
-          cartForm.style.opacity = '0';
-          cartForm.style.transform = 'translateY(-10px)';
-          
-          setTimeout(() => {
-            cartWrapper.innerHTML = `
-              <div class="cart-empty-state">
-                <div class="cart-empty-backdrop"></div>
-                <div class="cart-empty-icon-wrapper">
-                  <div class="cart-empty-icon-circle">
-                    <svg width="52" height="52" viewBox="0 0 48 48" fill="none" class="cart-empty-icon-svg">
-                      <path d="M8 16L6 20V38C6 39.1 6.9 40 8 40H40C41.1 40 42 39.1 42 38V20L40 16H8Z" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                      <path d="M16 16V10C16 7.8 17.8 6 20 6H28C30.2 6 32 7.8 32 10V16" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                      <circle cx="24" cy="28" r="1.2" fill="currentColor"/>
-                    </svg>
-                  </div>
-                </div>
-                <div class="cart-empty-content">
-                  <h1 class="cart-empty-heading">Your cart is empty</h1>
-                  <p class="cart-empty-text">Discover beautiful items and start building your collection today.</p>
-                  <div class="cart-empty-actions">
-                    <a class="cart-empty-button cart-empty-button--primary" href="/collections/all">Continue Shopping</a>
-                    <a class="cart-empty-button cart-empty-button--secondary" href="/">Return Home</a>
-                  </div>
-                </div>
-                <div class="cart-empty-decoration">
-                  <div class="cart-empty-decoration-item cart-empty-decoration-item--1"></div>
-                  <div class="cart-empty-decoration-item cart-empty-decoration-item--2"></div>
-                  <div class="cart-empty-decoration-item cart-empty-decoration-item--3"></div>
-                </div>
-              </div>
-            `;
-          }, 250);
-        }
-      },
-
-      showError(line, message) {
-        const errorEl = document.querySelector(`[data-error="${line}"]`);
-        if (errorEl) {
-          const textEl = errorEl.querySelector('.cart-item__error-text');
-          if (textEl) textEl.textContent = message;
-          errorEl.classList.remove('hidden');
-          setTimeout(() => errorEl.classList.add('hidden'), 3500);
-        }
-      },
-
-      formatMoney(cents) {
-        const amount = (cents / 100).toFixed(2);
-        const symbol = `<span class="dirham-symbol" aria-hidden="true">&#xE000;</span>`;
-        if (typeof Shopify !== 'undefined' && Shopify.formatMoney) {
-          const raw = Shopify.formatMoney(cents, '{{amount}}');
-          return symbol + raw;
-        }
-        return symbol + amount;
-      },
-
-      // Listen for cart changes from other sources (e.g., add to cart)
-      listenForCartChanges() {
-        // Listen for theme's cart update events
-        document.addEventListener('cart:refresh', () => {
-          this.refreshCart();
-        });
-
-        // Listen for Shopify's built-in events
-        document.addEventListener('cart.requestComplete', (event) => {
-          if (event.detail?.cart) {
-            this.updateCartDisplay(event.detail.cart);
-          } else {
-            this.refreshCart();
-          }
-        });
-
-        // Listen for theme cart update events (dispatched by ProductFormComponent and others)
-        document.addEventListener('cart:update', (event) => {
-          try {
-            const resource = event?.detail?.resource || event?.detail?.data || event?.detail || null;
-            if (resource && resource.items) {
-              this.updateCartDisplay(resource);
-            } else if (event?.detail?.resource) {
-              this.updateCartDisplay(event.detail.resource);
-            } else {
-              // fallback to fetching full cart when resource not provided
-              this.refreshCart();
-            }
-          } catch (err) {
-            this.refreshCart();
-          }
-        });
-
-        // Additional listeners to catch add-to-cart actions across themes
-        // Catch form submits that post to /cart/add
-        document.addEventListener('submit', (e) => {
-          try {
-            const form = e.target;
-            if (form && form.action && form.action.indexOf('/cart/add') !== -1) {
-              // Give the theme's own handlers a chance to run, then refresh
-              setTimeout(() => this.refreshCart(), 400);
-            }
-          } catch (err) {
-            // ignore
-          }
-        }, true);
-
-        // Catch clicks on elements that may trigger AJAX add-to-cart
-        document.addEventListener('click', (e) => {
-          try {
-            const btn = e.target.closest('[data-add-to-cart], [data-action="add-to-cart"], .add-to-cart, button.add-to-cart');
-            if (btn) {
-              setTimeout(() => this.refreshCart(), 400);
-            }
-          } catch (err) {
-            // ignore
-          }
-        });
-
-        // Monkey-patch fetch to detect network calls to /cart/add.js and ensure a refresh
-        if (typeof window.fetch === 'function' && !window.__cart_manager_fetch_hooked) {
-          window.__cart_manager_fetch_hooked = true;
-          const _fetch = window.fetch.bind(window);
-          window.fetch = function(input, init) {
-            const url = (typeof input === 'string') ? input : (input && input.url) ? input.url : '';
-            const result = _fetch(input, init);
-            try {
-              if (url && (url.indexOf('/cart/add') !== -1 || url.indexOf('/cart.js') !== -1 || url.indexOf('/cart/change') !== -1)) {
-                result.then(() => {
-                  setTimeout(() => {
-                    try { CartManager.refreshCart(); } catch (e) {}
-                  }, 80);
-                }).catch(()=>{});
-              }
-            } catch (err) {
-              // ignore
-            }
-            return result;
-          };
-        }
-      },
-
-      // Refresh cart from server
-      refreshCart() {
-        fetch('/cart.js')
-          .then(response => response.json())
-          .then(cart => {
-            this.updateCartDisplay(cart);
-          })
-          .catch(error => {
-            console.error('Cart refresh error:', error);
-          });
-      }
-    };
-
-    // Initialize when DOM is ready
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => CartManager.init());
-    } else {
-      CartManager.init();
-    }
-
-    // Expose CartManager globally for manual refresh
-    window.CartManager = CartManager;
-  })();
-</script>

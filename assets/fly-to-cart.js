@@ -41,8 +41,25 @@ class FlyToCart extends HTMLElement {
     this.style.setProperty('--travel-x', `${endPoint.x - startPoint.x}px`);
     this.style.setProperty('--travel-y', `${endPoint.y - startPoint.y}px`);
     await Promise.allSettled(this.getAnimations().map((a) => a.finished));
+    this.#pulseDestination();
     this.remove();
   };
+
+  /**
+   * Gives the destination (the cart icon) a quick "impact" pulse timed to the moment
+   * the flying item actually lands, instead of leaving it static once the animation ends.
+   */
+  #pulseDestination() {
+    if (!(this.destination instanceof HTMLElement)) return;
+
+    const destination = this.destination;
+    destination.classList.add('fly-to-cart-impact');
+    destination.addEventListener(
+      'animationend',
+      () => destination.classList.remove('fly-to-cart-impact'),
+      { once: true }
+    );
+  }
 }
 
 if (!customElements.get('fly-to-cart')) {
