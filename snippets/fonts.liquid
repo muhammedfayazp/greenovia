@@ -1,4 +1,37 @@
 {% # theme-check-disable %}
+{%- comment -%}
+  Custom Google Fonts (Playfair Display, Inter, Montserrat, Outfit) used by
+  assets/greenovia.css and snippets/cart-products.liquid. These previously used
+  @import inside those stylesheets, which is render-blocking and, for the
+  cart-products.liquid copy, loaded from a <style> tag in the body rather than
+  <head> — the page painted with fallback fonts first and visibly re-flowed once
+  the fonts arrived. Loading one combined, deduplicated request here with the
+  standard "preload as style, swap to stylesheet on load" pattern lets the
+  fonts fetch in parallel with everything else without blocking first paint.
+{%- endcomment -%}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link
+  rel="preconnect"
+  href="https://fonts.gstatic.com"
+  crossorigin
+>
+<link
+  rel="preload"
+  as="style"
+  href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+>
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+  media="print"
+  onload="this.media='all'"
+>
+<noscript>
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+  >
+</noscript>
 {%- unless settings.type_body_font.system? -%}
   <link
     rel="preload"
