@@ -71,6 +71,10 @@
     // Button to remove all applied product filters
     "clear_all": "Clear all",
     "close": "Close",
+    // Button to copy a loyalty reward's discount code to the clipboard
+    "copy_code": "Copy",
+    // Shown briefly on the copy-code button after a successful copy
+    "code_copied": "Copied!",
     "open": "Open",
     // Continue shopping link on the cart page which takes the user back to a collection page
     "continue_shopping": "Continue shopping",

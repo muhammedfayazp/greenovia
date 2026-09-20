@@ -80,6 +80,27 @@
             {{ 'content.account_profile' | t }}
           </a>
         </li>
+        {%- comment -%}
+          Only shows once a Page using the "page.loyalty" template exists with the handle
+          "loyalty" (Online Store → Pages → create a page, set its handle to "loyalty", and
+          assign it the "loyalty" template) — avoids linking to a page that doesn't exist yet.
+        {%- endcomment -%}
+        {%- if pages['loyalty'] -%}
+          <li class="account-actions__list-item">
+            <a
+              href="{{ pages['loyalty'].url }}"
+              class="account-actions__link button-secondary"
+            >
+              <span
+                class="account-actions__icon"
+                aria-hidden="true"
+              >
+                {{- 'icon-checkmark-burst.svg' | inline_asset_content -}}
+              </span>
+              Rewards
+            </a>
+          </li>
+        {%- endif -%}
       </ul>
     </nav>
   </div>
@@ -186,7 +207,7 @@
 
   .account-actions__list {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
     gap: 0.625rem;
     width: 100%;
     list-style: none;

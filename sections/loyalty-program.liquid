@@ -1,0 +1,565 @@
+{%- doc -%}
+  Renders a customer-facing loyalty/rewards page: current points balance, progress toward the
+  next reward tier, and the list of reward tiers with their discount codes.
+
+  Points themselves are stored in the `customer.metafields.custom.loyalty_points` metafield.
+  This section only ever *reads* that value — a theme can't securely award or deduct points on
+  its own (that would require exposing Admin API credentials in the browser). Points are
+  expected to be awarded by a Shopify Flow workflow (e.g. "when an order is paid, increase
+  loyalty_points by the order total") configured in the Shopify admin.
+
+  Each tier's discount code is intentionally the same code for every customer who reaches that
+  tier — this only works safely because the code is created in Shopify admin with "Limit to one
+  use per customer" enabled, which Shopify enforces at checkout regardless of how many people
+  see the code.
+{%- enddoc -%}
+
+{%- liquid
+  assign points = 0
+  if customer
+    assign points = customer.metafields.custom.loyalty_points.value | default: 0
+  endif
+
+  assign tiers = section.blocks | where: 'type', 'tier'
+  assign sorted_tiers = tiers | sort: 'settings.threshold'
+
+  assign next_tier = null
+  for tier in sorted_tiers
+    if tier.settings.threshold > points and next_tier == null
+      assign next_tier = tier
+    endif
+  endfor
+-%}
+
+<div class="loyalty-page color-{{ section.settings.color_scheme }}">
+  <div class="loyalty-hero">
+    <p class="loyalty-hero__label">{{ section.settings.eyebrow | default: 'Greenovia Rewards' }}</p>
+    <h1 class="loyalty-hero__heading">{{ section.settings.heading | default: 'Earn points. Grow your rewards.' }}</h1>
+    <p class="loyalty-hero__text">
+      {{ section.settings.subheading | default: 'Earn points on every order and redeem them for discounts on your next purchase.' }}
+    </p>
+    {%- if section.settings.points_per_currency > 0 -%}
+      <p class="loyalty-hero__rate">
+        <span class="svg-wrapper">{{- 'icon-checkmark.svg' | inline_asset_content -}}</span>
+        Earn {{ section.settings.points_per_currency }} point{% if section.settings.points_per_currency != 1 %}s{% endif %}
+        for every <span class="dirham-symbol" aria-hidden="true">&#xE000;</span>1 you spend
+      </p>
+    {%- endif -%}
+  </div>
+
+  {%- if customer -%}
+    <div class="loyalty-balance">
+      <div class="loyalty-balance__card">
+        <span class="loyalty-balance__label">Your balance</span>
+        <span class="loyalty-balance__value">{{ points }}</span>
+        <span class="loyalty-balance__unit">{{ section.settings.points_label | default: 'points' }}</span>
+      </div>
+
+      {%- if next_tier -%}
+        {%- liquid
+          assign remaining = next_tier.settings.threshold | minus: points
+          assign progress = points | times: 100.0 | divided_by: next_tier.settings.threshold
+          if progress > 100
+            assign progress = 100
+          endif
+        -%}
+        <div class="loyalty-progress">
+          <div class="loyalty-progress__track">
+            <div class="loyalty-progress__fill" style="width: {{ progress }}%;"></div>
+          </div>
+          <p class="loyalty-progress__text">
+            {{ remaining }} more point{% if remaining != 1 %}s{% endif %} to unlock
+            <strong>{{ next_tier.settings.title }}</strong>
+          </p>
+        </div>
+      {%- elsif sorted_tiers.size > 0 -%}
+        <p class="loyalty-progress__text loyalty-progress__text--complete">
+          <span class="svg-wrapper">{{- 'icon-checkmark-burst.svg' | inline_asset_content -}}</span>
+          You've unlocked every reward tier!
+        </p>
+      {%- endif -%}
+    </div>
+  {%- else -%}
+    <div class="loyalty-signin">
+      <p>{{ section.settings.signin_text | default: 'Sign in to see your points balance and unlock rewards.' }}</p>
+      <a
+        href="{% if request.design_mode %}{{ routes.account_url }}{% else %}{{ routes.storefront_login_url }}{% endif %}"
+        class="button"
+      >
+        {{ 'actions.log_in' | t }}
+      </a>
+    </div>
+  {%- endif -%}
+
+  {%- if sorted_tiers.size > 0 -%}
+    <div class="loyalty-tiers">
+      <h2 class="loyalty-tiers__heading">{{ section.settings.tiers_heading | default: 'Reward tiers' }}</h2>
+
+      <div class="loyalty-tiers__grid">
+        {%- for tier in sorted_tiers -%}
+          {%- liquid
+            assign is_unlocked = false
+            if customer and points >= tier.settings.threshold
+              assign is_unlocked = true
+            endif
+          -%}
+          <div
+            class="loyalty-tier{% if is_unlocked %} loyalty-tier--unlocked{% endif %}"
+            {{ tier.shopify_attributes }}
+          >
+            <div class="loyalty-tier__icon">
+              {%- if is_unlocked -%}
+                {{- 'icon-checkmark.svg' | inline_asset_content -}}
+              {%- else -%}
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="5" y="11" width="14" height="10" rx="2"/>
+                  <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+                </svg>
+              {%- endif -%}
+            </div>
+
+            <p class="loyalty-tier__threshold">{{ tier.settings.threshold }} {{ section.settings.points_label | default: 'points' }}</p>
+            <h3 class="loyalty-tier__title">{{ tier.settings.title }}</h3>
+            {%- if tier.settings.description != blank -%}
+              <p class="loyalty-tier__description">{{ tier.settings.description }}</p>
+            {%- endif -%}
+
+            {%- if tier.settings.discount_code != blank -%}
+              {%- if is_unlocked -%}
+                <div class="loyalty-tier__code" data-loyalty-code>
+                  <span class="loyalty-tier__code-value">{{ tier.settings.discount_code }}</span>
+                  <button
+                    type="button"
+                    class="loyalty-tier__copy"
+                    data-copy-code="{{ tier.settings.discount_code }}"
+                    data-copy-label="{{ 'actions.copy_code' | t }}"
+                    data-copied-label="{{ 'actions.code_copied' | t }}"
+                  >
+                    {{ 'actions.copy_code' | t }}
+                  </button>
+                </div>
+              {%- else -%}
+                <p class="loyalty-tier__locked">
+                  {%- if customer -%}
+                    {{ tier.settings.threshold | minus: points }} {{ section.settings.points_label | default: 'points' }} to unlock
+                  {%- else -%}
+                    Sign in to track progress
+                  {%- endif -%}
+                </p>
+              {%- endif -%}
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  {%- endif -%}
+</div>
+
+<script src="{{ 'loyalty-program.js' | asset_url }}" type="module" fetchpriority="low"></script>
+
+{% stylesheet %}
+  .loyalty-page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: var(--padding-2xl, 3rem) var(--padding-md, 1.25rem) var(--padding-3xl, 4rem);
+  }
+
+  .loyalty-hero {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .loyalty-hero__label {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: #5A7C3E;
+    margin: 0 0 0.5rem;
+  }
+
+  .loyalty-hero__heading {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 700;
+    color: #1f3d2b;
+    margin: 0 0 0.75rem;
+    letter-spacing: -0.02em;
+  }
+
+  .loyalty-hero__text {
+    color: #5a5a5a;
+    max-width: 520px;
+    margin: 0 auto 1rem;
+    line-height: 1.6;
+  }
+
+  .loyalty-hero__rate {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #f0f7eb;
+    border: 1px solid #d4e8c4;
+    color: #1f3d2b;
+    font-weight: 600;
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    margin: 0;
+  }
+
+  .loyalty-hero__rate .svg-wrapper {
+    width: 16px;
+    height: 16px;
+    color: #1a5c3a;
+    flex-shrink: 0;
+  }
+
+  /* Balance card */
+  .loyalty-balance {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 3rem;
+  }
+
+  .loyalty-balance__card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: linear-gradient(135deg, #1a5c3a 0%, #0d3d26 100%);
+    color: #fff;
+    border-radius: 16px;
+    padding: 1.75rem 3rem;
+    box-shadow: 0 10px 30px rgba(26, 92, 58, 0.2);
+  }
+
+  .loyalty-balance__label {
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    opacity: 0.85;
+  }
+
+  .loyalty-balance__value {
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  .loyalty-balance__unit {
+    font-size: 0.875rem;
+    opacity: 0.85;
+  }
+
+  .loyalty-progress {
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .loyalty-progress__track {
+    width: 100%;
+    height: 8px;
+    background: #eef3ea;
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .loyalty-progress__fill {
+    height: 100%;
+    background: linear-gradient(90deg, #5A7C3E, #1a5c3a);
+    border-radius: 999px;
+    transition: width 0.4s ease;
+  }
+
+  .loyalty-progress__text {
+    text-align: center;
+    font-size: 0.875rem;
+    color: #5a5a5a;
+    margin: 0.625rem 0 0;
+  }
+
+  .loyalty-progress__text--complete {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    color: #1a5c3a;
+    font-weight: 600;
+  }
+
+  .loyalty-progress__text--complete .svg-wrapper {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Signed-out state */
+  .loyalty-signin {
+    text-align: center;
+    background: #f6faf2;
+    border: 1px solid #e8f0e0;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .loyalty-signin p {
+    margin: 0 0 1rem;
+    color: #3a3a3a;
+  }
+
+  /* Tiers */
+  .loyalty-tiers__heading {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f3d2b;
+    margin: 0 0 1.5rem;
+  }
+
+  .loyalty-tiers__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .loyalty-tier {
+    border: 1.5px solid #e8eaed;
+    border-radius: 14px;
+    padding: 1.5rem;
+    text-align: center;
+    background: #fff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .loyalty-tier--unlocked {
+    border-color: #1a5c3a;
+    box-shadow: 0 6px 20px rgba(26, 92, 58, 0.12);
+  }
+
+  .loyalty-tier__icon {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto 0.875rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #f0f0f0;
+    color: #999;
+  }
+
+  .loyalty-tier--unlocked .loyalty-tier__icon {
+    background: #e6f2eb;
+    color: #1a5c3a;
+  }
+
+  .loyalty-tier__icon svg,
+  .loyalty-tier__icon .svg-wrapper {
+    width: 20px;
+    height: 20px;
+  }
+
+  .loyalty-tier__threshold {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #5A7C3E;
+    margin: 0 0 0.375rem;
+  }
+
+  .loyalty-tier__title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1f3d2b;
+    margin: 0 0 0.375rem;
+  }
+
+  .loyalty-tier__description {
+    font-size: 0.875rem;
+    color: #5a5a5a;
+    margin: 0 0 1rem;
+    line-height: 1.5;
+  }
+
+  .loyalty-tier__code {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    background: #f6faf2;
+    border: 1.5px dashed #5A7C3E;
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .loyalty-tier__code-value {
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #1f3d2b;
+    font-family: monospace;
+  }
+
+  .loyalty-tier__copy {
+    background: #1f3d2b;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.18s ease;
+    flex-shrink: 0;
+  }
+
+  .loyalty-tier__copy:hover {
+    background: #2D5016;
+  }
+
+  .loyalty-tier__copy.is-copied {
+    background: #5A7C3E;
+  }
+
+  .loyalty-tier__locked {
+    font-size: 0.8125rem;
+    color: #999;
+    margin: 0;
+  }
+
+  @media screen and (max-width: 480px) {
+    .loyalty-balance__card {
+      padding: 1.5rem 2rem;
+    }
+
+    .loyalty-balance__value {
+      font-size: 2.25rem;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Loyalty program",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text",
+      "default": "Greenovia Rewards"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Earn points. Grow your rewards."
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Earn points on every order and redeem them for discounts on your next purchase."
+    },
+    {
+      "type": "text",
+      "id": "points_label",
+      "label": "Points label",
+      "default": "points"
+    },
+    {
+      "type": "number",
+      "id": "points_per_currency",
+      "label": "Points earned per currency unit spent",
+      "info": "Informational only — the actual awarding of points happens outside the theme (e.g. via a Shopify Flow workflow). This number just controls the text shown to customers.",
+      "default": 1
+    },
+    {
+      "type": "text",
+      "id": "signin_text",
+      "label": "Signed-out message",
+      "default": "Sign in to see your points balance and unlock rewards."
+    },
+    {
+      "type": "text",
+      "id": "tiers_heading",
+      "label": "Tiers section heading",
+      "default": "Reward tiers"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tier",
+      "name": "Reward tier",
+      "settings": [
+        {
+          "type": "number",
+          "id": "threshold",
+          "label": "Points required",
+          "default": 100
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Reward title",
+          "default": "10% off your next order"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Reward description"
+        },
+        {
+          "type": "text",
+          "id": "discount_code",
+          "label": "Discount code",
+          "info": "Create this code in Shopify admin (Discounts) with \"Limit to one use per customer\" enabled, so it can be shown to every customer who reaches this tier without being reused."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Loyalty program",
+      "blocks": [
+        {
+          "type": "tier",
+          "settings": {
+            "threshold": 100,
+            "title": "5% off your next order",
+            "description": "A little thank-you for your first 100 points.",
+            "discount_code": "LOYALTY5"
+          }
+        },
+        {
+          "type": "tier",
+          "settings": {
+            "threshold": 500,
+            "title": "10% off your next order",
+            "description": "Keep growing — you've unlocked a bigger reward.",
+            "discount_code": "LOYALTY10"
+          }
+        },
+        {
+          "type": "tier",
+          "settings": {
+            "threshold": 1000,
+            "title": "Free delivery for a month",
+            "description": "Our top tier: free delivery on every order for 30 days.",
+            "discount_code": "LOYALTYFREESHIP"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
