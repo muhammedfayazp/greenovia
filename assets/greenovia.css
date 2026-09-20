@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap");
+/* Playfair Display / Inter / Montserrat are loaded non-blocking from snippets/fonts.liquid */
 
 :root {
   --gv-primary: #2D5016;

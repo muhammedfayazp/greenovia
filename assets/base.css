@@ -2819,6 +2819,26 @@ fly-to-cart.fly-to-cart--sticky {
   }
 }
 
+/* Cart icon "impact" pulse, played the instant a flying item lands (see fly-to-cart.js) so
+   the landing feels connected to the flight instead of a static icon appearing afterwards. */
+.fly-to-cart-impact {
+  animation: fly-to-cart-impact 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes fly-to-cart-impact {
+  0% {
+    transform: scale(1);
+  }
+
+  40% {
+    transform: scale(1.25);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
 @keyframes travel-y {
   to {
     translate: 0 var(--travel-y, 0);
