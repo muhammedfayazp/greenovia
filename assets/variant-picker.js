@@ -1,7 +1,11 @@
 import { Component } from '@theme/component';
 import { VariantSelectedEvent, VariantUpdateEvent } from '@theme/events';
 import { morph } from '@theme/morph';
-import { requestYieldCallback, getViewParameterValue } from '@theme/utilities';
+import { requestYieldCallback, getViewParameterValue, FetchCache } from '@theme/utilities';
+
+// Shared across every variant-picker instance: switching back to an already-seen variant
+// (a very common back-and-forth interaction) reuses the response instead of re-fetching it.
+const sectionCache = new FetchCache();
 
 /**
  * @typedef {object} VariantPickerRefs
@@ -240,8 +244,8 @@ export default class VariantPicker extends Component {
     this.#abortController?.abort();
     this.#abortController = new AbortController();
 
-    fetch(requestUrl, { signal: this.#abortController.signal })
-      .then((response) => response.text())
+    sectionCache
+      .get(requestUrl, (signal) => fetch(requestUrl, { signal }).then((response) => response.text()), this.#abortController.signal)
       .then((responseText) => {
         this.#pendingRequestUrl = undefined;
         const html = new DOMParser().parseFromString(responseText, 'text/html');
