@@ -183,6 +183,43 @@ export function queueCartMutation(task) {
 }
 
 /**
+ * A small in-memory cache for GET requests whose response only depends on the URL and
+ * doesn't change within a page view (variant/recommendation/quick-add markup, pickup
+ * availability, etc). Repeat interactions are common for these — switching a variant back
+ * and forth, reopening quick add for the same product — and re-fetching identical HTML every
+ * time wastes a network round trip the first fetch already paid for.
+ *
+ * Failed requests are not cached, so a network error doesn't permanently poison a URL.
+ *
+ * @template T
+ */
+export class FetchCache {
+  /** @type {Map<string, Promise<T>>} */
+  #cache = new Map();
+
+  /**
+   * @param {string} url - Cache key; typically the request URL.
+   * @param {(signal: AbortSignal) => Promise<T>} fetcher - Performs the request when there's no cached entry.
+   * @param {AbortSignal} [signal] - Forwarded to `fetcher` on a cache miss.
+   * @returns {Promise<T>}
+   */
+  async get(url, fetcher, signal) {
+    const cached = this.#cache.get(url);
+    if (cached) return cached;
+
+    const request = fetcher(/** @type {AbortSignal} */ (signal));
+    this.#cache.set(url, request);
+
+    try {
+      return await request;
+    } catch (error) {
+      this.#cache.delete(url);
+      throw error;
+    }
+  }
+}
+
+/**
  * Creates a debounced function that delays calling the provided function (fn)
  * until after wait milliseconds have elapsed since the last time
  * the debounced function was invoked. The returned function has a .cancel()

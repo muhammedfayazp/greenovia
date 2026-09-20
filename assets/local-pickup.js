@@ -1,6 +1,11 @@
 import { Component } from '@theme/component';
 import { morph } from '@theme/morph';
 import { ThemeEvents, VariantUpdateEvent } from '@theme/events';
+import { FetchCache } from '@theme/utilities';
+
+// Shared across instances so switching between already-seen variants (or revisiting a
+// product) reuses the pickup-availability markup instead of re-fetching it.
+const availabilityCache = new FetchCache();
 
 class LocalPickup extends Component {
   /** @type {AbortController | undefined} */
@@ -53,10 +58,10 @@ class LocalPickup extends Component {
     const abortController = this.#createAbortController();
 
     const url = this.dataset.productUrl;
-    fetch(`${url}?variant=${variantId}&section_id=${this.dataset.sectionId}`, {
-      signal: abortController.signal,
-    })
-      .then((response) => response.text())
+    const requestUrl = `${url}?variant=${variantId}&section_id=${this.dataset.sectionId}`;
+
+    availabilityCache
+      .get(requestUrl, (signal) => fetch(requestUrl, { signal }).then((response) => response.text()), abortController.signal)
       .then((text) => {
         if (abortController.signal.aborted) return;
 

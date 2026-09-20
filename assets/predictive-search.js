@@ -339,7 +339,9 @@ class PredictiveSearchComponent extends Component {
     url.searchParams.set('q', viewedProducts.map(/** @param {string} id */ (id) => `id:${id}`).join(' OR '));
     url.searchParams.set('resources[type]', 'product');
 
-    return sectionRenderer.getSectionHTML(this.dataset.sectionId, false, url);
+    // Cacheable: the URL already encodes the exact recently-viewed product ids, so an
+    // identical URL always means an identical result — safe to reuse across repeat opens.
+    return sectionRenderer.getSectionHTML(this.dataset.sectionId, true, url);
   }
 
   #hideResetButton() {
@@ -375,7 +377,9 @@ class PredictiveSearchComponent extends Component {
     const url = new URL(window.location.href);
     url.searchParams.delete('page');
 
-    const emptySectionMarkup = await sectionRenderer.getSectionHTML(emptySectionId, false, url);
+    // Cacheable: this fires every time the search is cleared/reopened, and returns the
+    // same "empty search" markup for the same URL each time.
+    const emptySectionMarkup = await sectionRenderer.getSectionHTML(emptySectionId, true, url);
     const parsedEmptySectionMarkup = new DOMParser()
       .parseFromString(emptySectionMarkup, 'text/html')
       .querySelector('.predictive-search-empty-section');
