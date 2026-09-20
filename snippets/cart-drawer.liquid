@@ -13,6 +13,27 @@
   type="module"
   fetchpriority="low"
 ></script>
+{%- comment -%}
+  cart-items-component (below, in both the empty and non-empty states) needs its class
+  registered for cart updates to do anything at all. snippets/cart-products.liquid also
+  loads these two scripts, but only inside its non-empty branch — when the cart starts
+  genuinely empty, that branch never renders, so those tags never reach the page and
+  cart-items-component sits there as an inert, unupgraded custom element: nothing is
+  listening, so the drawer can never update itself after the very first add-to-cart.
+  Loading them unconditionally here guarantees CartItemsComponent is always registered.
+  Module scripts are deduplicated by URL, so this is a no-op once cart-products.liquid's
+  own copies load too.
+{%- endcomment -%}
+<script
+  src="{{ 'component-cart-items.js' | asset_url }}"
+  type="module"
+  fetchpriority="low"
+></script>
+<script
+  src="{{ 'component-cart-quantity-selector.js' | asset_url }}"
+  type="module"
+  fetchpriority="low"
+></script>
 
 <cart-drawer-component
   id="CartDrawerMain"
@@ -403,9 +424,10 @@
    ========================================== */
 
 .cart-drawer__items {
-  flex: 1 1 auto; /* Take up available space */
+  flex: 0 0 auto;          /* Don't grow — size to content */
   overflow-y: auto;
   overflow-x: hidden;
+  max-height: calc(100vh - 300px); /* Scroll on large carts */
   padding: 16px;
   background: white;
 }
@@ -525,6 +547,7 @@
   
   .cart-drawer__items {
     padding: 12px;
+    max-height: calc(100vh - 260px);
   }
 }
 
