@@ -403,10 +403,9 @@
    ========================================== */
 
 .cart-drawer__items {
-  flex: 0 0 auto;          /* Don't grow — size to content */
+  flex: 1 1 auto; /* Take up available space */
   overflow-y: auto;
   overflow-x: hidden;
-  max-height: calc(100vh - 300px); /* Scroll on large carts */
   padding: 16px;
   background: white;
 }
@@ -526,7 +525,6 @@
   
   .cart-drawer__items {
     padding: 12px;
-    max-height: calc(100vh - 260px);
   }
 }
 

@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "hero_plant_slider_D3Ke6b": {
@@ -475,11 +484,6 @@
       "type": "newsletter-strip",
       "name": "Newsletter",
       "settings": {}
-    },
-    "homepage_services_gv1": {
-      "type": "homepage-services",
-      "name": "Our Services",
-      "settings": {}
     }
   },
   "order": [
@@ -490,7 +494,6 @@
     "trust_bar_gv1",
     "category_product_rows_wwMeap",
     "shop_by_category_e8ipig",
-    "homepage_services_gv1",
     "testimonials_gv1",
     "newsletter_gv1",
     "daily_deals_WpJVGc"
